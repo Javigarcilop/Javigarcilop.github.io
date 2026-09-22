@@ -227,10 +227,10 @@ function openProject(slug,noHash){
       <h3>Tecnologías</h3>
       <div class="d-tags">${p.stack.map(t=>`<button type="button" data-t="${esc(t)}">${esc(t)}</button>`).join('')}</div>
       ${links?`<div class="cta" style="margin-top:22px">${links}</div>`:''}
-      <div class="d-nav">
+      ${PROJECTS.length>1?`<div class="d-nav">
         <button type="button" data-go="${prev.slug}">${arrowL}<span><small>Anterior</small>${esc(prev.title)}</span></button>
         <button type="button" data-go="${next.slug}"><span style="text-align:right"><small>Siguiente</small>${esc(next.title)}</span>${arrow}</button>
-      </div>
+      </div>`:''}
     </div>`;
   if(!dlg.open) dlg.showModal();
   dlg.scrollTop=0;
