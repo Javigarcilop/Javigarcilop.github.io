@@ -14,9 +14,14 @@ const PROJECTS = [
     highlights:[
       'Frontend en Angular 19 y API en PHP con base de datos MySQL.',
       'Entorno de desarrollo completo con docker-compose: backend, MySQL y phpMyAdmin.',
-      'Proyecto propio para practicar producto de principio a fin.'
+      'Proyecto propio para practicar producto de principio a fin.',
+      'La demo online usa un backend simulado en el navegador: los datos son de ejemplo y no se envía ningún correo real.'
     ],
-    stack:['Angular','PHP','MySQL','Docker']
+    stack:['Angular','PHP','MySQL','Docker'],
+    links:[
+      { label:'Ver demo', url:'https://javigarcilop.github.io/TempliMail/' },
+      { label:'Ver código en GitHub', url:'https://github.com/Javigarcilop/TempliMail' }
+    ]
   },
   {
     slug:'generador-especificaciones', title:'Generador de especificaciones de producto', short:'Generador de specs', type:'Herramienta con IA', context:'Proyecto personal',
