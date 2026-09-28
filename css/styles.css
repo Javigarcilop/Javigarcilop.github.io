@@ -122,6 +122,7 @@ h2.h{font-size:clamp(30px,4vw,44px);line-height:1.08;letter-spacing:-.025em;colo
 .status{display:inline-flex;align-items:center;gap:7px;font-size:13px;font-weight:500;color:var(--muted)}
 .status i{width:8px;height:8px;border-radius:50%;background:var(--blue);display:inline-block}
 .status.ok i{background:var(--ok)}
+.demo-pill{margin-left:6px;padding:2px 9px;border-radius:999px;font-size:12px;font-weight:600;color:var(--blue-text);background:color-mix(in srgb,var(--blue) 12%,transparent)}
 .card h3{font-size:22px;line-height:1.2;letter-spacing:-.015em;color:var(--ink);font-weight:700}
 .card .meta{font-size:14px;color:var(--muted)}
 .card p.sum{font-size:15px;color:var(--text);display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}

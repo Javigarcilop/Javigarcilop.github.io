@@ -60,7 +60,7 @@ function renderGrid(){
     const tags=p.stack.slice(0,4).map(t=>`<span class="tag">${esc(t)}</span>`).join('')+(p.stack.length>4?`<span class="tag">+${p.stack.length-4}</span>`:'');
     b.innerHTML=`<span class="art">${cover(p,320,150)}</span>
       <span class="body">
-        <span class="status ${p.ok?'ok':''}"><i></i>${esc(p.status)}</span>
+        <span class="status ${p.ok?'ok':''}"><i></i>${esc(p.status)}${(p.links||[]).some(l=>/demo/i.test(l.label))?'<span class="demo-pill">Demo disponible</span>':''}</span>
         <h3>${esc(p.title)}</h3>
         <span class="meta">${esc(p.type)} · ${esc(p.context)}</span>
         <p class="sum">${esc(p.summary)}</p>
