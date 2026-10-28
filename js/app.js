@@ -613,9 +613,83 @@ addEventListener('resize',()=>{if(labPos>=0)moveLabPacket(LAB.scenarios[labSc].s
 setLabScenario(0);
 inspectLab(2,false);
 
-/* ---------- aparición al hacer scroll ---------- */
+/* ---------- experiencia: entrada, titulares, hilo del recorrido y profundidad ---------- */
+const calm=matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* El texto visible se parte en piezas animables; el accesible queda entero en aria-label. */
+function splitText(el,unit){
+  const text=el.textContent.trim();
+  el.setAttribute('aria-label',text);
+  let k=0;
+  el.innerHTML=text.split(' ').map(w=>{
+    const inner=unit==='char'?[...w].map(c=>`<span class="ch" style="--i:${k++}">${esc(c)}</span>`).join(''):`<span class="wd-in" style="--i:${k++}">${esc(w)}</span>`;
+    return `<span class="wd" aria-hidden="true">${inner}</span>`;
+  }).join(' ');
+}
+splitText($('h1.title'),'char');
+$$('h2.h, .path-title, .contact h2').forEach(h=>splitText(h,'word'));
+document.documentElement.classList.add('intro');
+
+$$('.reveal').forEach(s=>{
+  $$(':scope :is(.sec-head > div > *, .wrap > :not(.sec-head, .path-head, .contact), .contact > *, .path-head > *)',s)
+    .filter(el=>!el.hasAttribute('aria-label')||!el.querySelector('.wd'))
+    .forEach((el,i)=>{
+      el.classList.add('rv');el.style.setProperty('--rv',i);
+      el.addEventListener('transitionend',function done(e){
+        if(e.target!==el||e.propertyName!=='opacity')return;
+        el.classList.remove('rv');el.style.removeProperty('--rv');el.removeEventListener('transitionend',done);
+      });
+    });
+});
 const revealIO=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');revealIO.unobserve(e.target)}}),{threshold:.12});
 $$('.reveal').forEach(el=>revealIO.observe(el));
+
+const rail=$('#rail'),railFill=$('#railFill');
+const railSecs=$$('main > section[id]'),railNames={inicio:'Inicio',camino:'El camino'};
+railSecs.forEach((s,i)=>{
+  const b=document.createElement('button');
+  b.type='button';b.tabIndex=-1;b.className='rail-dot';
+  b.style.setProperty('--y',i/(railSecs.length-1));
+  const name=railNames[s.id]||$(`nav.main a[href="#${s.id}"]`)?.textContent||s.id;
+  b.innerHTML=`<span class="rail-label">${esc(name)}</span>`;
+  b.onclick=()=>s.scrollIntoView({behavior:calm?'auto':'smooth'});
+  rail.appendChild(b);
+});
+const railDots=$$('.rail-dot',rail),mapbox=$('.mapbox'),hero=$('.hero');
+let scrollQueued=false;
+function onScrollFrame(){
+  scrollQueued=false;
+  const mid=innerHeight*.5;
+  let pos=0;
+  railSecs.forEach((s,i)=>{
+    const r=s.getBoundingClientRect();
+    if(r.top<=mid)pos=i+Math.min(1,Math.max(0,(mid-r.top)/r.height))*(i<railSecs.length-1?1:0);
+  });
+  const atEnd=innerHeight+scrollY>=document.documentElement.scrollHeight-4;
+  if(atEnd)pos=railSecs.length-1;
+  railFill.style.transform=`scaleY(${pos/(railSecs.length-1)})`;
+  railDots.forEach((d,i)=>{d.classList.toggle('on',i<=Math.floor(pos+.001));d.classList.toggle('now',i===Math.min(railSecs.length-1,Math.floor(pos+.001)))});
+  rail.classList.toggle('show',scrollY>innerHeight*.35);
+  if(!calm&&scrollY<hero.offsetHeight){
+    const k=scrollY/hero.offsetHeight;
+    mapbox.style.transform=`translate3d(0,${scrollY*.18}px,0) scale(${1-k*.06})`;
+    mapbox.style.opacity=String(1-k*.7);
+  }
+}
+addEventListener('scroll',()=>{if(!scrollQueued){scrollQueued=true;requestAnimationFrame(onScrollFrame)}},{passive:true});
+addEventListener('resize',onScrollFrame,{passive:true});
+onScrollFrame();
+
+/* Foco de luz que sigue al puntero sobre las superficies interactivas */
+if(!calm&&matchMedia('(hover: hover)').matches){
+  document.addEventListener('pointermove',e=>{
+    const el=e.target.closest?.('.card, .think-panel, .journey-card, .stack-detail');
+    if(!el)return;
+    const r=el.getBoundingClientRect();
+    el.style.setProperty('--mx',(e.clientX-r.left)+'px');
+    el.style.setProperty('--my',(e.clientY-r.top)+'px');
+  },{passive:true});
+}
 
 /* ---------- arranque ---------- */
 renderCats();renderGrid();renderStack();buildMap();

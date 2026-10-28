@@ -20,6 +20,7 @@
 </head>
 <body>
 <div id="progress" aria-hidden="true"></div>
+<div class="rail" id="rail" aria-hidden="true"><span class="rail-track"><span class="rail-fill" id="railFill"></span></span></div>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
   <symbol id="mono" viewBox="0 0 144 144">
@@ -57,7 +58,7 @@
 <main>
 <section class="hero" id="inicio">
   <div class="wrap">
-    <div>
+    <div class="hero-copy">
       <p class="eyebrow">Full Stack · Backend · Integraciones · IA aplicada</p>
       <h1 class="title">Javier García</h1>
       <p class="role">Desarrollo software con visión de producto.<span class="cursor" aria-hidden="true"></span></p>
@@ -80,7 +81,7 @@
   </div>
 </section>
 
-<section class="path-band" aria-labelledby="pathTitle">
+<section class="path-band reveal" id="camino" aria-labelledby="pathTitle">
   <div class="wrap">
     <div class="path-head">
       <p class="eyebrow">El camino que suma</p>

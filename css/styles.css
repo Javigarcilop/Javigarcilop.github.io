@@ -135,9 +135,47 @@ section{padding:72px 0}
 h2.h{font-size:clamp(30px,4vw,44px);line-height:1.08;letter-spacing:-.025em;color:var(--ink);font-weight:700}
 .sub{color:var(--muted);max-width:52ch;margin-top:10px}
 
-/* aparición al hacer scroll */
-.js .reveal{opacity:0;transform:translateY(22px);transition:opacity .5s cubic-bezier(.2,.8,.2,1),transform .5s cubic-bezier(.2,.8,.2,1)}
-.js .reveal.in{opacity:1;transform:none}
+/* experiencia: sistema de movimiento */
+:root{--ease-out:cubic-bezier(.2,.8,.2,1)}
+.js .rv{opacity:0;transform:translateY(28px);transition:opacity .8s var(--ease-out),transform .8s var(--ease-out);transition-delay:calc(var(--rv) * 90ms + 120ms)}
+.js .in .rv{opacity:1;transform:none}
+.wd{display:inline-block;overflow:clip;padding-bottom:.1em;margin-bottom:-.1em;vertical-align:top}
+.js .reveal .wd-in{display:inline-block;transform:translateY(110%);transition:transform .9s var(--ease-out);transition-delay:calc(var(--i) * 55ms + 60ms)}
+.js .reveal.in .wd-in{transform:none}
+.js:not(.intro) h1.title{opacity:0}
+h1.title .wd{padding-top:.12em;margin-top:-.12em}
+h1.title .ch{display:inline-block}
+.js.intro h1.title .ch{animation:chIn 1s var(--ease-out) both;animation-delay:calc(var(--i) * 45ms + .15s)}
+@keyframes chIn{from{opacity:0;transform:translateY(105%) rotate(8deg)}}
+.js .hero-copy > :not(h1){animation:heroIn .9s var(--ease-out) both}
+.js .hero-copy > :nth-child(1){animation-delay:.05s}
+.js .hero-copy > :nth-child(3){animation-delay:.6s}
+.js .hero-copy > :nth-child(4){animation-delay:.75s}
+.js .hero-copy > :nth-child(5){animation-delay:.88s}
+.js .hero-copy > :nth-child(6){animation-delay:1s}
+.js header.top{animation:headIn .7s var(--ease-out) both}
+@keyframes heroIn{from{opacity:0;transform:translateY(18px)}}
+@keyframes headIn{from{opacity:0;transform:translateY(-100%)}}
+.mapbox{will-change:transform}
+
+/* hilo del recorrido */
+.rail{display:none;position:fixed;z-index:40;left:max(14px,calc((100vw - 1180px) / 2 - 56px));top:50%;width:20px;height:min(56vh,440px);opacity:0;transform:translate(-10px,-50%);pointer-events:none;transition:opacity .5s,transform .5s var(--ease-out)}
+@media (min-width:1320px){.rail{display:block}}
+.rail.show{opacity:1;transform:translate(0,-50%);pointer-events:auto}
+.rail-track{position:absolute;left:9px;top:0;bottom:0;width:2px;border-radius:2px;background:var(--sky);overflow:hidden}
+.rail-fill{position:absolute;inset:0;background:linear-gradient(180deg,var(--blue),var(--cyan));transform-origin:top;transform:scaleY(0);transition:transform .2s linear}
+.rail-dot{position:absolute;left:0;top:calc(var(--y) * 100%);width:20px;height:20px;margin-top:-10px;padding:0;border:0;background:none;display:grid;place-items:center}
+.rail-dot::before{content:"";width:10px;height:10px;border-radius:50%;border:2px solid var(--sky);background:var(--bg);transition:background .3s,border-color .3s,transform .3s var(--ease-out),box-shadow .3s}
+.rail-dot.on::before{border-color:var(--blue);background:var(--blue)}
+.rail-dot.now::before{transform:scale(1.4);box-shadow:0 0 0 5px var(--glow1)}
+.rail-dot:last-child.now::before{border-color:var(--cyan);background:var(--cyan);box-shadow:0 0 0 5px var(--glow2)}
+.rail-label{position:absolute;left:30px;white-space:nowrap;font-size:13px;font-weight:600;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:3px 10px;box-shadow:var(--shadow);opacity:0;transform:translateX(-6px);transition:opacity .2s,transform .2s;pointer-events:none}
+.rail-dot:hover .rail-label{opacity:1;transform:none}
+
+/* foco de luz bajo el puntero */
+@media (hover:hover){
+  :is(.card,.think-panel,.journey-card,.stack-detail):hover{background-image:radial-gradient(380px circle at var(--mx,50%) var(--my,50%),var(--glow1),transparent 65%)}
+}
 
 /* cómo pienso */
 .think{display:grid;gap:28px}
@@ -465,4 +503,5 @@ dialog[open]{animation:pop .28s cubic-bezier(.2,.9,.3,1)}
 }
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}
+  .js .rv,.js .reveal .wd-in{opacity:1;transform:none}
 }
