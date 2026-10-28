@@ -154,16 +154,18 @@ function buildMap(){
     nodes.forEach(n=>{n.X=Math.max(44,Math.min(W-44,n.X));n.Y=Math.max(30,Math.min(H-52,n.Y))});
   }
 
-  const gE=document.createElementNS(NS,'g'),gN=document.createElementNS(NS,'g');
-  svg.append(gE,gN);
+  const gPulse=document.createElementNS(NS,'g'),gE=document.createElementNS(NS,'g'),gN=document.createElementNS(NS,'g');
+  svg.append(gPulse,gE,gN);
   const edges=links.map(([i,j])=>{
     const a=nodes[i],b=nodes[j];
     const l=document.createElementNS(NS,'line');
     l.setAttribute('class','edge');l.setAttribute('x1',a.X);l.setAttribute('y1',a.Y);l.setAttribute('x2',b.X);l.setAttribute('y2',b.Y);
-    gE.appendChild(l);return {el:l,a:a.id,b:b.id};
+    gE.appendChild(l);return {el:l,a:a.id,b:b.id,i,j};
   });
   const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
   nodes.forEach((n,k)=>{
+    n.x=n.X;n.y=n.Y;n.vx=0;n.vy=0;
+    n.freq1=.6+rnd()*.5;n.freq2=.5+rnd()*.6;n.phase1=rnd()*6.28;n.phase2=rnd()*6.28;
     const g=document.createElementNS(NS,'g');
     const isIA=n.type==='t'&&TECH[n.t]==='IA y automatización';
     g.setAttribute('class','node '+n.type+(isIA?' ia':''));
@@ -180,15 +182,88 @@ function buildMap(){
     const on=()=>highlight(n.id),off=()=>highlight(null);
     g.addEventListener('pointerenter',on);g.addEventListener('pointerleave',off);
     g.addEventListener('focus',on);g.addEventListener('blur',off);
-    const act=()=>{n.type==='p'?openProject(n.p.slug):setTech(n.t,true)};
-    g.addEventListener('click',act);
+    const act=()=>{pulseFrom(n);n.type==='p'?openProject(n.p.slug):setTech(n.t,true)};
+    if(reduce){
+      g.addEventListener('click',act);
+    }else{
+      g.style.cursor='grab';
+      let downX=0,downY=0,dragging=false,moved=false;
+      g.addEventListener('pointerdown',e=>{
+        downX=e.clientX;downY=e.clientY;dragging=true;moved=false;n.dragging=true;
+        g.setPointerCapture(e.pointerId);g.style.cursor='grabbing';g.classList.add('dragging');
+      });
+      g.addEventListener('pointermove',e=>{
+        if(!dragging)return;
+        if(Math.hypot(e.clientX-downX,e.clientY-downY)>4)moved=true;
+        const p=toSvgPoint(svg,e.clientX,e.clientY);
+        n.x=p.x;n.y=p.y;n.vx=0;n.vy=0;
+      });
+      const release=e=>{
+        if(!dragging)return;
+        dragging=false;n.dragging=false;g.style.cursor='grab';g.classList.remove('dragging');
+        if(!moved)act();
+      };
+      g.addEventListener('pointerup',release);
+      g.addEventListener('pointercancel',release);
+    }
     g.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();act()}});
   });
   MAP={svg,nodes,edges,links};
+  if(reduce){
+    requestAnimationFrame(()=>requestAnimationFrame(()=>{
+      nodes.forEach(n=>{n.el.style.transform=`translate(${n.X}px,${n.Y}px)`});
+      svg.classList.add('ready');
+    }));
+    return;
+  }
+  const mouse={x:null,y:null,active:false};
+  svg.addEventListener('pointermove',e=>{const p=toSvgPoint(svg,e.clientX,e.clientY);mouse.x=p.x;mouse.y=p.y;mouse.active=true});
+  svg.addEventListener('pointerleave',()=>mouse.active=false);
   requestAnimationFrame(()=>requestAnimationFrame(()=>{
     nodes.forEach(n=>{n.el.style.transform=`translate(${n.X}px,${n.Y}px)`});
-    setTimeout(()=>svg.classList.add('ready'),reduce?0:750);
+    setTimeout(()=>{svg.classList.add('ready');runPhysics()},750);
   }));
+  function runPhysics(){
+    let t=0;
+    (function tick(){
+      t+=.016;
+      nodes.forEach(n=>{
+        if(n.dragging)return;
+        const dxh=n.X-n.x,dyh=n.Y-n.y;
+        n.vx+=dxh*.012;n.vy+=dyh*.012;
+        n.vx+=Math.sin(t*n.freq1+n.phase1)*.0035;
+        n.vy+=Math.cos(t*n.freq2+n.phase2)*.0035;
+        if(mouse.active){
+          const dx=n.x-mouse.x,dy=n.y-mouse.y,d=Math.hypot(dx,dy)||1,radius=95;
+          if(d<radius){const f=(1-d/radius)*2.6;n.vx+=dx/d*f;n.vy+=dy/d*f}
+        }
+        n.vx*=.9;n.vy*=.9;n.x+=n.vx;n.y+=n.vy;
+      });
+      nodes.forEach(n=>{n.el.style.transform=`translate(${n.x}px,${n.y}px)`});
+      edges.forEach(e=>{const a=nodes[e.i],b=nodes[e.j];e.el.setAttribute('x1',a.x);e.el.setAttribute('y1',a.y);e.el.setAttribute('x2',b.x);e.el.setAttribute('y2',b.y)});
+      MAP.raf=requestAnimationFrame(tick);
+    })();
+  }
+  function pulseFrom(n){
+    edges.forEach(e=>{
+      if(e.a!==n.id&&e.b!==n.id)return;
+      const other=nodes[e.a===n.id?e.j:e.i];
+      const dot=document.createElementNS(NS,'circle');
+      dot.setAttribute('class','pulse-dot');dot.setAttribute('r','4');
+      const path=document.createElementNS(NS,'path');
+      path.setAttribute('d',`M${n.x} ${n.y} L${other.x} ${other.y}`);
+      const anim=document.createElementNS(NS,'animateMotion');
+      anim.setAttribute('dur','.7s');anim.setAttribute('fill','freeze');anim.setAttribute('path',path.getAttribute('d'));
+      dot.appendChild(anim);gPulse.appendChild(dot);
+      anim.beginElement?.();
+      setTimeout(()=>dot.remove(),750);
+    });
+  }
+}
+function toSvgPoint(svg,clientX,clientY){
+  const pt=svg.createSVGPoint();pt.x=clientX;pt.y=clientY;
+  const m=svg.getScreenCTM();
+  return m?pt.matrixTransform(m.inverse()):{x:0,y:0};
 }
 function highlight(id){
   if(!MAP)return;
@@ -261,13 +336,22 @@ addEventListener('scroll',()=>{
   const h=document.documentElement;
   bar.style.width=Math.min(100,(h.scrollTop/(h.scrollHeight-h.clientHeight||1))*100)+'%';
 },{passive:true});
-const secs=$$('main section[id]'),links=$$('nav.main a');
-const io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){links.forEach(a=>a.setAttribute('aria-current',String(a.getAttribute('href')==='#'+e.target.id)))}})},{rootMargin:'-45% 0px -50% 0px'});
+const secs=$$('main section[id]'),links=$$('nav.main a'),navCursor=$('#navCursor');
+function moveNavCursor(){
+  const active=links.find(a=>a.getAttribute('aria-current')==='true');
+  if(!active){navCursor.classList.remove('show');return}
+  const navBox=active.parentElement.getBoundingClientRect(),box=active.getBoundingClientRect();
+  navCursor.style.width=box.width+'px';
+  navCursor.style.transform=`translateX(${box.left-navBox.left}px)`;
+  navCursor.classList.add('show');
+}
+const io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){links.forEach(a=>a.setAttribute('aria-current',String(a.getAttribute('href')==='#'+e.target.id)))}});moveNavCursor()},{rootMargin:'-45% 0px -50% 0px'});
 secs.forEach(s=>io.observe(s));
+addEventListener('resize',moveNavCursor,{passive:true});
 function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('show');clearTimeout(toast.t);toast.t=setTimeout(()=>t.classList.remove('show'),2200)}
 $('#copy').onclick=async()=>{
-  const url='https://www.linkedin.com/in/francisco-javier-garcia-lopez';
-  try{await navigator.clipboard.writeText(url);toast('Enlace copiado')}catch(e){toast('No se pudo copiar. Abre el perfil desde el botón azul.')}
+  const email='javigarcilop@gmail.com';
+  try{await navigator.clipboard.writeText(email);toast('Email copiado')}catch(e){toast('No se pudo copiar. Escríbeme desde el botón azul.')}
 };
 
 /* ---------- arranque ---------- */

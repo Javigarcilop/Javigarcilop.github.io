@@ -41,9 +41,15 @@ header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:50;backgroun
 .top .wrap{height:var(--header-h);display:flex;align-items:center;gap:20px}
 .brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--ink);font-weight:700;letter-spacing:-.01em}
 .brand svg{width:34px;height:34px;flex:none}
-nav.main{margin-left:auto;display:flex;align-items:center;gap:4px}
-nav.main a{color:var(--muted);text-decoration:none;font-weight:500;font-size:15px;padding:8px 12px;border-radius:999px;transition:background .2s,color .2s}
-nav.main a:hover,nav.main a[aria-current="true"]{color:var(--ink);background:color-mix(in srgb,var(--blue) 12%,transparent)}
+nav.main{position:relative;margin-left:auto;display:flex;align-items:center;gap:4px}
+nav.main a{position:relative;color:var(--muted);text-decoration:none;font-weight:500;font-size:15px;padding:8px 12px;border-radius:999px;transition:color .2s;z-index:1}
+nav.main a:hover{color:var(--ink)}
+nav.main a[aria-current="true"]{color:#fff}
+.nav-cursor{position:absolute;top:0;left:0;height:100%;border-radius:999px;background:var(--blue);opacity:0;transform:translateX(0);width:0;transition:transform .35s cubic-bezier(.2,.8,.2,1),width .35s cubic-bezier(.2,.8,.2,1),opacity .2s}
+.nav-cursor.show{opacity:1}
+.btn.sm{padding:8px 14px;font-size:14px}
+.cv-btn svg{width:15px;height:15px}
+@media (max-width:900px){.cv-btn span{display:none}.cv-btn{padding:9px}}
 .icon-btn{width:40px;height:40px;border-radius:50%;border:1px solid var(--line);background:var(--surface);display:grid;place-items:center;color:var(--ink);transition:transform .2s,border-color .2s}
 .icon-btn:hover{border-color:var(--blue)}
 .icon-btn:active{transform:scale(.94)}
@@ -57,11 +63,14 @@ nav.main a:hover,nav.main a[aria-current="true"]{color:var(--ink);background:col
 .hero{position:relative;padding:56px 0 40px;overflow:hidden}
 .hero::before{content:"";position:absolute;inset:-20% -10% auto auto;width:70%;height:120%;background:radial-gradient(closest-side,var(--glow1),transparent 70%),radial-gradient(closest-side at 70% 80%,var(--glow2),transparent 70%);pointer-events:none}
 .hero .wrap{position:relative;display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:24px;align-items:center}
-h1.title{font-weight:700;font-size:clamp(44px,7vw,84px);line-height:1;letter-spacing:-.035em;color:var(--ink)}
+h1.title{font-weight:700;font-size:clamp(34px,5.4vw,60px);line-height:1.05;letter-spacing:-.03em;color:var(--ink)}
+.role{margin-top:14px;font-weight:700;font-size:clamp(20px,2.6vw,26px);letter-spacing:-.01em;color:var(--blue-text)}
 .cursor{display:inline-block;width:.32em;height:.78em;background:var(--blue);margin-left:.14em;vertical-align:-.02em;border-radius:2px;animation:blink 1.1s steps(1) infinite}
 @keyframes blink{50%{opacity:0}}
 .lead{margin-top:22px;font-size:clamp(17px,2vw,20px);color:var(--muted);max-width:34ch}
 .cta{display:flex;flex-wrap:wrap;gap:12px;margin-top:30px}
+.cta-secondary{margin-top:14px}
+.cta-secondary .btn{padding:10px 18px;font-size:14px}
 .btn{display:inline-flex;align-items:center;gap:8px;padding:13px 22px;border-radius:999px;font-weight:500;text-decoration:none;border:1px solid transparent;transition:transform .2s,box-shadow .2s,background .2s}
 .btn.primary{background:var(--blue);color:#fff}
 .btn.primary:hover{box-shadow:0 8px 22px color-mix(in srgb,var(--blue) 40%,transparent);transform:translateY(-1px)}
@@ -76,6 +85,10 @@ h1.title{font-weight:700;font-size:clamp(44px,7vw,84px);line-height:1;letter-spa
 .has-active .edge{opacity:.06!important}
 .has-active .edge.on{opacity:.9!important;stroke-width:2}
 .node{cursor:pointer;transition:opacity .25s,transform 1s cubic-bezier(.2,.8,.2,1)}
+.ready .node{transition:opacity .25s}
+.node.dragging{cursor:grabbing}
+.node.dragging circle.core,.node.dragging circle:not(.halo){stroke:var(--cyan)}
+.pulse-dot{fill:var(--cyan);filter:drop-shadow(0 0 4px var(--cyan))}
 .node text{font-family:var(--font);paint-order:stroke;stroke:var(--bg);stroke-width:4px;stroke-linejoin:round;pointer-events:none}
 .node.p text{font-size:14px;font-weight:700;fill:var(--ink)}
 .node.t text{font-size:11.5px;font-weight:500;fill:var(--muted);opacity:.85}
