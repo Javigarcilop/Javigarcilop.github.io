@@ -95,7 +95,7 @@ const JOURNEY = [
     carry:'Sistemas reales'
   },
   {
-    stage:'Product Engineering e IA', where:'Máster en Product Engineering e IA · Evolve Academy (en curso)',
+    stage:'Product Engineering e IA', where:'Máster en Product Engineering con IA · Evolve (en curso)',
     learned:'Integrar IA en productos donde aporta valor, y decidir qué construir y por qué.',
     today:'Uso la IA como una pieza más del sistema, con sus límites y su coste, al servicio del producto.',
     evidence:'El Generador de especificaciones integra Gemini de forma segura mediante una función serverless.',
@@ -105,10 +105,10 @@ const JOURNEY = [
 /* El camino resumido: cada etapa suma algo a la anterior */
 const PATH = {
   steps:[
-    {name:'Marketing', adds:'Entender al usuario y al negocio'},
-    {name:'Diseño', adds:'Hacerlo claro y usable'},
-    {name:'Código', adds:'Construirlo y que funcione en real'},
-    {name:'Product Engineering e IA', adds:'Decidir qué construir y potenciarlo con IA'}
+    {name:'Marketing', adds:'Para qué sirve y qué valor aporta'},
+    {name:'Diseño', adds:'Quién lo va a usar'},
+    {name:'Código', adds:'Convertirlo en algo que funciona'},
+    {name:'Product Engineering e IA', adds:'La pieza que faltaba'}
   ],
   result:'Soluciones digitales que resuelven problemas reales'
 };
