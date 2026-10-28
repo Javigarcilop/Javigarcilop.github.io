@@ -410,6 +410,44 @@ dialog[open]{animation:pop .28s cubic-bezier(.2,.9,.3,1)}
 :root[data-theme="dark"] #toast{background:#fff;color:#0B2A6B}
 #toast.show{opacity:1;transform:translate(-50%,0)}
 
+/* el camino que suma */
+.path-band{padding:clamp(36px,6vw,64px) 0;border-block:1px solid var(--line);background:linear-gradient(180deg,var(--surface),color-mix(in srgb,var(--surface) 40%,var(--bg)))}
+.path-head{text-align:center;margin-bottom:clamp(26px,4vw,40px)}
+.path-title{color:var(--ink);font-size:clamp(22px,3.2vw,32px);font-weight:700;letter-spacing:-.02em;margin-top:6px}
+.path{--fill:0;position:relative;display:grid;grid-template-columns:repeat(var(--n),minmax(0,1fr));list-style:none;margin:0;padding:0}
+.path::before,.path::after{content:"";position:absolute;top:25px;left:calc(50% / var(--n));right:calc(50% / var(--n));height:2px;border-radius:2px}
+.path::before{background:var(--sky)}
+.path::after{background:linear-gradient(90deg,var(--blue),var(--cyan));transform-origin:left;transform:scaleX(var(--fill));transition:transform .7s cubic-bezier(.3,.7,.2,1)}
+.path li{position:relative;z-index:1;display:flex;justify-content:center}
+.path-step{display:flex;flex-direction:column;align-items:center;gap:10px;padding:0 4px;border:0;background:none;text-align:center;max-width:220px}
+.path-ring{display:grid;place-items:center;width:52px;height:52px;border-radius:50%;border:2px solid var(--sky);background:var(--surface);transition:border-color .4s,box-shadow .4s,transform .3s}
+.path-ring span{width:16px;height:16px;border-radius:50%;background:var(--sky);transform:scale(.7);transition:background .4s,transform .4s}
+.path-step.on .path-ring{border-color:var(--blue);box-shadow:0 0 0 7px var(--glow1)}
+.path-step.on .path-ring span{background:var(--blue);transform:scale(1)}
+.path li:last-child .path-step.on .path-ring{border-color:var(--cyan);box-shadow:0 0 0 7px var(--glow2),0 0 26px var(--glow2)}
+.path li:last-child .path-step.on .path-ring span{background:var(--cyan)}
+.path-step[aria-pressed="true"] .path-ring{transform:scale(1.08)}
+.path-step:hover .path-ring{transform:scale(1.08)}
+.path-step b{color:var(--ink);font-size:clamp(15px,2.2vw,22px);font-weight:700;letter-spacing:-.01em}
+.path-step small{color:var(--muted);font-size:14px;line-height:1.4;opacity:.55;transition:opacity .4s}
+.path-step.on small{opacity:1}
+.path-sum{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:8px 10px;min-height:46px;margin-top:clamp(26px,4vw,38px)}
+.path-sum .term{padding:6px 14px;border:1px solid var(--line);border-radius:999px;background:var(--surface);color:var(--ink);font-weight:600;font-size:15px;animation:pathIn .45s both}
+.path-sum .op{color:var(--muted);font-weight:700}
+.path-sum .total{padding:8px 18px;border-radius:999px;background:var(--blue-text);color:#fff;font-weight:700;font-size:16px;box-shadow:0 6px 22px var(--glow1);animation:pathIn .5s both}
+:root[data-theme="dark"] .path-sum .total{color:var(--bg)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .path-sum .total{color:var(--bg)}}
+@keyframes pathIn{from{opacity:0;transform:translateY(6px) scale(.96)}}
+.path-more{display:table;margin:18px auto 0;font-weight:600;font-size:15px}
+@media (max-width:640px){
+  .path-step small{display:none}
+  .path-step b{font-size:14px}
+  .path-ring{width:40px;height:40px}
+  .path::before,.path::after{top:19px}
+  .path-sum .term{font-size:14px;padding:5px 11px}
+  .path-sum .total{font-size:15px;text-align:center}
+}
+
 @media (max-width:900px){
   .hero .wrap{grid-template-columns:1fr}
   .hero{padding-top:36px}

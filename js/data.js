@@ -67,18 +67,18 @@ const THINKING = [
 /* Trayectoria: cada etapa aporta algo que sigo usando */
 const JOURNEY = [
   {
-    stage:'Diseño gráfico', where:'Experiencia previa',
-    learned:'Jerarquía visual, composición, tipografía y coherencia de marca.',
-    today:'Construyo interfaces claras y consistentes, y cuido cómo se ve y se entiende lo que desarrollo.',
-    evidence:'La identidad de este portfolio, del monograma JG a la paleta, es diseño propio.',
-    carry:'Criterio visual'
-  },
-  {
     stage:'Marketing', where:'Experiencia previa',
     learned:'Pensar en el público, el mensaje y el objetivo de negocio antes que en la herramienta.',
     today:'Empiezo cada proyecto por el usuario y por lo que tiene que conseguir, no por la tecnología.',
     evidence:'Mi proyecto principal, TempliMail, nace en ese terreno: el email marketing.',
     carry:'Usuario y negocio'
+  },
+  {
+    stage:'Diseño gráfico', where:'Experiencia previa',
+    learned:'Jerarquía visual, composición, tipografía y coherencia de marca.',
+    today:'Construyo interfaces claras y consistentes, y cuido cómo se ve y se entiende lo que desarrollo.',
+    evidence:'La identidad de este portfolio, del monograma JG a la paleta, es diseño propio.',
+    carry:'Criterio visual'
   },
   {
     stage:'Desarrollo web', where:'Técnico Superior en DAW · Campus Cámara Sevilla',
@@ -95,13 +95,23 @@ const JOURNEY = [
     carry:'Sistemas reales'
   },
   {
-    stage:'IA aplicada y producto', where:'Máster en Product Engineering e IA · Evolve Academy (en curso)',
+    stage:'Product Engineering e IA', where:'Máster en Product Engineering e IA · Evolve Academy (en curso)',
     learned:'Integrar IA en productos donde aporta valor, y decidir qué construir y por qué.',
     today:'Uso la IA como una pieza más del sistema, con sus límites y su coste, al servicio del producto.',
     evidence:'El Generador de especificaciones integra Gemini de forma segura mediante una función serverless.',
     carry:'IA con criterio'
   }
 ];
+/* El camino resumido: cada etapa suma algo a la anterior */
+const PATH = {
+  steps:[
+    {name:'Marketing', adds:'Entender al usuario y al negocio'},
+    {name:'Diseño', adds:'Hacerlo claro y usable'},
+    {name:'Código', adds:'Construirlo y que funcione en real'},
+    {name:'Product Engineering e IA', adds:'Decidir qué construir y potenciarlo con IA'}
+  ],
+  result:'Soluciones digitales que resuelven problemas reales'
+};
 /* Engineering Lab: simulación conceptual basada en comportamientos reales de TempliMail */
 const LAB = {
   nodes:[

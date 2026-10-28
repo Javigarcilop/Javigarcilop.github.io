@@ -470,6 +470,33 @@ function setThink(i,focus){
 }
 setThink(0);
 
+/* ---------- el camino que suma ---------- */
+const pathEl=$('#path'),pathSum=$('#pathSum'),pathLast=PATH.steps.length-1;
+PATH.steps.forEach((s,i)=>{
+  const li=document.createElement('li');
+  li.innerHTML=`<button type="button" class="path-step" aria-pressed="false"><span class="path-ring" aria-hidden="true"><span></span></span><b>${esc(s.name)}</b><small>+ ${esc(s.adds)}</small></button>`;
+  li.querySelector('button').onclick=()=>{pathStop();setPath(i)};
+  pathEl.appendChild(li);
+});
+function setPath(i){
+  $$('.path-step',pathEl).forEach((b,j)=>{b.setAttribute('aria-pressed',String(j===i));b.classList.toggle('on',j<=i)});
+  pathEl.style.setProperty('--fill',i/pathLast);
+  pathSum.innerHTML=PATH.steps.slice(0,i+1).map((s,j)=>`${j?'<span class="op" aria-hidden="true">+</span>':''}<span class="term" style="--d:${j}">${esc(s.name)}</span>`).join('')
+    +(i===pathLast?`<span class="op" aria-hidden="true">=</span><span class="total">${esc(PATH.result)}</span>`:'');
+}
+let pathTimer=null;
+function pathStop(){clearInterval(pathTimer);pathTimer=null}
+if(matchMedia('(prefers-reduced-motion: reduce)').matches||!('IntersectionObserver' in window))setPath(pathLast);
+else{
+  setPath(0);
+  const pio=new IntersectionObserver(es=>{
+    if(!es[0].isIntersecting)return;
+    pio.disconnect();
+    let k=0;pathTimer=setInterval(()=>{k++;setPath(k);if(k>=pathLast)pathStop()},750);
+  },{threshold:.5});
+  pio.observe(pathEl);
+}
+
 /* ---------- trayectoria ---------- */
 const jSteps=$('#journeySteps'),jCard=$('#journeyCard'),jCarry=$('#journeyCarry');
 JOURNEY.forEach((s,i)=>{
