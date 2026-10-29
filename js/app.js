@@ -200,21 +200,30 @@ function buildMap(){
       g.addEventListener('click',act);
     }else{
       g.style.cursor='grab';
-      let downX=0,downY=0,dragging=false,moved=false;
+      let downX=0,downY=0,dragging=false,moved=false,inv=null,lastT=0;
       g.addEventListener('pointerdown',e=>{
         downX=e.clientX;downY=e.clientY;dragging=true;moved=false;n.dragging=true;
+        inv=svg.getScreenCTM().inverse();lastT=e.timeStamp;n.vx=0;n.vy=0;
         g.setPointerCapture(e.pointerId);g.style.cursor='grabbing';g.classList.add('dragging');
       });
       g.addEventListener('pointermove',e=>{
         if(!dragging)return;
         if(Math.hypot(e.clientX-downX,e.clientY-downY)>4)moved=true;
-        const p=toSvgPoint(svg,e.clientX,e.clientY);
-        n.x=p.x;n.y=p.y;n.vx=0;n.vy=0;
+        const x=inv.a*e.clientX+inv.c*e.clientY+inv.e,y=inv.b*e.clientX+inv.d*e.clientY+inv.f;
+        /* Velocidad suavizada en px por fotograma, para lanzar el nodo al soltarlo */
+        const k=16/Math.max(8,e.timeStamp-lastT);lastT=e.timeStamp;
+        n.vx=n.vx*.6+(x-n.x)*k*.4;n.vy=n.vy*.6+(y-n.y)*k*.4;
+        n.x=x;n.y=y;
       });
       const release=e=>{
         if(!dragging)return;
         dragging=false;n.dragging=false;g.style.cursor='grab';g.classList.remove('dragging');
-        if(!moved)act();
+        if(!moved){n.vx=0;n.vy=0;act();return}
+        if(e.timeStamp-lastT>80){n.vx=0;n.vy=0}
+        const v=Math.hypot(n.vx,n.vy),max=22;
+        if(v>max){n.vx*=max/v;n.vy*=max/v}
+        n.elastic=1;
+        window.motion?.enabled&&motion.release(g);
       };
       g.addEventListener('pointerup',release);
       g.addEventListener('pointercancel',release);
@@ -243,14 +252,17 @@ function buildMap(){
       nodes.forEach(n=>{
         if(n.dragging)return;
         const dxh=n.X-n.x,dyh=n.Y-n.y;
-        n.vx+=dxh*.012;n.vy+=dyh*.012;
+        /* Recién soltado: muelle más vivo que se apaga poco a poco, para un rebote elástico contenido */
+        const el=n.elastic||0;
+        n.vx+=dxh*(.012+.008*el);n.vy+=dyh*(.012+.008*el);
+        if(el){n.elastic=el>.02?el*.95:0}
         n.vx+=Math.sin(t*n.freq1+n.phase1)*.0035;
         n.vy+=Math.cos(t*n.freq2+n.phase2)*.0035;
         if(mouse.active&&!n.hover){
           const dx=mouse.x-n.x,dy=mouse.y-n.y,d=Math.hypot(dx,dy)||1,radius=140;
           if(d>18&&d<radius){const f=Math.sin(Math.PI*d/radius)*.09;n.vx+=dx/d*f;n.vy+=dy/d*f}
         }
-        if(n.hover){n.vx*=.6;n.vy*=.6}
+        if(n.hover&&!el){n.vx*=.6;n.vy*=.6}
         n.vx*=.9;n.vy*=.9;n.x+=n.vx;n.y+=n.vy;
       });
       nodes.forEach(n=>{n.el.style.transform=`translate(${n.x}px,${n.y}px)`});
@@ -443,7 +455,8 @@ thinkTabs.addEventListener('keydown',e=>{
   e.preventDefault();
   setThink((to+THINKING.length)%THINKING.length,true);
 });
-function setThink(i,focus){
+function setThink(i,focus,fromScroll){
+  const changed=thinkIdx!==i;
   thinkIdx=i;
   const last=THINKING.length-1;
   $$('.think-tab',thinkTabs).forEach((b,j)=>{b.setAttribute('aria-selected',String(j===i));b.tabIndex=j===i?0:-1});
@@ -467,6 +480,7 @@ function setThink(i,focus){
     <div class="tp-nav"><button type="button" class="btn ghost sm" data-next>${i<last?'Siguiente fase':'Volver a empezar'} ${arrow}</button></div>`;
   $$('[data-open]',thinkPanel).forEach(b=>b.onclick=()=>openProject(b.dataset.open));
   $('[data-next]',thinkPanel).onclick=()=>setThink(i<last?i+1:0,true);
+  if(changed)document.dispatchEvent(new CustomEvent('thinkchange',{detail:{i,fromScroll:!!fromScroll}}));
 }
 setThink(0);
 
@@ -574,7 +588,9 @@ function labCenter(i){
   return {x:node.left+node.width/2-st.left,y:node.top+node.height/2-st.top};
 }
 function moveLabPacket(i,animate){
-  const to=labCenter(i),end=`translate(${to.x}px,${to.y}px) translate(-50%,-50%)`;
+  const to=labCenter(i);
+  if(window.motion?.enabled){motion.packet(labPacket,to.x,to.y,animate&&labPacket.classList.contains('show'));return}
+  const end=`translate(${to.x}px,${to.y}px) translate(-50%,-50%)`;
   const from=getComputedStyle(labPacket).transform;
   labPacket.getAnimations?.().forEach(a=>a.cancel());
   labPacket.style.transform=end;
@@ -594,11 +610,12 @@ function stepLab(){
   labPrevNode=node;
   labPacket.classList.toggle('res',dir==='res');
   if(labPos===0){moveLabPacket(node,false);labPacket.classList.add('show')}else moveLabPacket(node,true);
+  window.motion?.enabled&&motion.arrive(nodes[node].querySelector('.lab-ico'),dir,labPos===0?0:.5);
   labTrace.insertAdjacentHTML('beforeend',`<li class="${dir}"><b>${esc(LAB.nodes[node].name)}</b><span>${esc(text)}</span></li>`);
   inspectLab(node,false);
   $$('.lab-node',labNodes).forEach(b=>b.classList.remove('picked'));
   const done=labPos===s.steps.length-1;
-  if(done){const c=$('#labCode');c.textContent=s.code;c.classList.add(s.ok?'ok':'err');labRun.disabled=false;labStepBtn.textContent='Repetir'}
+  if(done){const c=$('#labCode');c.textContent=s.code;c.classList.add(s.ok?'ok':'err');labRun.disabled=false;labStepBtn.textContent='Repetir';window.motion?.enabled&&motion.pop(c)}
   else labStepBtn.textContent='Siguiente paso';
   return done;
 }
@@ -608,7 +625,7 @@ labRun.onclick=()=>{
   const tick=()=>{if(!stepLab())labTimer=setTimeout(tick,labReduce?1400:950)};
   tick();
 };
-labStepBtn.onclick=()=>{clearTimeout(labTimer);labRun.disabled=false;stepLab()};
+labStepBtn.onclick=()=>{window.motion?.enabled&&motion.press(labStepBtn);clearTimeout(labTimer);labRun.disabled=false;stepLab()};
 addEventListener('resize',()=>{if(labPos>=0)moveLabPacket(LAB.scenarios[labSc].steps[labPos][0],false)},{passive:true});
 setLabScenario(0);
 inspectLab(2,false);
