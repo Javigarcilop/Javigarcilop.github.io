@@ -26,60 +26,18 @@ const TECH_USE = {
   'HTML y CSS':'Maquetación semántica, accesible y responsive. Este portfolio está hecho a mano, sin frameworks.',
   'Git':'Control de versiones en el trabajo diario y en todos mis proyectos públicos.'
 };
-/* Cómo pienso: cada fase lleva una evidencia comprobable en un proyecto real */
-const THINKING = [
-  {
-    step:'Entender', node:'Necesidad', title:'Primero, el problema.',
-    text:'Antes de escribir código defino para quién es, qué tiene que conseguir y qué no. Del marketing y el diseño me traje el hábito de empezar por el usuario y el negocio.',
-    inputs:['Usuario','Negocio','Requisitos'],
-    evidence:'El Generador de especificaciones automatiza justo este paso: convierte una idea de producto en historias de usuario y criterios de aceptación.',
-    project:'generador-especificaciones'
-  },
-  {
-    step:'Diseñar', node:'Diseño', title:'Datos, contrato e interfaz. En ese orden.',
-    text:'Modelo los datos, defino la API que los expone y después la interfaz que los usa. Así cada decisión tiene un porqué y el resto del sistema no depende de un detalle visual.',
-    inputs:['Modelo de datos','API','UX'],
-    evidence:'En TempliMail cada campaña guarda una copia de su contenido: si después editas la plantilla, el historial sigue mostrando lo que se envió de verdad.',
-    project:'templimail'
-  },
-  {
-    step:'Construir', node:'Ingeniería', title:'Código que otra persona pueda mantener.',
-    text:'Separo responsabilidades por capas, valido en el servidor y trato los errores de forma explícita. Prefiero una solución clara a una ingeniosa.',
-    inputs:['Backend','Frontend','Seguridad'],
-    evidence:'TempliMail: API en PHP sin framework organizada en controladores, servicios y modelos, con autenticación JWT y frontend en Angular.',
-    project:'templimail'
-  },
-  {
-    step:'Integrar', node:'Integración', title:'Conectar servicios sin exponer nada.',
-    text:'Integro APIs externas e IA donde aportan algo real, y automatizo lo repetitivo. Las claves y la lógica sensible se quedan en el servidor.',
-    inputs:['APIs','IA','Automatización'],
-    evidence:'El Generador llama a Gemini desde una función serverless en Vercel, así la clave nunca llega al navegador. TempliMail envía sus campañas con un worker y reintentos.',
-    project:'generador-especificaciones'
-  },
-  {
-    step:'Mejorar', node:'Valor', title:'Probar, aprender y volver a empezar.',
-    text:'Un producto no se termina al desplegarlo. Pruebo los flujos críticos, corrijo con lo que enseña el uso real y priorizo lo que más valor aporta.',
-    inputs:['Pruebas','Feedback','Iteración'],
-    evidence:'El backend de TempliMail tiene pruebas end-to-end que recorren autenticación, permisos entre usuarios, envíos y reintentos contra un entorno Docker.',
-    project:'templimail'
-  }
-];
-/* Trayectoria: cada etapa se suma a la anterior (formación solo donde está confirmada) */
+/* Trayectoria: cada etapa alimenta a la siguiente; "implement" cuenta cómo la aplico al construir software */
 const PATH = {
   steps:[
     {
       name:'Marketing', ask:'¿Para qué sirve y qué valor aporta?',
       training:[],
-      origin:'Experiencia previa',
-      today:'Empiezo por el valor y el objetivo de negocio, no por la tecnología.',
-      evidence:'TempliMail, mi proyecto principal, nace en ese terreno: el email marketing.'
+      implement:'Defino qué problema resuelvo y para quién. Todo lo demás parte de aquí.'
     },
     {
       name:'Diseño', ask:'¿Quién lo va a usar?',
       training:[],
-      origin:'Diseño gráfico · Experiencia previa',
-      today:'Pienso primero en la persona que lo usará y cuido jerarquía, claridad y coherencia.',
-      evidence:'Mientras diseñaba webs y apps me preguntaba qué había detrás. Esa pregunta me llevó al código.'
+      implement:'Convierto ese valor en una experiencia clara y usable para quien lo va a utilizar.'
     },
     {
       name:'Código', ask:'¿Cómo lo convierto en algo que funciona?',
@@ -87,18 +45,14 @@ const PATH = {
         {title:'Técnico Superior en Desarrollo de Aplicaciones Web',place:'Campus Cámara Sevilla'},
         {title:'Formación en RPA',place:'Fundación Generation Spain'}
       ],
-      origin:'Desarrollador Full Stack en SiOnline',
-      today:'Aplicaciones reales en producción: formación bonificada, integraciones con FUNDAE y SEPE y automatización de procesos.',
-      evidence:'TempliMail empezó como mi proyecto final del ciclo y sigue evolucionando.'
+      implement:'Doy forma real a esa experiencia: base de datos, backend e interfaz conectados, con integraciones y automatización de procesos.'
     },
     {
       name:'Product Engineering e IA', ask:'La pieza que faltaba: IA aplicada al desarrollo.',
       training:[
-        {title:'Máster en Product Engineering con IA',place:'Evolve · en curso'}
+        {title:'Máster en Product Engineering con IA',place:'Evolve'}
       ],
-      origin:'Formación actual',
-      today:'Uso la IA como una pieza más del sistema, con sus límites, al servicio del producto.',
-      evidence:'El Generador de especificaciones integra Gemini de forma segura mediante una función serverless.'
+      implement:'Potencio todo lo anterior con IA: automatiza y ahorra trabajo, siempre al servicio del producto.'
     }
   ],
   result:'Soluciones digitales que resuelven problemas reales'

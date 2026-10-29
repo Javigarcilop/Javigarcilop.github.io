@@ -176,51 +176,142 @@ function start(){
     dust.frustumCulled=false;
     scene.add(dust);
 
-    /* Etiquetas de cada etapa: texto en textura, un plano por portal */
+    /* Etiquetas de cada etapa: un título y dos tarjetas de cristal junto al pasillo. El centro queda libre para ver la profundidad. */
     try{await Promise.race([document.fonts.load('700 96px Geist'),new Promise(r=>setTimeout(r,1500))])}catch(e){}
     const FONT="Geist,'Segoe UI',system-ui,sans-serif";
-    const steps=(typeof PATH!=='undefined'?PATH.steps:[]).map((s,i)=>({kicker:'Etapa 0'+(i+1),title:s.name,sub:s.ask}));
-    if(typeof PATH!=='undefined')steps.push({kicker:'El resultado',title:PATH.result,sub:'Cada etapa suma a la anterior.',big:true});
+    const data=typeof PATH!=='undefined'?PATH:null;
+    const steps=data?data.steps.map((s,i)=>({
+      kicker:'Etapa 0'+(i+1),title:s.name,sub:s.ask,
+      left:s.training.length?{label:'Formación',items:s.training.map(t=>t.title+' · '+t.place)}:null,
+      right:{label:'Cómo lo implemento',items:[s.implement]}
+    })):[];
+    if(data)steps.push({kicker:'El resultado',title:data.result,sub:'Javier García · Desarrollo Full Stack · Sevilla',big:true});
+
     const wrap=(ctx,text,max)=>{
       const out=[];let line='';
       for(const w of text.split(' ')){const t=line?line+' '+w:w;if(ctx.measureText(t).width>max&&line){out.push(line);line=w}else line=t}
       out.push(line);return out;
     };
-    const W=coarse?768:1024,Hh=W/2;
-    const labelTex=s=>{
-      const c=document.createElement('canvas');c.width=W;c.height=Hh;
-      const x=c.getContext('2d'),k=W/1024;
+    const aniso=Math.min(8,renderer.capabilities.getMaxAnisotropy());
+    const portraitNow=()=>innerWidth/innerHeight<.8;
+    let portrait=portraitNow();
+    const mctx=document.createElement('canvas').getContext('2d');
+    const roundRect=(x,px,py,w,h,r)=>{x.beginPath();x.moveTo(px+r,py);x.arcTo(px+w,py,px+w,py+h,r);x.arcTo(px+w,py+h,px,py+h,r);x.arcTo(px,py+h,px,py,r);x.arcTo(px,py,px+w,py,r);x.closePath()};
+    const toTex=c=>{const t=new THREE.CanvasTexture(c);t.anisotropy=aniso;t.colorSpace=THREE.SRGBColorSpace;return t};
+
+    /* Título: etapa, nombre (equilibrado en 1-2 líneas) y pregunta */
+    const titleTex=(s,cw,pt)=>{
+      const kick=cw*(pt?.034:.026),tsz0=cw*(s.big?(pt?.075:.062):(pt?.108:.1)),ssz=cw*(pt?.046:.034);
+      let f=1,tl,sl;
+      const lay=()=>{
+        mctx.font='700 '+(tsz0*f)+'px '+FONT;
+        tl=wrap(mctx,s.title,cw*.92);
+        while(tl.length>(s.big?3:2)){f*=.94;mctx.font='700 '+(tsz0*f)+'px '+FONT;tl=wrap(mctx,s.title,cw*.92)}
+        if(tl.length===2){
+          const ws=s.title.split(' ');let best=null;
+          for(let i=1;i<ws.length;i++){const l=ws.slice(0,i).join(' '),r=ws.slice(i).join(' '),m=Math.max(mctx.measureText(l).width,mctx.measureText(r).width);if(!best||m<best.m)best={m,l,r}}
+          if(best&&best.m<=cw*.92)tl=[best.l,best.r];
+        }
+        mctx.font='500 '+ssz+'px '+FONT;
+        sl=wrap(mctx,s.sub,cw*.86).slice(0,2);
+      };
+      lay();
+      const tlh=tsz0*f*1.06,slh=ssz*1.3,pad=cw*.02;
+      const H=Math.ceil(pad+kick*1.7+tl.length*tlh+cw*.012+sl.length*slh+pad);
+      const c=document.createElement('canvas');c.width=cw;c.height=H;
+      const x=c.getContext('2d');
       x.textAlign='center';x.textBaseline='alphabetic';
-      let size=(s.big?80:132)*k;
-      x.font=`700 ${size}px ${FONT}`;
-      let lines=wrap(x,s.title,W*.92);
-      while(lines.length>(s.big?3:2)||Math.max(...lines.map(l=>x.measureText(l).width))>W*.94){size*=.92;x.font=`700 ${size}px ${FONT}`;lines=wrap(x,s.title,W*.92)}
-      x.font=`500 ${38*k}px ${FONT}`;
-      const sub=wrap(x,s.sub,W*.86).slice(0,2);
-      const lh=size*1.1,kick=30*k,gap=26*k,subLh=46*k;
-      const total=kick+gap+lines.length*lh+gap*.6+sub.length*subLh;
-      let y=(Hh-total)/2;
-      x.font=`500 ${kick}px ${FONT}`;x.fillStyle='#8a9fd0';
-      x.letterSpacing=`${4*k}px`;x.fillText(s.kicker.toUpperCase(),W/2,y+kick*.85);x.letterSpacing='0px';
-      y+=kick+gap;
-      x.font=`700 ${size}px ${FONT}`;
-      x.shadowColor='rgba(76,130,255,.55)';x.shadowBlur=36*k;x.fillStyle='#eef3ff';
-      lines.forEach((l,i)=>x.fillText(l,W/2,y+size*.85+i*lh));
+      let y=pad;
+      x.font='600 '+kick+'px '+FONT;x.fillStyle='#a9bde8';
+      x.letterSpacing=(cw*.0035)+'px';x.fillText(s.kicker.toUpperCase(),cw/2,y+kick);x.letterSpacing='0px';
+      y+=kick*1.7;
+      x.font='700 '+(tsz0*f)+'px '+FONT;
+      x.shadowColor='rgba(76,130,255,.5)';x.shadowBlur=cw*.016;x.fillStyle='#ffffff';
+      tl.forEach((l,i)=>x.fillText(l,cw/2,y+tsz0*f*.86+i*tlh));
       x.shadowBlur=0;
-      y+=lines.length*lh+gap*.6;
-      x.font=`500 ${38*k}px ${FONT}`;x.fillStyle='#a9bbe6';
-      sub.forEach((l,i)=>x.fillText(l,W/2,y+subLh*.8+i*subLh));
-      const t=new THREE.CanvasTexture(c);t.anisotropy=4;t.colorSpace=THREE.SRGBColorSpace;return t;
+      y+=tl.length*tlh+cw*.012;
+      x.font='500 '+ssz+'px '+FONT;x.fillStyle='#d3e0ff';
+      sl.forEach((l,i)=>x.fillText(l,cw/2,y+ssz*.95+i*slh));
+      return {tex:toTex(c),ratio:H/cw};
     };
-    const labels=steps.map((s,i)=>{
-      const tex=track(labelTex(s));
-      const mat=track(new THREE.MeshBasicMaterial({map:tex,transparent:true,depthWrite:false,opacity:0}));
-      const geo=track(new THREE.PlaneGeometry(16,8));
-      const m=new THREE.Mesh(geo,mat);
-      m.position.set(0,0,-(i+1)*S);
-      scene.add(m);
-      return m;
-    });
+
+    /* Tarjeta de cristal con etiqueta y varios puntos */
+    const cardTex=(label,items,cw)=>{
+      const fs=cw*.047,lf=cw*.029,pad=cw*.07,bullet=cw*.05,lh=fs*1.34,gap=cw*.02;
+      mctx.font='400 '+fs+'px '+FONT;
+      const blocks=items.filter(Boolean).map(t=>wrap(mctx,t,cw-2*pad-bullet));
+      const head=lf*1.5+cw*.035;
+      const H=Math.ceil(pad+head+blocks.reduce((n,l)=>n+l.length*lh+gap,0)-gap+pad);
+      const c=document.createElement('canvas');c.width=cw;c.height=H;
+      const x=c.getContext('2d');
+      roundRect(x,3,3,cw-6,H-6,cw*.05);
+      x.fillStyle='rgba(13,15,18,.82)';x.fill();
+      x.lineWidth=3;x.strokeStyle='rgba(120,160,255,.4)';x.stroke();
+      x.textBaseline='alphabetic';x.textAlign='left';
+      let y=pad;
+      x.fillStyle='#7fa6ff';x.beginPath();x.arc(pad+lf*.3,y+lf*.55,lf*.3,0,6.2832);x.fill();
+      x.font='600 '+lf+'px '+FONT;x.fillStyle='#a9bde8';
+      x.letterSpacing=(cw*.004)+'px';x.fillText(label.toUpperCase(),pad+lf*1.1,y+lf*.88);x.letterSpacing='0px';
+      y+=head;
+      x.font='400 '+fs+'px '+FONT;
+      blocks.forEach(lines=>{
+        x.fillStyle='#7fa6ff';x.beginPath();x.arc(pad+bullet*.2,y+fs*.6,fs*.09,0,6.2832);x.fill();
+        x.fillStyle='#e8efff';
+        lines.forEach((l,i)=>x.fillText(l,pad+bullet,y+fs*.95+i*lh));
+        y+=lines.length*lh+gap;
+      });
+      return {tex:toTex(c),ratio:H/cw};
+    };
+
+    let labels=[];
+    const buildGroup=(s,i)=>{
+      const g=new THREE.Group(),mats=[];
+      g.position.set(0,0,-(i+1)*S);
+      const plane=(t,w,x,y)=>{
+        const mat=new THREE.MeshBasicMaterial({map:t.tex,transparent:true,depthWrite:false,opacity:0});
+        const m=new THREE.Mesh(new THREE.PlaneGeometry(w,w*t.ratio),mat);
+        m.position.set(x,y,0);g.add(m);mats.push(mat);return w*t.ratio;
+      };
+      const tw=portrait?9:(s.big?13:11);
+      const T=titleTex(s,portrait?1024:2048,portrait);
+      const th=tw*T.ratio;
+      let top=0,bottom;
+      if(s.big){
+        plane(T,tw,0,0);top=th/2;bottom=-th/2;
+      }else{
+        const R=cardTex(s.right.label,s.right.items,1024),L=s.left?cardTex(s.left.label,s.left.items,1024):null;
+        const cw=portrait?8.6:6.6,gapT=.9;
+        const rh=cw*R.ratio,lh=L?cw*L.ratio:0;
+        plane(T,tw,0,-th/2);
+        let y=-th-gapT;
+        if(portrait){
+          if(L){plane(L,cw,0,y-lh/2);y-=lh+.5}
+          plane(R,cw,0,y-rh/2);y-=rh;
+          bottom=y;
+        }else if(L){
+          plane(L,cw,-(cw/2+.9),y-lh/2);
+          plane(R,cw,cw/2+.9,y-rh/2);
+          bottom=y-Math.max(lh,rh);
+        }else{
+          plane(R,cw,0,y-rh/2);
+          bottom=y-rh;
+        }
+      }
+      const shift=-(top+bottom)/2;
+      g.children.forEach(m=>{m.position.y+=shift});
+      g.userData={mats,w:s.big?tw:(portrait||!s.left?(portrait?9:Math.max(tw,6.6)):2*6.6+1.8),h:top-bottom};
+      scene.add(g);
+      return g;
+    };
+    const makeLabels=()=>{labels=steps.map(buildGroup)};
+    const clearLabels=()=>{
+      labels.forEach(g=>{
+        scene.remove(g);
+        g.children.forEach(m=>{m.material.map.dispose();m.material.dispose();m.geometry.dispose()});
+      });
+      labels=[];
+    };
+    makeLabels();
 
     /* Resplandor al final del pasillo */
     const gc=document.createElement('canvas');gc.width=gc.height=128;
@@ -249,9 +340,12 @@ function start(){
       camera.fov=w/h<.8?FOV+14:FOV;
       camera.updateProjectionMatrix();
       U.uScale.value=h*pr*.5/Math.tan(THREE.MathUtils.degToRad(camera.fov/2));
-      const visW=2*STOP*Math.tan(THREE.MathUtils.degToRad(camera.fov/2))*camera.aspect;
-      const sc=clamp(visW*.78/16,.45,1.25);
-      labels.forEach(m=>m.scale.setScalar(sc));
+      const now=portraitNow();
+      if(now!==portrait){portrait=now;clearLabels();makeLabels()}
+      const visH=2*STOP*Math.tan(THREE.MathUtils.degToRad(camera.fov/2)),visW=visH*camera.aspect;
+      const ext=labels.reduce((e,g)=>({w:Math.max(e.w,g.userData.w),h:Math.max(e.h,g.userData.h)}),{w:1,h:1});
+      const sc=clamp(Math.min(visW*(portrait?.94:.82)/ext.w,visH*(portrait?.84:.8)/ext.h),.35,1.7);
+      labels.forEach(g=>g.scale.setScalar(sc));
       if(!full)draw();
     };
 
@@ -269,9 +363,10 @@ function start(){
       const z=camZ(P.p);
       camera.position.set(0,0,z);
       camera.rotation.set(M.pitch,M.yaw,Math.sin(P.p*SEG*3.1416)*.012);
-      for(const m of labels){
-        const d=z-m.position.z;
-        m.material.opacity=smooth(40,20,d)*smooth(3,9,d);
+      for(const g of labels){
+        const o=smooth(40,20,z-g.position.z)*smooth(3,9,z-g.position.z);
+        g.visible=o>.005;
+        if(g.visible)for(const m of g.userData.mats)m.opacity=o;
       }
       glow.material.opacity=.35+.65*smooth(0,1,P.p);
       renderer.render(scene,camera);
@@ -301,7 +396,7 @@ function start(){
       removeEventListener('pointermove',onMove);
       canvas.removeEventListener('webglcontextlost',onLost);
       tl?.scrollTrigger?.kill();tl?.kill();
-      disposables.forEach(o=>o.dispose());
+      disposables.forEach(o=>o.dispose());clearLabels();
       renderer.dispose();renderer.forceContextLoss();
       tunnel.classList.remove('ready');
     }

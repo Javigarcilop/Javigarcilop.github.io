@@ -78,6 +78,8 @@ gsap.timeline({ delay: 1.1, repeat: -1, repeatDelay: 5, yoyo: true,
 Versión actual del hero (`js/tunnel.js`, escena en `.tunnel`). Sustituye al fondo Canvas 2D del escáner y a una primera versión de glifos de colores que cansaba la vista.
 
 - **Idea**: un pasillo de marcos que recorre las etapas de `PATH` (Marketing → Diseño → Código → Product Engineering e IA → resultado). Cada etapa es un portal con su nombre y su pregunta; los marcos pasan de gris azulado a azul y a cian.
+- **Información útil sin tapar el túnel**: cada portal lleva el título arriba y dos tarjetas de cristal (formación y trabajo / se nota hoy) a los lados; el centro queda libre para ver la profundidad. En vertical se apilan. Las tarjetas se dibujan en texturas 2D (texto nítido, 1024 px de ancho) y se reconstruyen si cambia la orientación.
+- **Scroll**: no usar `scroll-behavior: smooth` en CSS junto a ScrollTrigger (rompe el recálculo cuando la página está desplazada); el desplazamiento suave de los enlaces se hace con `scrollTo({behavior:'smooth'})` desde JavaScript.
 - **Paleta contenida**: un fondo #0d0f12, líneas finas con alfa bajo y mezcla aditiva suave; un solo tono para el polvo de glifos, sin parpadeo ni colores saturados superpuestos. Evitar verdes/índigos de relleno, destellos y brillo aditivo alto: dañan la lectura y fatigan.
 - **Pocas draw calls**: un `LineSegments` (marcos y guías), un `Points` (≈1000 glifos tenues) y un plano por etiqueta (texto en `CanvasTexture`).
 - **Cámara por paradas**: avanza con un ease suave y se detiene a 14 unidades de cada portal, de modo que cada etiqueta se lee. La opacidad de cada etiqueta depende de la distancia.

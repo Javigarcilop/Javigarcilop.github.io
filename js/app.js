@@ -131,7 +131,16 @@ function renderStack(focusT){
 /* ---------- mapa interactivo ---------- */
 let MAP=null;
 function buildMap(){
-  const svg=$('#map'); svg.innerHTML='';
+  if(MAP&&MAP.raf)cancelAnimationFrame(MAP.raf);
+  MAP=null;
+  /* svg nuevo y limpio: sin listeners ni nodos de la versión anterior */
+  const old=$('#map'),svg=old.cloneNode(false);
+  old.replaceWith(svg);
+  const mbox=svg.parentElement,cw=Math.max(300,mbox.clientWidth),ch=Math.max(300,mbox.clientHeight);
+  const kz=cw<600?1:cw<1000?1.25:1.5;
+  const W=Math.round(cw/kz),H=Math.round(ch/kz);
+  svg.setAttribute('viewBox','0 0 '+W+' '+H);
+  $('#readout').innerHTML='<p class="map-hint">Selecciona un nodo para ver qué es y dónde lo uso. Puedes arrastrarlos.</p>';
   const techs=[...new Set(PROJECTS.flatMap(p=>p.stack))];
   const nodes=[...PROJECTS.map(p=>({id:p.slug,type:'p',label:p.short,r:15,p})),...techs.map(t=>({id:'t:'+t,type:'t',label:t,r:6,t}))];
   const idx=Object.fromEntries(nodes.map((n,i)=>[n.id,i]));
@@ -147,12 +156,12 @@ function buildMap(){
     links.forEach(([i,j])=>{const a=nodes[i],b=nodes[j];const dx=b.x-a.x,dy=b.y-a.y,d=Math.hypot(dx,dy)||1;const f=(d-108)*.022;a.vx+=dx/d*f;a.vy+=dy/d*f;b.vx-=dx/d*f;b.vy-=dy/d*f});
     nodes.forEach(n=>{n.vx-=n.x*.005;n.vy-=n.y*.005;n.x+=n.vx*.4;n.y+=n.vy*.4;n.vx*=.55;n.vy*=.55});
   }
-  const W=640,H=540,padX=78,padY=50;
+  const padX=Math.round(Math.min(110,W*.1)),padT=Math.round(Math.min(165,H*.34)),padB=Math.round(Math.min(100,H*.2));
   const xs=nodes.map(n=>n.x),ys=nodes.map(n=>n.y);
   const minx=Math.min(...xs),maxx=Math.max(...xs),miny=Math.min(...ys),maxy=Math.max(...ys);
-  const s=Math.min((W-2*padX)/(maxx-minx||1),(H-2*padY)/(maxy-miny||1));
-  const cx=(minx+maxx)/2,cy=(miny+maxy)/2;
-  nodes.forEach(n=>{n.X=W/2+(n.x-cx)*s;n.Y=H/2+(n.y-cy)*s});
+  const sx=(W-2*padX)/(maxx-minx||1),sy=(H-padT-padB)/(maxy-miny||1);
+  const cx=(minx+maxx)/2,cy=(miny+maxy)/2,mid=padT+(H-padT-padB)/2;
+  nodes.forEach(n=>{n.X=W/2+(n.x-cx)*sx;n.Y=mid+(n.y-cy)*sy});
   const bx=n=>n.type==='p'?{w:n.label.length*4.7+24,t:-28,b:46}:{w:n.label.length*3.4+8,t:-10,b:28};
   for(let it=0;it<200;it++){
     for(let i=0;i<nodes.length;i++)for(let j=i+1;j<nodes.length;j++){
@@ -245,9 +254,12 @@ function buildMap(){
     nodes.forEach(n=>{n.el.style.transform=`translate(${n.X}px,${n.Y}px)`});
     setTimeout(()=>{svg.classList.add('ready');runPhysics()},750);
   }));
+  let mapVisible=true;
+  new IntersectionObserver(es=>{mapVisible=es[0].isIntersecting},{threshold:0}).observe(mbox);
   function runPhysics(){
     let t=0;
     (function tick(){
+      if(!mapVisible){MAP.raf=requestAnimationFrame(tick);return}
       t+=.016;
       nodes.forEach(n=>{
         if(n.dragging)return;
@@ -432,93 +444,22 @@ $('#copy').onclick=async()=>{
   try{await navigator.clipboard.writeText(email);toast('Email copiado')}catch(e){toast('No se pudo copiar. Escríbeme desde el botón azul.')}
 };
 
-/* ---------- cómo pienso ---------- */
-const thinkTabs=$('#thinkTabs'),flow=$('#flow'),thinkPanel=$('#thinkPanel');
-let thinkIdx=0;
-THINKING.forEach((f,i)=>{
-  const b=document.createElement('button');
-  b.type='button';b.className='think-tab';b.id='tt-'+i;
-  b.setAttribute('role','tab');b.setAttribute('aria-controls','thinkPanel');
-  b.innerHTML=`<span class="tn">0${i+1}</span><span>${esc(f.step)}</span>`;
-  b.onclick=()=>setThink(i);
-  thinkTabs.appendChild(b);
-  if(i>0){const l=document.createElement('span');l.className='flow-link';flow.appendChild(l)}
-  const n=document.createElement('span');
-  n.className='flow-node';n.innerHTML=`<i></i><b>${esc(f.node)}</b>`;
-  n.onclick=()=>setThink(i);
-  flow.appendChild(n);
-});
-thinkTabs.addEventListener('keydown',e=>{
-  const last=THINKING.length-1;
-  const to={ArrowRight:thinkIdx+1,ArrowDown:thinkIdx+1,ArrowLeft:thinkIdx-1,ArrowUp:thinkIdx-1,Home:0,End:last}[e.key];
-  if(to===undefined)return;
-  e.preventDefault();
-  setThink((to+THINKING.length)%THINKING.length,true);
-});
-function setThink(i,focus,fromScroll){
-  const changed=thinkIdx!==i;
-  thinkIdx=i;
-  const last=THINKING.length-1;
-  $$('.think-tab',thinkTabs).forEach((b,j)=>{b.setAttribute('aria-selected',String(j===i));b.tabIndex=j===i?0:-1});
-  if(focus)$('#tt-'+i).focus();
-  thinkPanel.setAttribute('aria-labelledby','tt-'+i);
-  $$('.flow-node',flow).forEach((n,j)=>{n.classList.toggle('built',j<=i);n.classList.toggle('active',j===i)});
-  $$('.flow-link',flow).forEach((l,j)=>l.classList.toggle('on',j<i));
-  const f=THINKING[i],p=PROJECTS.find(x=>x.slug===f.project);
-  thinkPanel.innerHTML=`
-    <div class="tp-main">
-      <span class="ro-kind">Fase 0${i+1} · ${esc(f.node)}</span>
-      <h3>${esc(f.title)}</h3>
-      <p>${esc(f.text)}</p>
-      <ul class="tp-inputs" aria-label="Qué entra en juego">${f.inputs.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>
-    </div>
-    <div class="tp-evidence">
-      <span class="ro-kind">Dónde se ve</span>
-      <p>${esc(f.evidence)}</p>
-      ${p?`<button type="button" class="link-btn" data-open="${esc(p.slug)}">Ver ${esc(p.title)} ${arrow}</button>`:''}
-    </div>
-    <div class="tp-nav"><button type="button" class="btn ghost sm" data-next>${i<last?'Siguiente fase':'Volver a empezar'} ${arrow}</button></div>`;
-  $$('[data-open]',thinkPanel).forEach(b=>b.onclick=()=>openProject(b.dataset.open));
-  $('[data-next]',thinkPanel).onclick=()=>setThink(i<last?i+1:0,true);
-  if(changed)document.dispatchEvent(new CustomEvent('thinkchange',{detail:{i,fromScroll:!!fromScroll}}));
-}
-setThink(0);
-
-/* ---------- trayectoria: marketing + diseño + código + IA ---------- */
-const pathEl=$('#path'),pathCard=$('#pathCard'),pathSum=$('#pathSum'),pathLast=PATH.steps.length-1;
-PATH.steps.forEach((s,i)=>{
-  const li=document.createElement('li');
-  li.innerHTML=`<button type="button" class="path-step" aria-pressed="false"><span class="path-ring" aria-hidden="true"><span></span></span><b>${esc(s.name)}</b></button>`;
-  li.querySelector('button').onclick=()=>{pathStop();setPath(i)};
-  pathEl.appendChild(li);
-});
-function setPath(i){
-  $$('.path-step',pathEl).forEach((b,j)=>{b.setAttribute('aria-pressed',String(j===i));b.classList.toggle('on',j<=i)});
-  pathEl.style.setProperty('--fill',i/pathLast);
-  const s=PATH.steps[i];
+/* ---------- trayectoria: cuatro etapas ---------- */
+const pathEl=$('#path'),pathSum=$('#pathSum');
+pathEl.innerHTML=PATH.steps.map((s,i)=>{
   const train=s.training.length
-    ?`<div><span class="ro-kind">Formación</span><ul class="pc-train">${s.training.map(t=>`<li><b>${esc(t.title)}</b><span>${esc(t.place)}</span></li>`).join('')}</ul></div>`
+    ?`<div class="ps-block"><span class="ro-kind">Formación</span><ul class="ps-train">${s.training.map(t=>`<li><b>${esc(t.title)}</b><span>${esc(t.place)}</span></li>`).join('')}</ul></div>`
     :'';
-  pathCard.innerHTML=`
-    <div class="pc-head"><span class="ro-kind">Etapa 0${i+1} de 0${PATH.steps.length} · ${esc(s.origin)}</span><h3>${esc(s.name)}</h3><p class="pc-ask">${esc(s.ask)}</p></div>
-    <div class="pc-cols">${train}<div><span class="ro-kind">Se nota hoy</span><p>${esc(s.today)}</p></div></div>
-    <p class="pc-evidence">${esc(s.evidence)}</p>`;
-  pathSum.innerHTML=PATH.steps.slice(0,i+1).map((x,j)=>`${j?'<span class="op" aria-hidden="true">+</span>':''}<span class="term">${esc(x.name)}</span>`).join('')
-    +(i===pathLast?`<span class="op" aria-hidden="true">=</span><span class="total">${esc(PATH.result)}</span>`:'');
-  window.motion?.enabled&&motion.card?.(pathCard);
-}
-let pathTimer=null;
-function pathStop(){clearInterval(pathTimer);pathTimer=null}
-if(matchMedia('(prefers-reduced-motion: reduce)').matches||!('IntersectionObserver' in window))setPath(pathLast);
-else{
-  setPath(0);
-  const pio=new IntersectionObserver(es=>{
-    if(!es[0].isIntersecting)return;
-    pio.disconnect();
-    let k=0;pathTimer=setInterval(()=>{k++;setPath(k);if(k>=pathLast)pathStop()},1500);
-  },{threshold:.5});
-  pio.observe(pathEl);
-}
+  return `<li class="ps" style="--i:${i}">
+    <span class="ps-num" aria-hidden="true">0${i+1}</span>
+    <h3>${esc(s.name)}</h3>
+    <p class="ps-ask">${esc(s.ask)}</p>
+    ${train}
+    <div class="ps-block"><span class="ro-kind">Cómo lo implemento</span><p>${esc(s.implement)}</p></div>
+  </li>`;
+}).join('');
+pathSum.innerHTML=PATH.steps.map((x,j)=>`${j?'<span class="op" aria-hidden="true">+</span>':''}<span class="term">${esc(x.name)}</span>`).join('')
+  +`<span class="op" aria-hidden="true">=</span><span class="total">${esc(PATH.result)}</span>`;
 
 /* ---------- experiencia: entrada, titulares, hilo del recorrido y profundidad ---------- */
 const calm=matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -551,27 +492,11 @@ $$('.reveal').forEach(s=>{
 const revealIO=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');revealIO.unobserve(e.target)}}),{threshold:.12});
 $$('.reveal').forEach(el=>revealIO.observe(el));
 
-const mapbox=$('.mapbox'),hero=$('.hero');
-let scrollQueued=false;
-function onScrollFrame(){
-  scrollQueued=false;
-  if(!calm){
-    const r=hero.getBoundingClientRect(),off=Math.max(0,-r.top);
-    if(off>0&&r.bottom>0){
-      const k=Math.min(1,off/r.height);
-      mapbox.style.transform=`translate3d(0,${off*.18}px,0) scale(${1-k*.06})`;
-      mapbox.style.opacity=String(1-k*.7);
-    }else if(mapbox.style.transform){mapbox.style.transform='';mapbox.style.opacity=''}
-  }
-}
-addEventListener('scroll',()=>{if(!scrollQueued){scrollQueued=true;requestAnimationFrame(onScrollFrame)}},{passive:true});
-addEventListener('resize',onScrollFrame,{passive:true});
-onScrollFrame();
 
 /* Foco de luz que sigue al puntero sobre las superficies interactivas */
 if(!calm&&matchMedia('(hover: hover)').matches){
   document.addEventListener('pointermove',e=>{
-    const el=e.target.closest?.('.card, .think-panel, .path-card, .stack-detail');
+    const el=e.target.closest?.('.card, .ps, .stack-detail');
     if(!el)return;
     const r=el.getBoundingClientRect();
     el.style.setProperty('--mx',(e.clientX-r.left)+'px');
@@ -579,6 +504,30 @@ if(!calm&&matchMedia('(hover: hover)').matches){
   },{passive:true});
 }
 
+/* ---------- desplazamiento suave a las secciones (no con CSS: ScrollTrigger lo necesita instantáneo al recalcular) ---------- */
+document.addEventListener('click',e=>{
+  const a=e.target.closest?.('a[href^="#"]');
+  if(!a||e.defaultPrevented||e.metaKey||e.ctrlKey||e.shiftKey)return;
+  const id=a.getAttribute('href').slice(1);
+  if(!id||id.startsWith('p='))return;
+  const el=document.getElementById(id);
+  if(!el)return;
+  e.preventDefault();
+  const y=id==='inicio'?0:el.getBoundingClientRect().top+scrollY-76;
+  scrollTo({top:Math.max(0,y),behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});
+  try{history.replaceState(null,'','#'+id)}catch(err){}
+});
+
 /* ---------- arranque ---------- */
 renderCats();renderGrid();renderStack();buildMap();
+{
+  let lw=$('#mapfull').clientWidth,lh=$('#mapfull').clientHeight,tm=null;
+  new ResizeObserver(()=>{
+    clearTimeout(tm);
+    tm=setTimeout(()=>{
+      const w=$('#mapfull').clientWidth,h=$('#mapfull').clientHeight;
+      if(Math.abs(w-lw)>40||Math.abs(h-lh)>60){lw=w;lh=h;buildMap()}
+    },250);
+  }).observe($('#mapfull'));
+}
 if(location.hash.startsWith('#p='))openProject(location.hash.slice(3),true);

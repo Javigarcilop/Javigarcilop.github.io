@@ -33,7 +33,7 @@
     <a class="brand" href="#inicio" aria-label="Javier García, inicio"><svg aria-hidden="true"><use href="#mono"/></svg></a>
     <nav class="main" id="mainnav" aria-label="Principal">
       <a href="#trayectoria">Trayectoria</a>
-      <a href="#como-pienso">Cómo pienso</a>
+      <a href="#mapa">Mapa</a>
       <a href="#proyectos">Proyectos</a>
       <a href="#stack">Stack</a>
       <a href="#contacto">Contacto</a>
@@ -73,21 +73,13 @@
   </div>
 </section>
 
-<section class="hero reveal" id="presentacion" aria-label="Quién soy">
-  <div class="wrap">
-    <div class="hero-copy">
-      <p class="lead">Mi mayor ventaja como developer no la aprendí programando.</p>
-      <p class="lead-more">Vengo del marketing y del diseño gráfico. Soy desarrollador web Full Stack con una orientación cada vez mayor hacia backend. Mi camino hacia el desarrollo de software comenzó en el diseño gráfico y la curiosidad por entender cómo se construía por dentro aquello que diseñaba me llevó a descubrir el mundo del software y a formarme en desarrollo de aplicaciones web.
-
-Actualmente trabajo en el desarrollo y evolución de aplicaciones utilizadas en entornos reales, especialmente en proyectos relacionados con formación, FUNDAE, SEPE, integración de sistemas y automatización de procesos.
-
-Mi evolución profesional está enfocada en el backend, automatización e inteligencia artificial, tanto aplicada al desarrollo de software como a la creación de soluciones y flujos de trabajo. Actualmente estoy abierto a nuevas oportunidades profesionales donde pueda seguir creciendo, aportar mi experiencia y afrontar nuevos retos dentro del mundo tech..</p>
-    </div>
-    <div class="mapbox">
-      <svg id="map" viewBox="0 0 640 540" role="group" aria-label="Mapa de proyectos y tecnologías. Cada círculo grande es un proyecto y cada círculo pequeño, una tecnología."></svg>
-      <div class="map-readout" id="readout" aria-live="polite">
-        <p class="map-hint">Selecciona un nodo para ver qué es y dónde lo uso. Puedes arrastrarlos.</p>
-      </div>
+<section class="intro reveal" id="presentacion" aria-label="Quién soy">
+  <div class="wrap intro-grid">
+    <p class="lead">Mi mayor ventaja como developer no la aprendí programando.</p>
+    <div class="intro-text">
+      <p>Vengo del marketing y del diseño gráfico. Soy desarrollador web Full Stack con una orientación cada vez mayor hacia backend. Mi camino hacia el desarrollo de software comenzó en el diseño gráfico y la curiosidad por entender cómo se construía por dentro aquello que diseñaba me llevó a descubrir el mundo del software y a formarme en desarrollo de aplicaciones web.</p>
+      <p>Actualmente trabajo en el desarrollo y evolución de aplicaciones utilizadas en entornos reales, especialmente en proyectos relacionados con formación, FUNDAE, SEPE, integración de sistemas y automatización de procesos.</p>
+      <p>Mi evolución profesional está enfocada en el backend, automatización e inteligencia artificial, tanto aplicada al desarrollo de software como a la creación de soluciones y flujos de trabajo. Actualmente estoy abierto a nuevas oportunidades profesionales donde pueda seguir creciendo, aportar mi experiencia y afrontar nuevos retos dentro del mundo tech.</p>
     </div>
   </div>
 </section>
@@ -98,25 +90,21 @@ Mi evolución profesional está enfocada en el backend, automatización e inteli
       <p class="eyebrow">Trayectoria</p>
       <h2 class="path-title" id="pathTitle">Marketing, diseño, código e IA. Cada etapa suma.</h2>
     </div>
-    <ol class="path" id="path" style="--n:4"></ol>
-    <div class="path-card" id="pathCard" aria-live="polite"></div>
+    <ol class="path" id="path" aria-label="Etapas de mi trayectoria"></ol>
     <div class="path-sum" id="pathSum"></div>
   </div>
 </section>
 
-<section id="como-pienso" class="reveal">
-  <div class="wrap">
-    <div class="sec-head">
-      <div>
-        <p class="eyebrow">Cómo pienso</p>
-        <h2 class="h">Una idea se convierte en producto en cinco pasos.</h2>
-        <p class="sub">Selecciona una fase para ver cómo la abordo y dónde se nota en mi trabajo.</p>
-      </div>
+<section class="mapa reveal" id="mapa" aria-label="Mapa de proyectos y tecnologías">
+  <div class="mapfull" id="mapfull">
+    <svg id="map" role="group" aria-label="Mapa de proyectos y tecnologías. Cada círculo grande es un proyecto y cada círculo pequeño, una tecnología."></svg>
+    <div class="mapfull-head">
+      <p class="eyebrow">Mapa</p>
+      <h2 class="h">Proyectos y tecnologías, conectados.</h2>
+      <p class="sub">Mueve el cursor para atraer los nodos, arrástralos y suéltalos, o selecciona uno para ver cómo se relaciona.</p>
     </div>
-    <div class="think">
-      <div class="think-tabs" role="tablist" aria-label="Fases de mi forma de trabajar" id="thinkTabs"></div>
-      <div class="flow" id="flow" aria-hidden="true"></div>
-      <div class="think-panel" id="thinkPanel" role="tabpanel" tabindex="0"></div>
+    <div class="map-readout" id="readout" aria-live="polite">
+      <p class="map-hint">Selecciona un nodo para ver qué es y dónde lo uso. Puedes arrastrarlos.</p>
     </div>
   </div>
 </section>
