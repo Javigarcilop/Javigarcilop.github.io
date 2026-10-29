@@ -182,7 +182,7 @@ function start(){
     const data=typeof PATH!=='undefined'?PATH:null;
     const steps=data?data.steps.map((s,i)=>({
       kicker:'Etapa 0'+(i+1),title:s.name,sub:s.ask,
-      left:s.training.length?{label:'Formación',items:s.training.map(t=>t.title+' · '+t.place)}:null,
+      left:s.training.length?{label:'Formación',items:s.training.map(t=>t.title+' · '+t.place+' · '+t.years)}:null,
       right:{label:'Cómo lo implemento',items:[s.implement]}
     })):[];
     if(data)steps.push({kicker:'El resultado',title:data.result,sub:'Javier García · Desarrollo Full Stack · Sevilla',big:true});

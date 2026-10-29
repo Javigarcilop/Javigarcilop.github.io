@@ -448,7 +448,7 @@ $('#copy').onclick=async()=>{
 const pathEl=$('#path'),pathSum=$('#pathSum');
 pathEl.innerHTML=PATH.steps.map((s,i)=>{
   const train=s.training.length
-    ?`<div class="ps-block"><span class="ro-kind">Formación</span><ul class="ps-train">${s.training.map(t=>`<li><b>${esc(t.title)}</b><span>${esc(t.place)}</span></li>`).join('')}</ul></div>`
+    ?`<div class="ps-block"><span class="ro-kind">Formación</span><ul class="ps-train">${s.training.map(t=>`<li><b>${esc(t.title)}</b><span>${esc(t.place)}</span><em>${esc(t.years)}</em></li>`).join('')}</ul></div>`
     :'';
   return `<li class="ps" style="--i:${i}">
     <span class="ps-num" aria-hidden="true">0${i+1}</span>
