@@ -158,20 +158,6 @@ h1.title .ch{display:inline-block}
 @keyframes headIn{from{opacity:0;transform:translateY(-100%)}}
 .mapbox{will-change:transform}
 
-/* hilo del recorrido */
-.rail{display:none;position:fixed;z-index:40;left:max(14px,calc((100vw - 1180px) / 2 - 56px));top:50%;width:20px;height:min(56vh,440px);opacity:0;transform:translate(-10px,-50%);pointer-events:none;transition:opacity .5s,transform .5s var(--ease-out)}
-@media (min-width:1320px){.rail{display:block}}
-.rail.show{opacity:1;transform:translate(0,-50%);pointer-events:auto}
-.rail-track{position:absolute;left:9px;top:0;bottom:0;width:2px;border-radius:2px;background:var(--sky);overflow:hidden}
-.rail-fill{position:absolute;inset:0;background:linear-gradient(180deg,var(--blue),var(--cyan));transform-origin:top;transform:scaleY(0);transition:transform .2s linear}
-.rail-dot{position:absolute;left:0;top:calc(var(--y) * 100%);width:20px;height:20px;margin-top:-10px;padding:0;border:0;background:none;display:grid;place-items:center}
-.rail-dot::before{content:"";width:10px;height:10px;border-radius:50%;border:2px solid var(--sky);background:var(--bg);transition:background .3s,border-color .3s,transform .3s var(--ease-out),box-shadow .3s}
-.rail-dot.on::before{border-color:var(--blue);background:var(--blue)}
-.rail-dot.now::before{transform:scale(1.4);box-shadow:0 0 0 5px var(--glow1)}
-.rail-dot:last-child.now::before{border-color:var(--cyan);background:var(--cyan);box-shadow:0 0 0 5px var(--glow2)}
-.rail-label{position:absolute;left:30px;white-space:nowrap;font-size:13px;font-weight:600;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:3px 10px;box-shadow:var(--shadow);opacity:0;transform:translateX(-6px);transition:opacity .2s,transform .2s;pointer-events:none}
-.rail-dot:hover .rail-label{opacity:1;transform:none}
-
 /* foco de luz bajo el puntero */
 @media (hover:hover){
   :is(.card,.think-panel,.journey-card,.stack-detail):hover{background-image:radial-gradient(380px circle at var(--mx,50%) var(--my,50%),var(--glow1),transparent 65%)}

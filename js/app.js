@@ -661,32 +661,10 @@ $$('.reveal').forEach(s=>{
 const revealIO=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');revealIO.unobserve(e.target)}}),{threshold:.12});
 $$('.reveal').forEach(el=>revealIO.observe(el));
 
-const rail=$('#rail'),railFill=$('#railFill');
-const railSecs=$$('main > section[id]'),railNames={inicio:'Inicio',camino:'El camino'};
-railSecs.forEach((s,i)=>{
-  const b=document.createElement('button');
-  b.type='button';b.tabIndex=-1;b.className='rail-dot';
-  b.style.setProperty('--y',i/(railSecs.length-1));
-  const name=railNames[s.id]||$(`nav.main a[href="#${s.id}"]`)?.textContent||s.id;
-  b.innerHTML=`<span class="rail-label">${esc(name)}</span>`;
-  b.onclick=()=>s.scrollIntoView({behavior:calm?'auto':'smooth'});
-  rail.appendChild(b);
-});
-const railDots=$$('.rail-dot',rail),mapbox=$('.mapbox'),hero=$('.hero');
+const mapbox=$('.mapbox'),hero=$('.hero');
 let scrollQueued=false;
 function onScrollFrame(){
   scrollQueued=false;
-  const mid=innerHeight*.5;
-  let pos=0;
-  railSecs.forEach((s,i)=>{
-    const r=s.getBoundingClientRect();
-    if(r.top<=mid)pos=i+Math.min(1,Math.max(0,(mid-r.top)/r.height))*(i<railSecs.length-1?1:0);
-  });
-  const atEnd=innerHeight+scrollY>=document.documentElement.scrollHeight-4;
-  if(atEnd)pos=railSecs.length-1;
-  railFill.style.transform=`scaleY(${pos/(railSecs.length-1)})`;
-  railDots.forEach((d,i)=>{d.classList.toggle('on',i<=Math.floor(pos+.001));d.classList.toggle('now',i===Math.min(railSecs.length-1,Math.floor(pos+.001)))});
-  rail.classList.toggle('show',scrollY>innerHeight*.35);
   if(!calm&&scrollY<hero.offsetHeight){
     const k=scrollY/hero.offsetHeight;
     mapbox.style.transform=`translate3d(0,${scrollY*.18}px,0) scale(${1-k*.06})`;
