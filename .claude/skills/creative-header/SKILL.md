@@ -73,14 +73,17 @@ gsap.timeline({ delay: 1.1, repeat: -1, repeatDelay: 5, yoyo: true,
 - [ ] Pausa al salir del hero (el ticker deja de dibujar).
 - [ ] Tema claro y oscuro legibles; cian solo en formas.
 
-## Variante implementada: túnel de código 3D (Three.js + ScrollTrigger)
+## Variante implementada: viaje por la trayectoria (Three.js + ScrollTrigger)
 
-Es la versión actual del hero (`js/tunnel.js`, escena en `.tunnel`). Sustituye al fondo Canvas 2D del escáner.
+Versión actual del hero (`js/tunnel.js`, escena en `.tunnel`). Sustituye al fondo Canvas 2D del escáner y a una primera versión de glifos de colores que cansaba la vista.
 
-- **Dos draw calls**: un `Points` con atlas de glifos (una sola textura, `ShaderMaterial` aditivo) y un `LineSegments` para las ráfagas de luz. Miles de elementos sin instanciar objetos sueltos.
-- **Carga diferida**: Three.js (`assets/vendor/three.module.min.js`) se importa con `import()` tras `load` + `requestIdleCallback`. El texto del hero es visible desde el primer pintado.
-- **Guion del scroll**: `.tunnel` mide 300 svh con un hijo `position: sticky`; un timeline con `scrollTrigger` (`scrub`) mueve la cámara, acerca y desvanece el texto, estira las ráfagas según la velocidad y funde el fondo hacia la siguiente sección. No usa `pin` de ScrollTrigger.
+- **Idea**: un pasillo de marcos que recorre las etapas de `PATH` (Marketing → Diseño → Código → Product Engineering e IA → resultado). Cada etapa es un portal con su nombre y su pregunta; los marcos pasan de gris azulado a azul y a cian.
+- **Paleta contenida**: un fondo #0d0f12, líneas finas con alfa bajo y mezcla aditiva suave; un solo tono para el polvo de glifos, sin parpadeo ni colores saturados superpuestos. Evitar verdes/índigos de relleno, destellos y brillo aditivo alto: dañan la lectura y fatigan.
+- **Pocas draw calls**: un `LineSegments` (marcos y guías), un `Points` (≈1000 glifos tenues) y un plano por etiqueta (texto en `CanvasTexture`).
+- **Cámara por paradas**: avanza con un ease suave y se detiene a 14 unidades de cada portal, de modo que cada etiqueta se lee. La opacidad de cada etiqueta depende de la distancia.
+- **Carga diferida**: Three.js (`assets/vendor/three.module.min.js`) se importa con `import()` tras `load` + `requestIdleCallback`.
+- **Guion del scroll**: `.tunnel` mide 520 svh con un hijo `position: sticky`; un timeline con `scrollTrigger` (`scrub`) mueve la cámara, acerca y desvanece el título y funde el fondo hacia la web. `ST.config({ignoreMobileResize:true})` evita recálculos por la barra del navegador.
 - **Degradado**: sin WebGL, sin GSAP, con `prefers-reduced-motion` o `saveData` queda `.tunnel.calm` (100 svh, texto legible sobre #0d0f12); con reduced-motion se pinta un único fotograma.
 - **Cabecera**: mientras `body.on-tunnel`, la cabecera usa colores claros sobre el fondo oscuro.
-- **Limpieza**: `window.tunnelScene.destroy()` (también en `pagehide` y al perder el contexto) para el ticker, desconecta observadores, mata el ScrollTrigger y hace `dispose()` de geometrías, materiales, textura y renderer.
-- **Móvil**: menos partículas, DPR ≤ 1.5, ~30 fps y sin giro de cámara por ratón.
+- **Limpieza**: `window.tunnelScene.destroy()` (también en `pagehide` y al perder el contexto): para el ticker, desconecta observadores, mata el ScrollTrigger y hace `dispose()` de geometrías, materiales, texturas y renderer.
+- **Móvil**: menos polvo, DPR ≤ 1.5, ~30 fps, FOV mayor en vertical, etiquetas escaladas al ancho visible y sin giro de cámara por ratón.
