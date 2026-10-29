@@ -484,19 +484,28 @@ function setThink(i,focus,fromScroll){
 }
 setThink(0);
 
-/* ---------- el camino que suma ---------- */
-const pathEl=$('#path'),pathSum=$('#pathSum'),pathLast=PATH.steps.length-1;
+/* ---------- trayectoria: marketing + diseño + código + IA ---------- */
+const pathEl=$('#path'),pathCard=$('#pathCard'),pathSum=$('#pathSum'),pathLast=PATH.steps.length-1;
 PATH.steps.forEach((s,i)=>{
   const li=document.createElement('li');
-  li.innerHTML=`<button type="button" class="path-step" aria-pressed="false"><span class="path-ring" aria-hidden="true"><span></span></span><b>${esc(s.name)}</b><small>+ ${esc(s.adds)}</small></button>`;
+  li.innerHTML=`<button type="button" class="path-step" aria-pressed="false"><span class="path-ring" aria-hidden="true"><span></span></span><b>${esc(s.name)}</b></button>`;
   li.querySelector('button').onclick=()=>{pathStop();setPath(i)};
   pathEl.appendChild(li);
 });
 function setPath(i){
   $$('.path-step',pathEl).forEach((b,j)=>{b.setAttribute('aria-pressed',String(j===i));b.classList.toggle('on',j<=i)});
   pathEl.style.setProperty('--fill',i/pathLast);
-  pathSum.innerHTML=PATH.steps.slice(0,i+1).map((s,j)=>`${j?'<span class="op" aria-hidden="true">+</span>':''}<span class="term" style="--d:${j}">${esc(s.name)}</span>`).join('')
+  const s=PATH.steps[i];
+  const train=s.training.length
+    ?`<div><span class="ro-kind">Formación</span><ul class="pc-train">${s.training.map(t=>`<li><b>${esc(t.title)}</b><span>${esc(t.place)}</span></li>`).join('')}</ul></div>`
+    :'';
+  pathCard.innerHTML=`
+    <div class="pc-head"><span class="ro-kind">Etapa 0${i+1} de 0${PATH.steps.length} · ${esc(s.origin)}</span><h3>${esc(s.name)}</h3><p class="pc-ask">${esc(s.ask)}</p></div>
+    <div class="pc-cols">${train}<div><span class="ro-kind">Se nota hoy</span><p>${esc(s.today)}</p></div></div>
+    <p class="pc-evidence">${esc(s.evidence)}</p>`;
+  pathSum.innerHTML=PATH.steps.slice(0,i+1).map((x,j)=>`${j?'<span class="op" aria-hidden="true">+</span>':''}<span class="term">${esc(x.name)}</span>`).join('')
     +(i===pathLast?`<span class="op" aria-hidden="true">=</span><span class="total">${esc(PATH.result)}</span>`:'');
+  window.motion?.enabled&&motion.card?.(pathCard);
 }
 let pathTimer=null;
 function pathStop(){clearInterval(pathTimer);pathTimer=null}
@@ -506,129 +515,10 @@ else{
   const pio=new IntersectionObserver(es=>{
     if(!es[0].isIntersecting)return;
     pio.disconnect();
-    let k=0;pathTimer=setInterval(()=>{k++;setPath(k);if(k>=pathLast)pathStop()},750);
+    let k=0;pathTimer=setInterval(()=>{k++;setPath(k);if(k>=pathLast)pathStop()},1500);
   },{threshold:.5});
   pio.observe(pathEl);
 }
-
-/* ---------- trayectoria ---------- */
-const jSteps=$('#journeySteps'),jCard=$('#journeyCard'),jCarry=$('#journeyCarry');
-JOURNEY.forEach((s,i)=>{
-  const li=document.createElement('li');
-  li.innerHTML=`<button type="button" class="j-step" aria-pressed="false"><span class="j-dot" aria-hidden="true"></span><span class="j-label"><b>${esc(s.stage)}</b><small>${esc(s.where)}</small></span></button>`;
-  li.querySelector('button').onclick=()=>setJourney(i);
-  jSteps.appendChild(li);
-  const c=document.createElement('li');c.textContent=s.carry;jCarry.appendChild(c);
-});
-function setJourney(i){
-  $$('.j-step',jSteps).forEach((b,j)=>{b.setAttribute('aria-pressed',String(j===i));b.classList.toggle('past',j<i)});
-  $$('li',jCarry).forEach((c,j)=>c.classList.toggle('on',j<=i));
-  jSteps.style.setProperty('--progress',i/(JOURNEY.length-1));
-  const s=JOURNEY[i];
-  jCard.innerHTML=`
-    <span class="ro-kind">Etapa 0${i+1} de 0${JOURNEY.length}</span>
-    <h3>${esc(s.stage)}</h3>
-    <p class="j-where">${esc(s.where)}</p>
-    <div class="j-cols">
-      <div><span class="ro-kind">Qué aprendí</span><p>${esc(s.learned)}</p></div>
-      <div><span class="ro-kind">Cómo influye hoy</span><p>${esc(s.today)}</p></div>
-    </div>
-    <p class="j-evidence">${esc(s.evidence)}</p>`;
-}
-setJourney(JOURNEY.length-1);
-
-/* ---------- engineering lab ---------- */
-const LAB_ICONS=[
-  '<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>',
-  '<rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/>',
-  '<path d="M8 4c-2 0-3 1-3 3v2c0 1.5-1 2-2 3 1 1 2 1.5 2 3v2c0 2 1 3 3 3M16 4c2 0 3 1 3 3v2c0 1.5 1 2 2 3-1 1-2 1.5-2 3v2c0 2-1 3-3 3"/>',
-  '<rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/><path d="M6.5 10v4a3 3 0 0 0 3 3H14"/>',
-  '<ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5"/><path d="M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/>',
-  '<path d="M9 14 4 9l5-5"/><path d="M4 9h10a6 6 0 0 1 0 12h-1"/>'
-];
-const labStage=$('#labStage'),labNodes=$('#labNodes'),labPacket=$('#labPacket'),labTrace=$('#labTrace'),labInspect=$('#labInspect'),labRun=$('#labRun'),labStepBtn=$('#labStep');
-const labReduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
-let labSc=0,labPos=-1,labTimer=null,labPrevNode=0;
-LAB.nodes.forEach((n,i)=>{
-  if(i)labNodes.insertAdjacentHTML('beforeend','<span class="lab-link" aria-hidden="true"></span>');
-  const b=document.createElement('button');
-  b.type='button';b.className='lab-node';
-  b.setAttribute('aria-label',n.name+': ver qué hace');
-  b.innerHTML=`<span class="lab-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${LAB_ICONS[i]}</svg></span><b>${esc(n.name)}</b>`;
-  b.onclick=()=>inspectLab(i,true);
-  labNodes.appendChild(b);
-});
-LAB.scenarios.forEach((s,i)=>{
-  const b=document.createElement('button');
-  b.type='button';b.className='chip';b.textContent=s.name;
-  b.onclick=()=>{setLabScenario(i)};
-  $('#labScenarios').appendChild(b);
-});
-function inspectLab(i,user){
-  const n=LAB.nodes[i];
-  if(user)$$('.lab-node',labNodes).forEach((b,j)=>b.classList.toggle('picked',j===i));
-  labInspect.innerHTML=`<span class="ro-kind">Pieza ${i+1} de ${LAB.nodes.length}</span><h3>${esc(n.name)}</h3><p>${esc(n.role)}</p><p class="lab-ex"><span class="ro-kind">En TempliMail</span>${esc(n.ex)}</p>`;
-}
-function setLabScenario(i){
-  clearTimeout(labTimer);labTimer=null;
-  labSc=i;labPos=-1;labPrevNode=0;
-  const s=LAB.scenarios[i];
-  $$('#labScenarios .chip').forEach((b,j)=>b.setAttribute('aria-pressed',String(j===i)));
-  $('#labMethod').textContent=s.method;
-  const code=$('#labCode');code.textContent='';code.className='lab-code';
-  labTrace.innerHTML='<li class="lab-hint">Pulsa «Enviar petición» o avanza paso a paso.</li>';
-  $$('.lab-node',labNodes).forEach(b=>b.classList.remove('hot','visited'));
-  $$('.lab-link',labNodes).forEach(l=>l.classList.remove('req','res'));
-  labPacket.classList.remove('show','res');
-  labRun.disabled=false;
-  labStepBtn.textContent='Paso a paso';
-}
-function labCenter(i){
-  const node=$$('.lab-node',labNodes)[i].querySelector('.lab-ico').getBoundingClientRect(),st=labStage.getBoundingClientRect();
-  return {x:node.left+node.width/2-st.left,y:node.top+node.height/2-st.top};
-}
-function moveLabPacket(i,animate){
-  const to=labCenter(i);
-  if(window.motion?.enabled){motion.packet(labPacket,to.x,to.y,animate&&labPacket.classList.contains('show'));return}
-  const end=`translate(${to.x}px,${to.y}px) translate(-50%,-50%)`;
-  const from=getComputedStyle(labPacket).transform;
-  labPacket.getAnimations?.().forEach(a=>a.cancel());
-  labPacket.style.transform=end;
-  if(animate&&!labReduce&&labPacket.animate&&labPacket.classList.contains('show')){
-    labPacket.animate([{transform:from},{transform:end}],{duration:520,easing:'cubic-bezier(.45,0,.2,1)'});
-  }
-}
-function stepLab(){
-  const s=LAB.scenarios[labSc];
-  if(labPos>=s.steps.length-1){setLabScenario(labSc)}
-  labPos++;
-  const [node,text]=s.steps[labPos],dir=labPos>4?'res':'req';
-  if(labPos===0)labTrace.innerHTML='';
-  const nodes=$$('.lab-node',labNodes),links=$$('.lab-link',labNodes);
-  nodes.forEach((b,j)=>{b.classList.toggle('hot',j===node);if(j===node)b.classList.add('visited')});
-  for(let k=Math.min(node,labPrevNode);k<Math.max(node,labPrevNode);k++){links[k].classList.remove('req','res');links[k].classList.add(dir)}
-  labPrevNode=node;
-  labPacket.classList.toggle('res',dir==='res');
-  if(labPos===0){moveLabPacket(node,false);labPacket.classList.add('show')}else moveLabPacket(node,true);
-  window.motion?.enabled&&motion.arrive(nodes[node].querySelector('.lab-ico'),dir,labPos===0?0:.5);
-  labTrace.insertAdjacentHTML('beforeend',`<li class="${dir}"><b>${esc(LAB.nodes[node].name)}</b><span>${esc(text)}</span></li>`);
-  inspectLab(node,false);
-  $$('.lab-node',labNodes).forEach(b=>b.classList.remove('picked'));
-  const done=labPos===s.steps.length-1;
-  if(done){const c=$('#labCode');c.textContent=s.code;c.classList.add(s.ok?'ok':'err');labRun.disabled=false;labStepBtn.textContent='Repetir';window.motion?.enabled&&motion.pop(c)}
-  else labStepBtn.textContent='Siguiente paso';
-  return done;
-}
-labRun.onclick=()=>{
-  setLabScenario(labSc);
-  labRun.disabled=true;
-  const tick=()=>{if(!stepLab())labTimer=setTimeout(tick,labReduce?1400:950)};
-  tick();
-};
-labStepBtn.onclick=()=>{window.motion?.enabled&&motion.press(labStepBtn);clearTimeout(labTimer);labRun.disabled=false;stepLab()};
-addEventListener('resize',()=>{if(labPos>=0)moveLabPacket(LAB.scenarios[labSc].steps[labPos][0],false)},{passive:true});
-setLabScenario(0);
-inspectLab(2,false);
 
 /* ---------- experiencia: entrada, titulares, hilo del recorrido y profundidad ---------- */
 const calm=matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -678,7 +568,7 @@ onScrollFrame();
 /* Foco de luz que sigue al puntero sobre las superficies interactivas */
 if(!calm&&matchMedia('(hover: hover)').matches){
   document.addEventListener('pointermove',e=>{
-    const el=e.target.closest?.('.card, .think-panel, .journey-card, .stack-detail');
+    const el=e.target.closest?.('.card, .think-panel, .path-card, .stack-detail');
     if(!el)return;
     const r=el.getBoundingClientRect();
     el.style.setProperty('--mx',(e.clientX-r.left)+'px');

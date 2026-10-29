@@ -7,23 +7,7 @@
   if(!enabled)return;
   G.registerPlugin(ST);
 
-  /* ---------- Engineering Lab ---------- */
-  motion.packet=(el,x,y,animate)=>{
-    G.killTweensOf(el);
-    if(!animate){G.set(el,{x,y,xPercent:-50,yPercent:-50,scale:1});return}
-    G.timeline()
-      .to(el,{x,y,xPercent:-50,yPercent:-50,duration:.6,ease:'power3.inOut'})
-      .to(el,{scale:1.35,duration:.3,ease:'power2.out',yoyo:true,repeat:1},0);
-  };
-  motion.arrive=(ico,kind,delay)=>{
-    const ring=document.createElement('span');
-    ring.className='lab-ripple '+kind;
-    ico.appendChild(ring);
-    G.fromTo(ring,{scale:.7,opacity:.7},{scale:1.7,opacity:0,duration:.75,delay,ease:'power2.out',onComplete:()=>ring.remove()});
-    G.fromTo(ico.querySelector('svg'),{scale:.6},{scale:1,duration:.8,delay,ease:'elastic.out(1,.45)',clearProps:'transform'});
-  };
-  motion.pop=el=>G.fromTo(el,{scale:.6},{scale:1,duration:.6,ease:'back.out(3)',clearProps:'transform'});
-  motion.press=el=>G.fromTo(el,{scale:.94,transition:'none'},{scale:1,duration:.6,ease:'elastic.out(1,.5)',clearProps:'transform,transition'});
+  motion.card=el=>G.fromTo(el.children,{opacity:0,y:14},{opacity:1,y:0,duration:.5,stagger:.07,ease:'power2.out',clearProps:'opacity,transform'});
 
   /* ---------- Mapa de nodos: rebote elástico al soltar ---------- */
   motion.release=g=>{

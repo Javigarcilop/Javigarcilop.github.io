@@ -32,10 +32,9 @@
   <div class="wrap">
     <a class="brand" href="#inicio" aria-label="Javier García, inicio"><svg aria-hidden="true"><use href="#mono"/></svg></a>
     <nav class="main" id="mainnav" aria-label="Principal">
+      <a href="#trayectoria">Trayectoria</a>
       <a href="#como-pienso">Cómo pienso</a>
       <a href="#proyectos">Proyectos</a>
-      <a href="#trayectoria">Trayectoria</a>
-      <a href="#lab">Lab</a>
       <a href="#stack">Stack</a>
       <a href="#contacto">Contacto</a>
       <span class="nav-cursor" id="navCursor" aria-hidden="true"></span>
@@ -80,15 +79,15 @@
   </div>
 </section>
 
-<section class="path-band reveal" id="camino" aria-labelledby="pathTitle">
+<section class="path-band reveal" id="trayectoria" aria-labelledby="pathTitle">
   <div class="wrap">
     <div class="path-head">
-      <p class="eyebrow">El camino que suma</p>
-      <h2 class="path-title" id="pathTitle">Cada etapa se suma a la anterior.</h2>
+      <p class="eyebrow">Trayectoria</p>
+      <h2 class="path-title" id="pathTitle">Marketing, diseño, código e IA. Cada etapa suma.</h2>
     </div>
     <ol class="path" id="path" style="--n:4"></ol>
-    <div class="path-sum" id="pathSum" aria-live="polite"></div>
-    <a class="path-more" href="#trayectoria">Ver la trayectoria completa</a>
+    <div class="path-card" id="pathCard" aria-live="polite"></div>
+    <div class="path-sum" id="pathSum"></div>
   </div>
 </section>
 
@@ -131,61 +130,6 @@
     <div class="empty" id="empty">
       <p>Ningún proyecto coincide con esos filtros.</p>
       <button class="btn ghost" type="button" id="reset">Quitar filtros</button>
-    </div>
-  </div>
-</section>
-
-<section id="trayectoria" class="reveal">
-  <div class="wrap">
-    <div class="sec-head">
-      <div>
-        <p class="eyebrow">Trayectoria</p>
-        <h2 class="h">No empecé programando..</h2>
-        <p class="sub">Soy desarrollador Full Stack en Sevilla, con orientación a backend e integraciones. Antes trabajé en diseño y marketing, y cada etapa sigue presente en cómo construyo software.</p>
-      </div>
-    </div>
-    <div class="journey">
-      <ol class="journey-steps" id="journeySteps" aria-label="Etapas de mi trayectoria"></ol>
-      <div class="journey-card" id="journeyCard" aria-live="polite"></div>
-      <div class="journey-carry">
-        <span class="ro-kind">Lo que llevo conmigo</span>
-        <ul id="journeyCarry"></ul>
-      </div>
-    </div>
-  </div>
-</section>
-
-<section id="lab" class="reveal">
-  <div class="wrap">
-    <div class="sec-head">
-      <div>
-        <p class="eyebrow">Engineering Lab</p>
-        <h2 class="h">Sigue una petición de principio a fin.</h2>
-        <p class="sub">Elige un caso y envía la petición. Es una simulación conceptual, sin ningún servidor detrás, pero cada paso reproduce cómo responde de verdad el backend de TempliMail.</p>
-      </div>
-    </div>
-    <div class="lab">
-      <div class="lab-controls">
-        <div class="lab-scenarios" id="labScenarios" role="group" aria-label="Caso a simular"></div>
-        <div class="lab-actions">
-          <button type="button" class="btn primary sm" id="labRun">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 4 14 8-14 8z"/></svg>
-            Enviar petición
-          </button>
-          <button type="button" class="btn ghost sm" id="labStep">Paso a paso</button>
-        </div>
-      </div>
-      <div class="lab-stage" id="labStage">
-        <div class="lab-nodes" id="labNodes"></div>
-        <span class="lab-packet" id="labPacket" aria-hidden="true"></span>
-      </div>
-      <div class="lab-bottom">
-        <div class="lab-trace-box">
-          <div class="lab-req"><code id="labMethod"></code><span class="lab-code" id="labCode"></span></div>
-          <ol class="lab-trace" id="labTrace" aria-live="polite"></ol>
-        </div>
-        <div class="lab-inspect" id="labInspect" aria-live="polite"></div>
-      </div>
     </div>
   </div>
 </section>

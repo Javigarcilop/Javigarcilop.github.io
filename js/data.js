@@ -64,93 +64,44 @@ const THINKING = [
     project:'templimail'
   }
 ];
-/* Trayectoria: cada etapa aporta algo que sigo usando */
-const JOURNEY = [
-  {
-    stage:'Marketing', where:'Experiencia previa',
-    learned:'Pensar en el público, el mensaje y el objetivo de negocio antes que en la herramienta.',
-    today:'Empiezo cada proyecto por el usuario y por lo que tiene que conseguir, no por la tecnología.',
-    evidence:'Mi proyecto principal, TempliMail, nace en ese terreno: el email marketing.',
-    carry:'Usuario y negocio'
-  },
-  {
-    stage:'Diseño gráfico', where:'Experiencia previa',
-    learned:'Jerarquía visual, composición, tipografía y coherencia de marca.',
-    today:'Construyo interfaces claras y consistentes, y cuido cómo se ve y se entiende lo que desarrollo.',
-    evidence:'La identidad de este portfolio, del monograma JG a la paleta, es diseño propio.',
-    carry:'Criterio visual'
-  },
-  {
-    stage:'Desarrollo web', where:'Técnico Superior en DAW · Campus Cámara Sevilla',
-    learned:'Fundamentos full stack: bases de datos, backend, frontend y despliegue.',
-    today:'Puedo llevar una aplicación de la base de datos a la interfaz sin depender de nadie para las piezas básicas.',
-    evidence:'TempliMail empezó como mi proyecto final del ciclo.',
-    carry:'Base full stack'
-  },
-  {
-    stage:'Backend e integraciones', where:'SiOnline Multiservicios · Formación en RPA, Fundación Generation Spain',
-    learned:'Trabajar con aplicaciones reales en producción: lógica de negocio, bases de datos, integraciones y automatización.',
-    today:'Diseño pensando en mantenimiento, errores y datos reales, no solo en el caso feliz.',
-    evidence:'Desarrollo con PHP y MySQL en entornos de producción.',
-    carry:'Sistemas reales'
-  },
-  {
-    stage:'Product Engineering e IA', where:'Máster en Product Engineering con IA · Evolve (en curso)',
-    learned:'Integrar IA en productos donde aporta valor, y decidir qué construir y por qué.',
-    today:'Uso la IA como una pieza más del sistema, con sus límites y su coste, al servicio del producto.',
-    evidence:'El Generador de especificaciones integra Gemini de forma segura mediante una función serverless.',
-    carry:'IA con criterio'
-  }
-];
-/* El camino resumido: cada etapa suma algo a la anterior */
+/* Trayectoria: cada etapa se suma a la anterior (formación solo donde está confirmada) */
 const PATH = {
   steps:[
-    {name:'Marketing', adds:'Para qué sirve y qué valor aporta'},
-    {name:'Diseño', adds:'Quién lo va a usar'},
-    {name:'Código', adds:'Convertirlo en algo que funciona'},
-    {name:'Product Engineering e IA', adds:'La pieza que faltaba'}
+    {
+      name:'Marketing', ask:'¿Para qué sirve y qué valor aporta?',
+      training:[],
+      origin:'Experiencia previa',
+      today:'Empiezo por el valor y el objetivo de negocio, no por la tecnología.',
+      evidence:'TempliMail, mi proyecto principal, nace en ese terreno: el email marketing.'
+    },
+    {
+      name:'Diseño', ask:'¿Quién lo va a usar?',
+      training:[],
+      origin:'Diseño gráfico · Experiencia previa',
+      today:'Pienso primero en la persona que lo usará y cuido jerarquía, claridad y coherencia.',
+      evidence:'Mientras diseñaba webs y apps me preguntaba qué había detrás. Esa pregunta me llevó al código.'
+    },
+    {
+      name:'Código', ask:'¿Cómo lo convierto en algo que funciona?',
+      training:[
+        {title:'Técnico Superior en Desarrollo de Aplicaciones Web',place:'Campus Cámara Sevilla'},
+        {title:'Formación en RPA',place:'Fundación Generation Spain'}
+      ],
+      origin:'Desarrollador Full Stack en SiOnline',
+      today:'Aplicaciones reales en producción: formación bonificada, integraciones con FUNDAE y SEPE y automatización de procesos.',
+      evidence:'TempliMail empezó como mi proyecto final del ciclo y sigue evolucionando.'
+    },
+    {
+      name:'Product Engineering e IA', ask:'La pieza que faltaba: IA aplicada al desarrollo.',
+      training:[
+        {title:'Máster en Product Engineering con IA',place:'Evolve · en curso'}
+      ],
+      origin:'Formación actual',
+      today:'Uso la IA como una pieza más del sistema, con sus límites, al servicio del producto.',
+      evidence:'El Generador de especificaciones integra Gemini de forma segura mediante una función serverless.'
+    }
   ],
   result:'Soluciones digitales que resuelven problemas reales'
-};
-/* Engineering Lab: simulación conceptual basada en comportamientos reales de TempliMail */
-const LAB = {
-  nodes:[
-    {name:'Usuario',role:'Inicia la acción desde el navegador.',ex:'Rellena un formulario o pulsa un botón.'},
-    {name:'Frontend',role:'Valida lo básico y habla con la API.',ex:'En TempliMail, Angular con un único servicio que hace todas las peticiones y añade el token.'},
-    {name:'API',role:'Recibe la petición, comprueba quién la hace y la dirige.',ex:'Punto de entrada único en PHP con router por tabla y un middleware que valida el JWT.'},
-    {name:'Lógica',role:'Aplica las reglas de negocio: permisos, validaciones y decisiones.',ex:'Servicios en PHP: límite de intentos de login, contactos sin duplicar, cada usuario solo ve sus datos.'},
-    {name:'Base de datos',role:'Guarda y consulta los datos de forma consistente.',ex:'MySQL con consultas preparadas y datos aislados por usuario.'},
-    {name:'Respuesta',role:'Devuelve el resultado o un error claro.',ex:'JSON con un código HTTP que el frontend convierte en un mensaje comprensible.'}
-  ],
-  scenarios:[
-    {name:'Iniciar sesión',method:'POST /login',code:'200 OK',ok:true,steps:[
-      [0,'Escribe usuario y contraseña y pulsa «Iniciar sesión».'],
-      [1,'Comprueba que no falta ningún campo y envía la petición.'],
-      [2,'Es una ruta pública: no exige token. Pasa los datos al servicio de autenticación.'],
-      [3,'Comprueba que no haya demasiados intentos fallidos recientes.'],
-      [4,'Busca el usuario por su nombre.'],
-      [3,'Verifica la contraseña contra su hash y genera un token JWT.'],
-      [5,'200 OK con el token. El frontend lo guarda y abre el panel.']
-    ]},
-    {name:'Contacto duplicado',method:'POST /contactos',code:'409 Conflict',ok:false,steps:[
-      [0,'Añade un contacto con un correo que ya tiene guardado.'],
-      [1,'El formato del correo es válido: envía la petición con el token.'],
-      [2,'Valida el token e identifica al usuario.'],
-      [3,'Antes de insertar, comprueba si ese correo ya está entre sus contactos.'],
-      [4,'La consulta encuentra el correo.'],
-      [3,'Regla de negocio: no se duplican contactos. La operación se detiene.'],
-      [5,'409 Conflict con un mensaje claro: «Ya existe un contacto con ese correo».']
-    ]},
-    {name:'Datos de otro usuario',method:'PUT /contactos/{id}',code:'404 Not Found',ok:false,steps:[
-      [0,'Alguien cambia el identificador de la URL para editar un contacto ajeno.'],
-      [1,'El frontend envía la petición: la seguridad no puede depender de él.'],
-      [2,'El token es válido, así que la petición continúa.'],
-      [3,'Toda consulta se limita a los datos del usuario del token.'],
-      [4,'No existe ningún contacto con ese id que pertenezca a este usuario.'],
-      [3,'Para el sistema, ese contacto no existe.'],
-      [5,'404 Not Found. Nunca revela que el dato existe para otra persona.']
-    ]}
-  ]
 };
 const PROJECTS = [
   {
