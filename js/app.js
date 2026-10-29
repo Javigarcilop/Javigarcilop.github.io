@@ -555,10 +555,13 @@ const mapbox=$('.mapbox'),hero=$('.hero');
 let scrollQueued=false;
 function onScrollFrame(){
   scrollQueued=false;
-  if(!calm&&scrollY<hero.offsetHeight){
-    const k=scrollY/hero.offsetHeight;
-    mapbox.style.transform=`translate3d(0,${scrollY*.18}px,0) scale(${1-k*.06})`;
-    mapbox.style.opacity=String(1-k*.7);
+  if(!calm){
+    const r=hero.getBoundingClientRect(),off=Math.max(0,-r.top);
+    if(off>0&&r.bottom>0){
+      const k=Math.min(1,off/r.height);
+      mapbox.style.transform=`translate3d(0,${off*.18}px,0) scale(${1-k*.06})`;
+      mapbox.style.opacity=String(1-k*.7);
+    }else if(mapbox.style.transform){mapbox.style.transform='';mapbox.style.opacity=''}
   }
 }
 addEventListener('scroll',()=>{if(!scrollQueued){scrollQueued=true;requestAnimationFrame(onScrollFrame)}},{passive:true});

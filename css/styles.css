@@ -71,9 +71,8 @@ nav.main a[aria-current="true"]{color:#fff}
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .sun{display:block}:root:not([data-theme="light"]) .moon{display:none}}
 
 /* hero */
-.hero{position:relative;padding:56px 0 40px;overflow:clip}
+.hero{position:relative;padding:72px 0 40px;overflow:clip}
 .hero::before{content:"";position:absolute;inset:-20% -10% auto auto;width:70%;height:120%;background:radial-gradient(closest-side,var(--glow1),transparent 70%),radial-gradient(closest-side at 70% 80%,var(--glow2),transparent 70%);pointer-events:none}
-.hero-fx{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:0;transform:translate3d(0,0,0);will-change:transform}
 .hero .wrap{position:relative;display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:24px;align-items:center}
 .eyebrow{font-size:13px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:18px}
 h1.title{font-weight:700;font-size:clamp(46px,8vw,96px);line-height:.95;letter-spacing:-.04em;color:var(--ink)}
@@ -148,12 +147,10 @@ h1.title .wd{padding-top:.12em;margin-top:-.12em}
 h1.title .ch{display:inline-block}
 .js.intro h1.title .ch{animation:chIn 1s var(--ease-out) both;animation-delay:calc(var(--i) * 45ms + .15s)}
 @keyframes chIn{from{opacity:0;transform:translateY(105%) rotate(8deg)}}
-.js .hero-copy > :not(h1){animation:heroIn .9s var(--ease-out) both}
-.js .hero-copy > :nth-child(1){animation-delay:.05s}
-.js .hero-copy > :nth-child(3){animation-delay:.6s}
-.js .hero-copy > :nth-child(4){animation-delay:.75s}
-.js .hero-copy > :nth-child(5){animation-delay:.88s}
-.js .hero-copy > :nth-child(6){animation-delay:1s}
+.js .tunnel-copy > :not(h1){animation:heroIn .9s var(--ease-out) both}
+.js .tunnel-copy > :nth-child(1){animation-delay:.05s}
+.js .tunnel-copy > :nth-child(3){animation-delay:.6s}
+.js .tunnel-copy > :nth-child(4){animation-delay:.75s}
 .js header.top{animation:headIn .7s var(--ease-out) both}
 @keyframes heroIn{from{opacity:0;transform:translateY(18px)}}
 @keyframes headIn{from{opacity:0;transform:translateY(-100%)}}
@@ -400,6 +397,7 @@ dialog[open]{animation:pop .28s cubic-bezier(.2,.9,.3,1)}
   .d-nav small{display:none}
 }
 @media (prefers-reduced-motion:reduce){
+  .tunnel-hint i{animation:none}
   *,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}
   .js .rv,.js .reveal .wd-in{opacity:1;transform:none}
 }
@@ -415,3 +413,30 @@ dialog[open]{animation:pop .28s cubic-bezier(.2,.9,.3,1)}
 .pc-train b{color:var(--ink);font-size:15px;font-weight:600}
 .pc-train span{color:var(--muted);font-size:14px}
 .pc-evidence{margin-top:20px;padding:12px 16px;border-radius:12px;background:var(--bg);font-size:15px}
+
+/* túnel de código 3D (hero de entrada) */
+.tunnel{--tunnel-bg:#0d0f12;position:relative;height:300svh;margin-top:calc(-1 * var(--header-h))}
+.tunnel-pin{position:sticky;top:0;height:100svh;overflow:clip;background:var(--tunnel-bg);will-change:opacity}
+.tunnel-canvas{position:absolute;inset:0;width:100%;height:100%;display:block;pointer-events:none;opacity:0;transition:opacity 1.2s var(--ease-out)}
+.tunnel.ready .tunnel-canvas{opacity:1}
+.tunnel-pin::after{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse at center,transparent 38%,rgba(13,15,18,.55) 100%)}
+.tunnel-copy{position:absolute;inset:0;z-index:2;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:calc(var(--header-h) + 8px) 20px 72px;transform-origin:50% 46%;will-change:transform,opacity}
+.tunnel-copy::before{content:"";position:absolute;inset:14% 6%;z-index:-1;pointer-events:none;background:radial-gradient(ellipse at center,rgba(13,15,18,.7),rgba(13,15,18,.35) 45%,transparent 72%)}
+.tunnel-copy .eyebrow{color:#B7C3DD;text-shadow:0 1px 12px #0d0f12}
+.tunnel-copy .role{text-shadow:0 1px 14px #0d0f12}
+.tunnel-copy h1.title{color:#fff;font-size:clamp(52px,11vw,150px);text-shadow:0 0 60px rgba(76,130,255,.35)}
+.tunnel-copy .role{color:#8DB0FF;max-width:30ch;margin-inline:auto}
+.tunnel-copy .cta{justify-content:center}
+.tunnel-copy .btn.ghost{background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.28);color:#fff}
+.tunnel-copy .btn.ghost:hover{border-color:#8DB0FF}
+.tunnel-copy :focus-visible,.tunnel-hint:focus-visible{outline-color:#8DB0FF}
+.tunnel-hint{position:absolute;z-index:2;left:50%;bottom:26px;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:8px;color:#9AA9C7;font-size:12px;letter-spacing:.14em;text-transform:uppercase;text-decoration:none}
+.tunnel-hint i{width:1px;height:34px;background:linear-gradient(#8DB0FF,transparent);transform-origin:top;animation:hint 1.8s ease-in-out infinite}
+@keyframes hint{0%{transform:scaleY(0)}50%{transform:scaleY(1)}100%{transform:scaleY(1);opacity:0}}
+.tunnel + .hero{margin-top:-30svh;z-index:1}
+.tunnel.calm,.tunnel.nogl{height:100svh}
+.tunnel.calm + .hero,.tunnel.nogl + .hero{margin-top:0}
+.tunnel.calm .tunnel-hint,.tunnel.nogl .tunnel-hint{display:none}
+
+/* cabecera sobre el túnel: texto claro mientras el fondo es oscuro */
+.on-tunnel header.top{--ink:#fff;--text:#D5DEF5;--muted:#B7C3DD;--line:rgba(255,255,255,.16);--surface:#111C3A;--blue-text:#8DB0FF;--blue:#4C82FF;background:rgba(13,15,18,.55);border-bottom-color:rgba(255,255,255,.1)}

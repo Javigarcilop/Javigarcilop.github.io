@@ -54,18 +54,13 @@
 </header>
 
 <main>
-<section class="hero" id="inicio">
-  <div class="wrap">
-    <div class="hero-copy">
+<section class="tunnel" id="inicio" aria-label="Presentación">
+  <div class="tunnel-pin" id="tunnelPin">
+    <canvas class="tunnel-canvas" id="tunnelCanvas" aria-hidden="true"></canvas>
+    <div class="tunnel-copy" id="tunnelCopy">
       <p class="eyebrow">Full Stack · Backend · Integraciones · IA aplicada</p>
       <h1 class="title">Javier García</h1>
       <p class="role">Desarrollo software con visión de producto.<span class="cursor" aria-hidden="true"></span></p>
-      <p class="lead">Mi mayor ventaja como developer no la aprendí programando.</p>
-      <p class="lead-more">Vengo del marketing y del diseño gráfico. Soy desarrollador web Full Stack con una orientación cada vez mayor hacia backend. Mi camino hacia el desarrollo de software comenzó en el diseño gráfico y la curiosidad por entender cómo se construía por dentro aquello que diseñaba me llevó a descubrir el mundo del software y a formarme en desarrollo de aplicaciones web.
-
-Actualmente trabajo en el desarrollo y evolución de aplicaciones utilizadas en entornos reales, especialmente en proyectos relacionados con formación, FUNDAE, SEPE, integración de sistemas y automatización de procesos.
-
-Mi evolución profesional está enfocada en el backend, automatización e inteligencia artificial, tanto aplicada al desarrollo de software como a la creación de soluciones y flujos de trabajo. Actualmente estoy abierto a nuevas oportunidades profesionales donde pueda seguir creciendo, aportar mi experiencia y afrontar nuevos retos dentro del mundo tech..</p>
       <div class="cta">
         <a class="btn primary" href="#proyectos">Explorar proyectos</a>
         <a class="btn ghost" href="assets/cv-javi-garcia.pdf" download>
@@ -73,6 +68,20 @@ Mi evolución profesional está enfocada en el backend, automatización e inteli
           Ver CV
         </a>
       </div>
+    </div>
+    <a class="tunnel-hint" id="tunnelHint" href="#presentacion" aria-label="Seguir bajando"><span>Desliza</span><i aria-hidden="true"></i></a>
+  </div>
+</section>
+
+<section class="hero reveal" id="presentacion" aria-label="Quién soy">
+  <div class="wrap">
+    <div class="hero-copy">
+      <p class="lead">Mi mayor ventaja como developer no la aprendí programando.</p>
+      <p class="lead-more">Vengo del marketing y del diseño gráfico. Soy desarrollador web Full Stack con una orientación cada vez mayor hacia backend. Mi camino hacia el desarrollo de software comenzó en el diseño gráfico y la curiosidad por entender cómo se construía por dentro aquello que diseñaba me llevó a descubrir el mundo del software y a formarme en desarrollo de aplicaciones web.
+
+Actualmente trabajo en el desarrollo y evolución de aplicaciones utilizadas en entornos reales, especialmente en proyectos relacionados con formación, FUNDAE, SEPE, integración de sistemas y automatización de procesos.
+
+Mi evolución profesional está enfocada en el backend, automatización e inteligencia artificial, tanto aplicada al desarrollo de software como a la creación de soluciones y flujos de trabajo. Actualmente estoy abierto a nuevas oportunidades profesionales donde pueda seguir creciendo, aportar mi experiencia y afrontar nuevos retos dentro del mundo tech..</p>
     </div>
     <div class="mapbox">
       <svg id="map" viewBox="0 0 640 540" role="group" aria-label="Mapa de proyectos y tecnologías. Cada círculo grande es un proyecto y cada círculo pequeño, una tecnología."></svg>
@@ -189,8 +198,8 @@ Mi evolución profesional está enfocada en el backend, automatización e inteli
 <script defer src="assets/vendor/gsap.min.js"></script>
 <script defer src="assets/vendor/ScrollTrigger.min.js"></script>
 <script defer src="js/motion.js"></script>
-<script defer src="js/creative-hero.js"></script>
 <script defer src="js/data.js"></script>
 <script defer src="js/app.js"></script>
+<script type="module" src="js/tunnel.js"></script>
 </body>
 </html>

@@ -72,3 +72,15 @@ gsap.timeline({ delay: 1.1, repeat: -1, repeatDelay: 5, yoyo: true,
 - [ ] Móvil: menos elementos, sin parallax, ~30 fps.
 - [ ] Pausa al salir del hero (el ticker deja de dibujar).
 - [ ] Tema claro y oscuro legibles; cian solo en formas.
+
+## Variante implementada: túnel de código 3D (Three.js + ScrollTrigger)
+
+Es la versión actual del hero (`js/tunnel.js`, escena en `.tunnel`). Sustituye al fondo Canvas 2D del escáner.
+
+- **Dos draw calls**: un `Points` con atlas de glifos (una sola textura, `ShaderMaterial` aditivo) y un `LineSegments` para las ráfagas de luz. Miles de elementos sin instanciar objetos sueltos.
+- **Carga diferida**: Three.js (`assets/vendor/three.module.min.js`) se importa con `import()` tras `load` + `requestIdleCallback`. El texto del hero es visible desde el primer pintado.
+- **Guion del scroll**: `.tunnel` mide 300 svh con un hijo `position: sticky`; un timeline con `scrollTrigger` (`scrub`) mueve la cámara, acerca y desvanece el texto, estira las ráfagas según la velocidad y funde el fondo hacia la siguiente sección. No usa `pin` de ScrollTrigger.
+- **Degradado**: sin WebGL, sin GSAP, con `prefers-reduced-motion` o `saveData` queda `.tunnel.calm` (100 svh, texto legible sobre #0d0f12); con reduced-motion se pinta un único fotograma.
+- **Cabecera**: mientras `body.on-tunnel`, la cabecera usa colores claros sobre el fondo oscuro.
+- **Limpieza**: `window.tunnelScene.destroy()` (también en `pagehide` y al perder el contexto) para el ticker, desconecta observadores, mata el ScrollTrigger y hace `dispose()` de geometrías, materiales, textura y renderer.
+- **Móvil**: menos partículas, DPR ≤ 1.5, ~30 fps y sin giro de cámara por ratón.
