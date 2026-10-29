@@ -185,7 +185,7 @@ function start(){
       left:s.training.length?{label:'Formación',items:s.training.map(t=>t.title+' · '+t.place+' · '+t.years)}:null,
       right:{label:'Cómo lo implemento',items:[s.implement]}
     })):[];
-    if(data)steps.push({kicker:'El resultado',title:data.result,sub:'Javier García · Desarrollo Full Stack · Sevilla',big:true});
+    if(data)steps.push({kicker:'El resultado',title:data.result,sub:'Javier García · Desarrollo Full Stack',big:true});
 
     const wrap=(ctx,text,max)=>{
       const out=[];let line='';
