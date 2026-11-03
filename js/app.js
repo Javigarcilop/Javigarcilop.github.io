@@ -30,66 +30,152 @@ function cover(p,w,h){
     <g stroke="var(--blue)" stroke-opacity=".5" stroke-width="1.6">${lines}</g>${dots}</svg>`;
 }
 
-/* ---------- estado y filtros ---------- */
-const state={q:'',cat:'Todos',tech:null};
-function matches(p){
-  if(state.cat!=='Todos' && !p.cats.includes(state.cat)) return false;
-  if(state.tech && !p.stack.includes(state.tech)) return false;
-  const q=state.q.trim().toLowerCase();
-  if(q){
-    const hay=[p.title,p.type,p.context,p.summary,p.problem,p.solution,p.stack.join(' '),p.cats.join(' ')].join(' ').toLowerCase();
-    if(!q.split(/\s+/).every(w=>hay.includes(w))) return false;
+/* ---------- estado y proyectos ---------- */
+const state={tech:null};
+const matches=p=>!state.tech||p.stack.includes(state.tech);
+const liveUrl=p=>((p.links||[]).find(l=>/demo/i.test(l.label))||{}).url||'';
+const niceUrl=u=>{try{const x=new URL(u);return x.host+(x.pathname==='/'?'':x.pathname.replace(/\/$/,''))}catch(e){return u}};
+let current=null,loadAllowed=false;
+
+function infoHTML(p){
+  const demo=liveUrl(p);
+  const links=(p.links||[]).map(l=>`<a class="btn ghost" href="${esc(l.url)}" target="_blank" rel="noopener">${esc(l.label)}</a>`).join('');
+  return `<span class="status ${p.ok?'ok':''}"><i></i>${esc(p.status)}${demo?'<span class="demo-pill">Demo en vivo</span>':''}</span>
+    <h3>${esc(p.title)}</h3>
+    <p class="meta">${esc(p.type)} – ${esc(p.context)}</p>
+    <div class="pi-block"><span class="ro-kind">El problema</span><p>${esc(p.problem)}</p></div>
+    <div class="pi-block"><span class="ro-kind">La solución</span><p>${esc(p.solution)}</p></div>
+    <span class="tags">${p.stack.map(t=>`<span class="tag">${esc(t)}</span>`).join('')}</span>
+    <div class="pi-actions"><button type="button" class="btn primary" data-open>Ver caso de estudio ${arrow}</button>${links}</div>`;
+}
+function projectsHTML(){
+  return `<div class="visor">
+    <div class="visor-info">
+      <div class="selector" role="tablist" aria-label="Elegir proyecto">
+        ${PROJECTS.map((p,i)=>`<button type="button" role="tab" class="sel-btn" id="tab-${esc(p.slug)}" data-slug="${esc(p.slug)}" aria-selected="false" aria-controls="visor-panel" tabindex="-1"><span class="sel-n">0${i+1}</span><b>${esc(p.short)}</b><small>${esc(p.type)}</small></button>`).join('')}
+      </div>
+      <div class="info-panel" id="visor-panel" role="tabpanel" aria-live="polite"></div>
+    </div>
+    <div class="escena-3d-contenedor" data-dispositivo="monitor">
+      <div class="escena-rotor">
+        <div class="dispositivo-wrap">
+          <div class="monitor dispositivo-mockup">
+            <i class="grosor g1"></i><i class="grosor g2"></i>
+            <div class="marco">
+              <i class="camara"></i>
+              <div class="pantalla pantalla-principal-encendida" id="pantalla">
+                <div class="navegador">
+                  <div class="nav-chrome">
+                    <span class="semaforo" aria-hidden="true"><i></i><i></i><i></i></span>
+                    <div class="nav-tabs" aria-hidden="true">${PROJECTS.map(p=>`<button type="button" tabindex="-1" class="nav-tab" data-slug="${esc(p.slug)}"><span class="fav"></span>${esc(p.short)}</button>`).join('')}</div>
+                    <button type="button" class="nav-salir" id="navSalir">Salir</button>
+                  </div>
+                  <div class="nav-url">
+                    <span class="nav-lock" aria-hidden="true"></span><span class="nav-host" id="navHost"></span>
+                    <a class="nav-open" id="navOpen" href="#" target="_blank" rel="noopener" aria-label="Abrir la demo en una pestaña nueva">↗</a>
+                  </div>
+                </div>
+                <div class="viewport" id="viewport">
+                  ${PROJECTS.map(p=>`<iframe class="live" data-slug="${esc(p.slug)}" data-src="${esc(liveUrl(p))}" title="Vista en vivo de ${esc(p.title)}" sandbox="allow-scripts allow-same-origin allow-forms allow-popups" referrerpolicy="no-referrer"></iframe>`).join('')}
+                  <div class="cargando" id="cargando" aria-live="polite">Cargando vista en vivo…</div>
+                  <button type="button" class="capa-interaccion" id="capa" aria-label="Activar la vista en vivo para interactuar"><span>Haz clic para interactuar</span></button>
+                </div>
+                <i class="destello"></i>
+                <div class="pantalla-apagada"></div>
+                <i class="vidrio"></i>
+              </div>
+            </div>
+            <div class="menton"><i class="logo-mon" aria-hidden="true"></i></div>
+          </div>
+          <div class="cuello"></div><div class="pie"></div>
+        </div>
+        <div class="escritorio" aria-hidden="true"><div class="teclado"></div></div>
+      </div>
+    </div>
+  </div>`;
+}
+function ensureLoad(slug){
+  if(!loadAllowed)return;
+  const f=$('iframe.live[data-slug="'+slug+'"]');
+  if(f&&!f.getAttribute('src')&&f.dataset.src){
+    f.addEventListener('load',()=>{f.dataset.ok='1';if(current===slug)$('#cargando').classList.remove('on')},{once:true});
+    $('#cargando').classList.add('on');
+    f.src=f.dataset.src;
+    setTimeout(()=>{if(current===slug&&!f.dataset.ok)$('#cargando').textContent='Si no carga, ábrela con el botón ↗ de la barra.'},9000);
   }
-  return true;
 }
-function renderCats(){
-  const box=$('#cats'); box.innerHTML='';
-  ['Todos',...CATS].forEach(c=>{
-    const b=document.createElement('button');
-    b.type='button'; b.className='chip'; b.textContent=c; b.setAttribute('aria-pressed',String(state.cat===c));
-    b.onclick=()=>{state.cat=c;update()};
-    box.appendChild(b);
-  });
+function selectProject(slug,focus){
+  const p=PROJECTS.find(x=>x.slug===slug);
+  if(!p)return;
+  current=slug;
+  $$('.sel-btn').forEach(b=>{const on=b.dataset.slug===slug;b.setAttribute('aria-selected',String(on));b.tabIndex=on?0:-1;if(on&&focus)b.focus()});
+  $$('.nav-tab').forEach(b=>b.classList.toggle('on',b.dataset.slug===slug));
+  const panel=$('#visor-panel');
+  panel.setAttribute('aria-labelledby','tab-'+slug);
+  panel.innerHTML=infoHTML(p);
+  $('[data-open]',panel).onclick=e=>openProject(slug,false,e.currentTarget);
+  $('#navHost').textContent=niceUrl(liveUrl(p));
+  $('#navOpen').href=liveUrl(p)||'#';
+  $$('iframe.live').forEach(f=>f.classList.toggle('on',f.dataset.slug===slug));
+  const f=$('iframe.live[data-slug="'+slug+'"]');
+  $('#cargando').textContent='Cargando vista en vivo…';
+  $('#cargando').classList.toggle('on',!!(f&&!f.dataset.ok&&loadAllowed));
+  ensureLoad(slug);
+  releaseScreen();
 }
-function renderGrid(){
-  const list=PROJECTS.filter(matches);
-  const grid=$('#grid'); grid.innerHTML='';
-  list.forEach(p=>{
-    const b=document.createElement('button');
-    b.type='button'; b.className='card'; b.setAttribute('aria-label','Abrir proyecto '+p.title);
-    const tags=p.stack.slice(0,4).map(t=>`<span class="tag">${esc(t)}</span>`).join('')+(p.stack.length>4?`<span class="tag">+${p.stack.length-4}</span>`:'');
-    b.innerHTML=`<span class="art">${cover(p,320,150)}</span>
-      <span class="body">
-        <span class="status ${p.ok?'ok':''}"><i></i>${esc(p.status)}${(p.links||[]).some(l=>/demo/i.test(l.label))?'<span class="demo-pill">Demo disponible</span>':''}</span>
-        <h3>${esc(p.title)}</h3>
-        <span class="meta">${esc(p.type)} · ${esc(p.context)}</span>
-        <p class="sum">${esc(p.summary)}</p>
-        <span class="tags">${tags}</span>
-        <span class="more-link">Ver caso de estudio ${arrow}</span>
-      </span>`.replace(' · ',' – ');
-    b.onclick=()=>openProject(p.slug,false,b);
-    grid.appendChild(b);
+function releaseScreen(){$('#pantalla').classList.remove('activa')}
+function renderProjects(){
+  const box=$('#proyectos-lista');
+  box.innerHTML=projectsHTML();
+  const pick=slug=>{loadAllowed=true;selectProject(slug)};
+  $$('.sel-btn').forEach(b=>b.onclick=()=>pick(b.dataset.slug));
+  $$('.nav-tab').forEach(b=>b.onclick=()=>pick(b.dataset.slug));
+  $('.selector').addEventListener('keydown',e=>{
+    const keys=$$('.sel-btn').filter(b=>!b.hidden),i=keys.findIndex(b=>b.dataset.slug===current);
+    const to={ArrowRight:i+1,ArrowDown:i+1,ArrowLeft:i-1,ArrowUp:i-1,Home:0,End:keys.length-1}[e.key];
+    if(to===undefined||!keys.length)return;
+    e.preventDefault();selectProject(keys[(to+keys.length)%keys.length].dataset.slug,true);
   });
-  $('#count').textContent=`Mostrando ${list.length} de ${PROJECTS.length} proyectos`;
-  $('#empty').classList.toggle('show',list.length===0);
-  grid.style.display=list.length?'grid':'none';
+
+  /* La demo real cabe en la pantalla: se renderiza como en un escritorio y se escala */
+  const vp=$('#viewport');
+  new ResizeObserver(()=>{
+    const w=vp.clientWidth,h=vp.clientHeight;
+    if(!w||!h)return;
+    const vw=w<520?720:1280,k=w/vw;
+    $$('iframe.live').forEach(f=>{f.style.width=vw+'px';f.style.height=(h/k)+'px';f.style.transform='scale('+k+')'});
+  }).observe(vp);
+
+  /* Para que la página siga haciendo scroll, la demo solo responde tras un clic y se suelta al salir */
+  $('#capa').onclick=()=>{loadAllowed=true;ensureLoad(current);$('#pantalla').classList.add('activa')};
+  $('#navSalir').onclick=releaseScreen;
+  $('#pantalla').addEventListener('pointerleave',e=>{if(e.pointerType==='mouse')releaseScreen()});
+
+  /* Carga diferida: la demo solo se pide al acercarse a la sección */
+  new IntersectionObserver((es,io)=>{
+    if(es[0].isIntersecting){loadAllowed=true;ensureLoad(current);$('#cargando').classList.toggle('on',!!current&&!$('iframe.live[data-slug="'+current+'"]').dataset.ok);io.disconnect()}
+  },{rootMargin:'300px'}).observe($('.escena-3d-contenedor'));
+
+  selectProject(PROJECTS.filter(matches)[0]?.slug||PROJECTS[0].slug);
+  window.motion?.initProyectos?.();
+}
+function applyFilter(){
+  $$('.sel-btn').forEach(b=>{b.hidden=!matches(PROJECTS.find(x=>x.slug===b.dataset.slug))});
+  $$('.nav-tab').forEach(b=>{b.hidden=!matches(PROJECTS.find(x=>x.slug===b.dataset.slug))});
+  const cur=PROJECTS.find(x=>x.slug===current);
+  if(!cur||!matches(cur)){const n=PROJECTS.find(matches);if(n)selectProject(n.slug)}
 }
 function renderTechChip(){
   $('#techchip').classList.toggle('show',!!state.tech);
   $('#techname').textContent=state.tech||'';
 }
-function update(){renderCats();renderTechChip();renderGrid();renderStack();markMap()}
+function update(){renderTechChip();applyFilter();renderStack();markMap()}
 function setTech(t,scroll){
   state.tech=(state.tech===t)?null:t;
   update();
   if(scroll&&state.tech) $('#proyectos').scrollIntoView({behavior:'smooth',block:'start'});
 }
-$('#q').addEventListener('input',e=>{state.q=e.target.value;renderGrid()});
 $('#techclear').onclick=()=>{state.tech=null;update()};
-$('#reset').onclick=()=>{state.q='';state.cat='Todos';state.tech=null;$('#q').value='';update()};
-document.addEventListener('keydown',e=>{
-  if(e.key==='/'&&!/input|textarea/i.test(document.activeElement.tagName)&&!$('#dlg').open){e.preventDefault();$('#q').focus()}
-});
 
 /* ---------- stack ---------- */
 const TIER_LABEL={pro:'Experiencia profesional',proj:'Proyectos propios'};
@@ -496,7 +582,7 @@ $$('.reveal').forEach(el=>revealIO.observe(el));
 /* Foco de luz que sigue al puntero sobre las superficies interactivas */
 if(!calm&&matchMedia('(hover: hover)').matches){
   document.addEventListener('pointermove',e=>{
-    const el=e.target.closest?.('.card, .ps, .stack-detail');
+    const el=e.target.closest?.('.ps, .stack-detail');
     if(!el)return;
     const r=el.getBoundingClientRect();
     el.style.setProperty('--mx',(e.clientX-r.left)+'px');
@@ -519,7 +605,7 @@ document.addEventListener('click',e=>{
 });
 
 /* ---------- arranque ---------- */
-renderCats();renderGrid();renderStack();buildMap();
+renderProjects();renderStack();buildMap();
 {
   let lw=$('#mapfull').clientWidth,lh=$('#mapfull').clientHeight,tm=null;
   new ResizeObserver(()=>{
