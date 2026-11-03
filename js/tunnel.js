@@ -59,9 +59,9 @@ function start(){
     tl.to(P,{p:1,duration:.76},0)
       .fromTo(copy,{scale:1,opacity:1},{scale:1.35,opacity:0,ease:'power2.in',duration:.06,force3D:true},0)
       .to(hint,{opacity:0,duration:.02},0)
-      .to(P,{out:1,ease:'power3.in',duration:.2},.78)
-      .to(pin,{opacity:0,ease:'power1.inOut',duration:.18},.8)
-      .to({},{duration:.02},.98);
+      .to(P,{out:1,ease:'power2.inOut',duration:.15},.78)
+      .to(pin,{opacity:0,ease:'power1.inOut',duration:.08},.91)
+      .to({},{duration:.01},.99);
   }
 
   const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
