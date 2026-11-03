@@ -1,8 +1,10 @@
-/* Viaje por la trayectoria: un pasillo 3D de marcos controlado por el scroll (Three.js + GSAP ScrollTrigger).
-   Marketing → Diseño → Código → Product Engineering e IA → resultado. Cada etapa es un portal con su nombre;
-   los marcos pasan de gris azulado a azul y a cian: cada etapa suma a la anterior.
-   - Pocas draw calls: un LineSegments (marcos y guías), un Points (polvo) y un plano por etiqueta.
-   - Three.js se carga diferido (import dinámico) cuando la página ya es interactiva.
+/* Viaje por la trayectoria: un túnel realista controlado por el scroll (Three.js + GSAP ScrollTrigger).
+   Marketing → Diseño → Código → Product Engineering e IA → resultado: la cámara avanza recta y se detiene en cada etapa.
+   - Escena: tubo de hormigón, carretera con marcas viales, lámparas de techo con charcos de luz, niebla y la luz de la salida.
+   - Cámara estable y a la altura de los ojos: sin balanceo, cabeceo ni zoom, para que no maree.
+   - El texto de cada etapa NO se dibuja en 3D: va en un panel HTML (nítido, accesible y de alto contraste).
+   - Postprocesado suave en escritorio (bloom). En móvil, render directo más ligero.
+   - Three.js y los addons se cargan diferidos cuando la página ya es interactiva.
    - Sin WebGL, sin GSAP, con movimiento reducido o ahorro de datos: hero estático y legible. */
 
 const tunnel=document.querySelector('.tunnel');
@@ -10,7 +12,7 @@ if(tunnel)start();
 
 function start(){
   const pin=document.getElementById('tunnelPin'),canvas=document.getElementById('tunnelCanvas');
-  const copy=document.getElementById('tunnelCopy'),hint=document.getElementById('tunnelHint');
+  const copy=document.getElementById('tunnelCopy'),hint=document.getElementById('tunnelHint'),stageEl=document.getElementById('tunnelStage');
   const G=window.gsap,ST=window.ScrollTrigger;
   const calm=matchMedia('(prefers-reduced-motion: reduce)').matches;
   const coarse=matchMedia('(pointer: coarse)').matches;
@@ -49,7 +51,7 @@ function start(){
       }
     });
     tl.to(P,{p:1,duration:.76},0)
-      .fromTo(copy,{scale:1,opacity:1},{scale:3.2,opacity:0,ease:'power2.in',duration:.06,force3D:true},0)
+      .fromTo(copy,{scale:1,opacity:1},{scale:1.35,opacity:0,ease:'power2.in',duration:.06,force3D:true},0)
       .to(hint,{opacity:0,duration:.02},0)
       .to(pin,{opacity:0,ease:'power1.inOut',duration:.18},.8)
       .to({},{duration:.02},.98);
@@ -59,276 +61,407 @@ function start(){
 
   /* Carga diferida de Three.js: no compite con el primer pintado ni con la interactividad */
   const idle=cb=>('requestIdleCallback' in window)?requestIdleCallback(cb,{timeout:1800}):setTimeout(cb,400);
-  const boot=()=>idle(()=>import('../assets/vendor/three.module.min.js').then(build).catch(()=>tunnel.classList.add('nogl')));
+  const boot=()=>idle(async()=>{
+    try{
+      let THREE,post=null;
+      try{THREE=await import('three')}catch(e){THREE=await import('../assets/vendor/three.module.min.js')}
+      if(!coarse){
+        try{
+          const base='../assets/vendor/three-addons/';
+          const [a,b,c,d]=await Promise.all([
+            import(base+'postprocessing/EffectComposer.js'),import(base+'postprocessing/RenderPass.js'),
+            import(base+'postprocessing/UnrealBloomPass.js'),import(base+'postprocessing/OutputPass.js')
+          ]);
+          post={EffectComposer:a.EffectComposer,RenderPass:b.RenderPass,UnrealBloomPass:c.UnrealBloomPass,OutputPass:d.OutputPass};
+        }catch(e){post=null}
+      }
+      await build(THREE,post);
+    }catch(e){tunnel.classList.add('nogl')}
+  });
   if(document.readyState==='complete')boot();else addEventListener('load',boot,{once:true});
 
-  async function build(THREE){
-    const FOV=64,SEG=5,S=46,SP=S/4,STOP=14,HALF=7.5;
-    const ZEND=SEG*S;
+  async function build(THREE,post){
+    const FOV=62,SEG=5,S=46,R=7,EYE=-2,ROAD=-3.6;
+    const ZEND=SEG*S,L=ZEND+280;
     const clamp=(v,a,b)=>v<a?a:v>b?b:v;
     const smooth=(a,b,x)=>{const t=clamp((x-a)/(b-a),0,1);return t*t*(3-2*t)};
+    const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
     let renderer;
-    try{renderer=new THREE.WebGLRenderer({canvas,antialias:!coarse,alpha:false,powerPreference:'high-performance'})}
+    try{renderer=new THREE.WebGLRenderer({canvas,antialias:!coarse&&!post,alpha:false,powerPreference:'high-performance'})}
     catch(e){tunnel.classList.add('nogl');return}
     renderer.setClearColor(0x0d0f12,1);
+    renderer.toneMapping=THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure=1;
+    renderer.autoClear=false;
+    const maxAniso=Math.min(8,renderer.capabilities.getMaxAnisotropy());
 
     const scene=new THREE.Scene();
-    const camera=new THREE.PerspectiveCamera(FOV,1,.1,420);
+    scene.fog=new THREE.FogExp2(0x0d0f12,.0135);
+    const camera=new THREE.PerspectiveCamera(FOV,1,.1,500);
+    camera.position.set(0,EYE,0);
+    scene.add(camera);
+    let baseFov=FOV;
     const disposables=[];
     const track=o=>(disposables.push(o),o);
-
-    /* Color progresivo: gris azulado → azul → cian a lo largo del viaje */
-    const slate=new THREE.Color(0x56678f),blue=new THREE.Color(0x4c82ff),cyan=new THREE.Color(0x19d3f3);
-    const tint=(t,out)=>t<.62?out.copy(slate).lerp(blue,t/.62):out.copy(blue).lerp(cyan,(t-.62)/.38);
-
-    /* Marcos y guías: un único LineSegments */
-    const verts=[],cols=[],alphas=[],tmp=new THREE.Color();
-    const seg=(x1,y1,z1,x2,y2,z2,c,a)=>{verts.push(x1,y1,z1,x2,y2,z2);cols.push(c.r,c.g,c.b,c.r,c.g,c.b);alphas.push(a,a)};
-    const frame=(z,h,c,a)=>{
-      seg(-h,-h,z,h,-h,z,c,a);seg(h,-h,z,h,h,z,c,a);seg(h,h,z,-h,h,z,c,a);seg(-h,h,z,-h,-h,z,c,a);
-    };
-    const nFrames=Math.ceil((ZEND+SP*5)/SP);
-    for(let f=0;f<=nFrames;f++){
-      const z=-f*SP,t=clamp(-z/ZEND,0,1);
-      tint(t,tmp);
-      const portal=f%4===0&&f>0&&f<=SEG*4;
-      frame(z,HALF,tmp,portal?.85:.3);
-      if(portal){frame(z,HALF+1.6,tmp,.4);frame(z,HALF-1.5,tmp,.55)}
-    }
-    const zFar=-(ZEND+SP*5);
-    for(const [x,y,a] of [[-1,-1,.2],[1,-1,.2],[1,1,.2],[-1,1,.2],[0,-1,.1],[0,1,.1],[-1,0,.1],[1,0,.1]]){
-      for(let z=12;z>zFar;z-=40){
-        const t0=clamp(-z/ZEND,0,1),t1=clamp(-(z-40)/ZEND,0,1);
-        seg(x*HALF,y*HALF,z,x*HALF,y*HALF,z-40,tint((t0+t1)/2,tmp).clone(),a);
-      }
-    }
-    const lGeo=track(new THREE.BufferGeometry());
-    lGeo.setAttribute('position',new THREE.Float32BufferAttribute(verts,3));
-    lGeo.setAttribute('aColor',new THREE.Float32BufferAttribute(cols,3));
-    lGeo.setAttribute('aAlpha',new THREE.Float32BufferAttribute(alphas,1));
-    lGeo.boundingSphere=new THREE.Sphere(new THREE.Vector3(0,0,-ZEND/2),ZEND);
-    const lMat=track(new THREE.ShaderMaterial({
-      transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,
-      vertexShader:`
-        attribute vec3 aColor;attribute float aAlpha;
-        varying vec3 vColor;varying float vAlpha;
-        void main(){
-          vec4 mv=modelViewMatrix*vec4(position,1.0);
-          float d=-mv.z;
-          vAlpha=aAlpha*smoothstep(300.,70.,d)*smoothstep(.6,5.,d);
-          vColor=aColor;
-          gl_Position=projectionMatrix*mv;
-        }`,
-      fragmentShader:`varying vec3 vColor;varying float vAlpha;void main(){gl_FragColor=vec4(vColor*1.35,vAlpha);}`
-    }));
-    const lines=new THREE.LineSegments(lGeo,lMat);
-    lines.frustumCulled=false;
-    scene.add(lines);
-
-    /* Polvo de datos: muy pocos glifos tenues, un solo tono, quietos */
-    const GLYPHS='{}<>/=;01[]()#+_|';
-    const at=document.createElement('canvas');at.width=512;at.height=256;
-    const ax=at.getContext('2d');
-    ax.fillStyle='#fff';ax.textAlign='center';ax.textBaseline='middle';
-    ax.font='700 46px ui-monospace,SFMono-Regular,Consolas,Menlo,monospace';
-    for(let i=0;i<GLYPHS.length;i++)ax.fillText(GLYPHS[i],(i%8)*64+32,((i/8)|0)*64+34);
-    const atlas=track(new THREE.CanvasTexture(at));
-    atlas.anisotropy=2;
+    const SRGB=THREE.SRGBColorSpace;
     let seed=20260929;
     const rnd=()=>{seed=(seed*16807)%2147483647;return (seed-1)/2147483646};
-    const N=coarse?420:1000;
-    const dPos=new Float32Array(N*3),dChar=new Float32Array(N),dSize=new Float32Array(N);
-    for(let i=0;i<N;i++){
-      const a=rnd()*6.2832,r=HALF+1.2+rnd()*9;
-      dPos[i*3]=Math.cos(a)*r;dPos[i*3+1]=Math.sin(a)*r;dPos[i*3+2]=10-rnd()*(ZEND+SP*5);
-      dChar[i]=(rnd()*GLYPHS.length)|0;dSize[i]=.3+rnd()*.5;
+
+    /* Color progresivo de la luz: blanco frío → azul → cian a lo largo del viaje */
+    const slate=new THREE.Color(0xdfe8ff),blue=new THREE.Color(0x6f9bff),cyan=new THREE.Color(0x5fe0ff);
+    const tint=(t,out)=>t<.62?out.copy(slate).lerp(blue,t/.62):out.copy(blue).lerp(cyan,(t-.62)/.38);
+    const progress=z=>clamp(-z/ZEND,0,1);
+
+    /* Texturas generadas en canvas: hormigón y asfalto con marcas viales */
+    const canvasTex=(w,h,paint,srgb,wrap)=>{
+      const c=document.createElement('canvas');c.width=w;c.height=h;
+      paint(c.getContext('2d'),w,h);
+      const t=new THREE.CanvasTexture(c);
+      if(wrap){t.wrapS=t.wrapT=THREE.RepeatWrapping}
+      t.anisotropy=maxAniso;
+      if(srgb)t.colorSpace=SRGB;
+      return track(t);
+    };
+    const speckle=(x,w,h,n,base,alpha)=>{
+      for(let i=0;i<n;i++){
+        const v=base+(rnd()*70|0);
+        x.fillStyle='rgba('+v+','+(v+3)+','+(v+12)+','+alpha+')';
+        x.fillRect(rnd()*w,rnd()*h,1+rnd()*3,1+rnd()*3);
+      }
+    };
+    const concrete=canvasTex(512,512,(x,w,h)=>{
+      x.fillStyle='#69717f';x.fillRect(0,0,w,h);
+      speckle(x,w,h,14000,70,.08);speckle(x,w,h,6000,30,.1);
+      for(let i=0;i<10;i++){const gx=rnd()*w,gr=x.createLinearGradient(gx,0,gx+30,h);gr.addColorStop(0,'rgba(20,26,40,0)');gr.addColorStop(.5,'rgba(20,26,40,.12)');gr.addColorStop(1,'rgba(20,26,40,0)');x.fillStyle=gr;x.fillRect(gx,0,30,h)}
+      x.fillStyle='rgba(18,22,32,.55)';x.fillRect(0,0,3,h);x.fillRect(0,0,w,3);
+    },true,true);
+    const concreteBump=canvasTex(512,512,(x,w,h)=>{
+      x.fillStyle='#808080';x.fillRect(0,0,w,h);speckle(x,w,h,16000,60,.18);
+      x.fillStyle='#202020';x.fillRect(0,0,3,h);x.fillRect(0,0,w,3);
+    },false,true);
+    const asphalt=canvasTex(512,512,(x,w,h)=>{
+      x.fillStyle='#1c212b';x.fillRect(0,0,w,h);
+      speckle(x,w,h,16000,24,.14);
+      x.fillStyle='#d3dae9';x.fillRect(14,0,8,h);x.fillRect(w-22,0,8,h);
+      x.fillStyle='#e7c64e';x.fillRect(w/2-4,0,8,h*.4);
+    },true,true);
+    const tiled=(base,rx,ry)=>{const t=track(base.clone());t.repeat.set(rx,ry);t.needsUpdate=true;return t};
+
+    /* Entorno: cielo oscuro con tiras de luz, para que el asfalto tenga un brillo húmedo */
+    const pmrem=new THREE.PMREMGenerator(renderer);
+    const ec=document.createElement('canvas');ec.width=512;ec.height=256;
+    const ex=ec.getContext('2d'),eg=ex.createLinearGradient(0,0,0,256);
+    eg.addColorStop(0,'#1d2f66');eg.addColorStop(.5,'#0b1226');eg.addColorStop(1,'#04060c');
+    ex.fillStyle=eg;ex.fillRect(0,0,512,256);
+    ex.fillStyle='rgba(220,232,255,.95)';for(let i=0;i<8;i++)ex.fillRect(i*64+18,60,30,8);
+    const envSrc=new THREE.CanvasTexture(ec);envSrc.mapping=THREE.EquirectangularReflectionMapping;envSrc.colorSpace=SRGB;
+    const envRT=pmrem.fromEquirectangular(envSrc);
+    scene.environment=envRT.texture;scene.environmentIntensity=.4;
+    envSrc.dispose();pmrem.dispose();
+
+    /* Tubo de hormigón (por dentro) y carretera */
+    const zc=-(L/2)+30;
+    const shell=new THREE.Mesh(
+      track(new THREE.CylinderGeometry(R,R,L,56,1,true).rotateX(Math.PI/2)),
+      track(new THREE.MeshStandardMaterial({map:tiled(concrete,10,L/12),bumpMap:tiled(concreteBump,10,L/12),bumpScale:1.2,color:0xffffff,roughness:.94,metalness:0,side:THREE.BackSide}))
+    );
+    shell.position.z=zc;scene.add(shell);
+    const RW=11.6;
+    const road=new THREE.Mesh(
+      track(new THREE.PlaneGeometry(RW,L).rotateX(-Math.PI/2)),
+      track(new THREE.MeshStandardMaterial({map:tiled(asphalt,1,L/12),roughness:.42,metalness:.12}))
+    );
+    road.position.set(0,ROAD,zc);scene.add(road);
+
+    /* Lámparas de techo y charcos de luz en el asfalto */
+    const GAP=12,nL=Math.ceil(L/GAP);
+    const lampGeo=track(new THREE.BoxGeometry(1,1,1));
+    const lamps=new THREE.InstancedMesh(lampGeo,track(new THREE.MeshBasicMaterial({color:0xffffff})),nL*2);
+    const poolGeo=track(new THREE.PlaneGeometry(9,15).rotateX(-Math.PI/2));
+    const poolTex=canvasTex(128,128,(x)=>{
+      const g=x.createRadialGradient(64,64,0,64,64,64);
+      g.addColorStop(0,'rgba(255,255,255,.9)');g.addColorStop(.45,'rgba(255,255,255,.25)');g.addColorStop(1,'rgba(255,255,255,0)');
+      x.fillStyle=g;x.fillRect(0,0,128,128);
+    },false,false);
+    const pools=new THREE.InstancedMesh(poolGeo,track(new THREE.MeshBasicMaterial({map:poolTex,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,opacity:.5,fog:true})),nL*2);
+    const dummy=new THREE.Object3D(),col=new THREE.Color(),white=new THREE.Color(1,1,1);
+    const lampX=2.5,lampY=Math.sqrt(R*R-lampX*lampX)-.25;
+    let li=0;
+    for(let i=0;i<nL;i++){
+      const z=-6-i*GAP,t=progress(z);
+      for(const sx of [-1,1]){
+        dummy.position.set(sx*lampX,lampY,z);dummy.scale.set(.55,.14,3.4);dummy.updateMatrix();
+        lamps.setMatrixAt(li,dummy.matrix);
+        tint(t,col).lerp(white,.35).multiplyScalar(3.2);lamps.setColorAt(li,col);
+        dummy.position.set(sx*lampX*1.2,ROAD+.03,z);dummy.scale.set(1,1,1);dummy.updateMatrix();
+        pools.setMatrixAt(li,dummy.matrix);
+        tint(t,col).multiplyScalar(.9);pools.setColorAt(li,col);
+        li++;
+      }
     }
-    const dGeo=track(new THREE.BufferGeometry());
-    dGeo.setAttribute('position',new THREE.BufferAttribute(dPos,3));
-    dGeo.setAttribute('aChar',new THREE.BufferAttribute(dChar,1));
-    dGeo.setAttribute('aSize',new THREE.BufferAttribute(dSize,1));
-    dGeo.boundingSphere=lGeo.boundingSphere;
-    const U={uScale:{value:600},uAtlas:{value:atlas}};
-    const dMat=track(new THREE.ShaderMaterial({
-      uniforms:U,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,
-      vertexShader:`
-        uniform float uScale;attribute float aChar,aSize;
-        varying float vChar,vAlpha;
-        void main(){
-          vec4 mv=modelViewMatrix*vec4(position,1.0);
-          float d=-mv.z;
-          vAlpha=smoothstep(180.,40.,d)*smoothstep(2.,8.,d)*.34;
-          vChar=aChar;
-          gl_PointSize=clamp(aSize*uScale/max(d,.1),0.,56.);
-          gl_Position=projectionMatrix*mv;
-        }`,
-      fragmentShader:`
-        uniform sampler2D uAtlas;varying float vChar,vAlpha;
-        void main(){
-          float c=floor(vChar+.5);
-          vec2 cell=vec2(mod(c,8.),floor(c/8.));
-          vec2 uv=vec2((cell.x+gl_PointCoord.x)/8.,1.-(cell.y+gl_PointCoord.y)/4.);
-          gl_FragColor=vec4(vec3(.56,.64,.84),texture2D(uAtlas,uv).a*vAlpha);
-        }`
-    }));
-    const dust=new THREE.Points(dGeo,dMat);
-    dust.frustumCulled=false;
-    scene.add(dust);
+    lamps.instanceMatrix.needsUpdate=true;pools.instanceMatrix.needsUpdate=true;
+    if(lamps.instanceColor)lamps.instanceColor.needsUpdate=true;
+    if(pools.instanceColor)pools.instanceColor.needsUpdate=true;
+    lamps.frustumCulled=false;pools.frustumCulled=false;
+    scene.add(lamps,pools);disposables.push(lamps,pools);
 
-    /* Etiquetas de cada etapa: un título y dos tarjetas de cristal junto al pasillo. El centro queda libre para ver la profundidad. */
-    try{await Promise.race([document.fonts.load('700 96px Geist'),new Promise(r=>setTimeout(r,1500))])}catch(e){}
+    /* Luz: ambiente tenue y faro frontal que acompaña a la cámara */
+    scene.add(new THREE.HemisphereLight(0x8aa0d6,0x10131c,.6));
+    const head=new THREE.SpotLight(0xe6eeff,420,120,.8,.75,1.3);
+    head.position.set(0,.2,0);head.target.position.set(0,-.6,-40);
+    camera.add(head,head.target);
+
+    /* La luz de la salida, al fondo del túnel */
+    const exitTex=canvasTex(256,256,(x)=>{
+      const g=x.createRadialGradient(128,128,0,128,128,128);
+      g.addColorStop(0,'rgba(255,255,255,1)');g.addColorStop(.18,'rgba(210,228,255,.85)');g.addColorStop(.5,'rgba(110,160,255,.22)');g.addColorStop(1,'rgba(110,160,255,0)');
+      x.fillStyle=g;x.fillRect(0,0,256,256);
+    },false,false);
+    const exitGlow=new THREE.Mesh(track(new THREE.PlaneGeometry(60,60)),track(new THREE.MeshBasicMaterial({map:exitTex,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,fog:false,opacity:.0})));
+    exitGlow.position.set(0,EYE+1,-(ZEND+110));scene.add(exitGlow);
+
+    /* Elementos reales de un túnel de carretera: catadióptricos, salidas de emergencia y ventiladores */
+    const eyeGeo=track(new THREE.BoxGeometry(.14,.05,.22));
+    const nEye=Math.ceil(L/4)*2;
+    const eyes=new THREE.InstancedMesh(eyeGeo,track(new THREE.MeshBasicMaterial({color:0xffffff})),nEye);
+    const amber=new THREE.Color(1,.62,.12);
+    for(let i=0;i<nEye/2;i++){
+      const z=-i*4;
+      for(const sx of [-1,1]){
+        dummy.position.set(sx*(RW/2-.12),ROAD+.03,z);dummy.scale.set(1,1,1);dummy.rotation.set(0,0,0);dummy.updateMatrix();
+        const idx=i*2+(sx>0?1:0);
+        eyes.setMatrixAt(idx,dummy.matrix);
+        col.copy(sx<0?white:amber).multiplyScalar(2.4);eyes.setColorAt(idx,col);
+      }
+    }
+    eyes.instanceMatrix.needsUpdate=true;if(eyes.instanceColor)eyes.instanceColor.needsUpdate=true;
+    eyes.frustumCulled=false;scene.add(eyes);disposables.push(eyes);
+
+    const exitTexSign=canvasTex(256,160,(x,w,h)=>{
+      x.fillStyle='#0b7d3f';x.fillRect(0,0,w,h);
+      x.strokeStyle='#e8fff0';x.lineWidth=6;x.strokeRect(6,6,w-12,h-12);
+      x.fillStyle='#fff';x.font='700 44px Geist,Segoe UI,sans-serif';x.textAlign='center';x.fillText('SALIDA',w/2+20,64);
+      x.beginPath();x.moveTo(30,102);x.lineTo(104,102);x.lineTo(104,88);x.lineTo(136,112);x.lineTo(104,136);x.lineTo(104,122);x.lineTo(30,122);x.closePath();x.fill();
+      x.font='600 26px Geist,Segoe UI,sans-serif';x.fillText('EXIT',w/2+66,134);
+    },true,false);
+    const exitMat=track(new THREE.MeshBasicMaterial({map:exitTexSign,color:new THREE.Color(1.7,1.7,1.7)}));
+    const exitGeo=track(new THREE.PlaneGeometry(1.7,1.06));
+    const niche=track(new THREE.MeshStandardMaterial({color:0x10151f,roughness:.8,metalness:.2}));
+    const nicheGeo=track(new THREE.BoxGeometry(.2,2.3,2.4));
+    for(let k=0;k<=SEG;k++){
+      for(const dz of [-22,-34]){
+        const z=-k*S+dz;
+        const s=new THREE.Mesh(exitGeo,exitMat);s.position.set(6.55,.9,z);s.rotation.y=-Math.PI/2+.32;scene.add(s);
+        const n=new THREE.Mesh(nicheGeo,niche);n.position.set(6.8,-.1,z-.2);scene.add(n);
+      }
+    }
+    const fanMat=track(new THREE.MeshStandardMaterial({color:0x8d96a8,roughness:.45,metalness:.7}));
+    const fanGeo=track(new THREE.CylinderGeometry(.82,.82,3.4,28).rotateX(Math.PI/2));
+    const fanEnd=track(new THREE.CylinderGeometry(.62,.62,.08,28).rotateX(Math.PI/2));
+    const darkMat=track(new THREE.MeshStandardMaterial({color:0x05070b,roughness:.9}));
+    for(let z=-40;z>-L+60;z-=70){
+      for(const sx of [-1,1]){
+        const f=new THREE.Mesh(fanGeo,fanMat);f.position.set(sx*2.9,5.2,z);scene.add(f);
+        for(const e of [-1,1]){const d=new THREE.Mesh(fanEnd,darkMat);d.position.set(sx*2.9,5.2,z+e*1.72);scene.add(d)}
+      }
+    }
+
+    /* Puntos de control: cada etapa es un pórtico luminoso sobre la carretera, con el número pintado en el asfalto */
+    const labelScene=new THREE.Scene();
+    const BW=2048,BH=980,BWORLD=12.4,BCY=1.6,BDIST=12;
     const FONT="Geist,'Segoe UI',system-ui,sans-serif";
-    const data=typeof PATH!=='undefined'?PATH:null;
-    const steps=data?data.steps.map((s,i)=>({
-      kicker:'Etapa 0'+(i+1),title:s.name,sub:s.ask,
-      left:s.training.length?{label:'Formación',items:s.training.map(t=>t.title+' · '+t.place+' · '+t.years)}:null,
-      right:{label:'Cómo lo implemento',items:[s.implement]}
-    })):[];
-    if(data)steps.push({kicker:'El resultado',title:data.result,sub:'Javier García · Desarrollo Full Stack',big:true});
-
-    const wrap=(ctx,text,max)=>{
+    try{await Promise.race([document.fonts.load('700 96px Geist'),new Promise(r=>setTimeout(r,1500))])}catch(e){}
+    const mctx=document.createElement('canvas').getContext('2d');
+    const wrapText=(ctx,text,max)=>{
       const out=[];let line='';
       for(const w of text.split(' ')){const t=line?line+' '+w:w;if(ctx.measureText(t).width>max&&line){out.push(line);line=w}else line=t}
       out.push(line);return out;
     };
-    const aniso=Math.min(8,renderer.capabilities.getMaxAnisotropy());
-    const portraitNow=()=>innerWidth/innerHeight<.8;
-    let portrait=portraitNow();
-    const mctx=document.createElement('canvas').getContext('2d');
     const roundRect=(x,px,py,w,h,r)=>{x.beginPath();x.moveTo(px+r,py);x.arcTo(px+w,py,px+w,py+h,r);x.arcTo(px+w,py+h,px,py+h,r);x.arcTo(px,py+h,px,py,r);x.arcTo(px,py,px+w,py,r);x.closePath()};
-    const toTex=c=>{const t=new THREE.CanvasTexture(c);t.anisotropy=aniso;t.colorSpace=THREE.SRGBColorSpace;return t};
-
-    /* Título: etapa, nombre (equilibrado en 1-2 líneas) y pregunta */
-    const titleTex=(s,cw,pt)=>{
-      const kick=cw*(pt?.034:.026),tsz0=cw*(s.big?(pt?.075:.062):(pt?.108:.1)),ssz=cw*(pt?.046:.034);
-      let f=1,tl,sl;
-      const lay=()=>{
-        mctx.font='700 '+(tsz0*f)+'px '+FONT;
-        tl=wrap(mctx,s.title,cw*.92);
-        while(tl.length>(s.big?3:2)){f*=.94;mctx.font='700 '+(tsz0*f)+'px '+FONT;tl=wrap(mctx,s.title,cw*.92)}
-        if(tl.length===2){
-          const ws=s.title.split(' ');let best=null;
-          for(let i=1;i<ws.length;i++){const l=ws.slice(0,i).join(' '),r=ws.slice(i).join(' '),m=Math.max(mctx.measureText(l).width,mctx.measureText(r).width);if(!best||m<best.m)best={m,l,r}}
-          if(best&&best.m<=cw*.92)tl=[best.l,best.r];
-        }
-        mctx.font='500 '+ssz+'px '+FONT;
-        sl=wrap(mctx,s.sub,cw*.86).slice(0,2);
-      };
-      lay();
-      const tlh=tsz0*f*1.06,slh=ssz*1.3,pad=cw*.02;
-      const H=Math.ceil(pad+kick*1.7+tl.length*tlh+cw*.012+sl.length*slh+pad);
-      const c=document.createElement('canvas');c.width=cw;c.height=H;
-      const x=c.getContext('2d');
-      x.textAlign='center';x.textBaseline='alphabetic';
-      let y=pad;
-      x.font='600 '+kick+'px '+FONT;x.fillStyle='#a9bde8';
-      x.letterSpacing=(cw*.0035)+'px';x.fillText(s.kicker.toUpperCase(),cw/2,y+kick);x.letterSpacing='0px';
-      y+=kick*1.7;
-      x.font='700 '+(tsz0*f)+'px '+FONT;
-      x.shadowColor='rgba(76,130,255,.5)';x.shadowBlur=cw*.016;x.fillStyle='#ffffff';
-      tl.forEach((l,i)=>x.fillText(l,cw/2,y+tsz0*f*.86+i*tlh));
-      x.shadowBlur=0;
-      y+=tl.length*tlh+cw*.012;
-      x.font='500 '+ssz+'px '+FONT;x.fillStyle='#d3e0ff';
-      sl.forEach((l,i)=>x.fillText(l,cw/2,y+ssz*.95+i*slh));
-      return {tex:toTex(c),ratio:H/cw};
+    const fitText=(text,weight,maxW,maxLines,start,min)=>{
+      let s=start;
+      for(;s>min;s-=4){
+        mctx.font=weight+' '+s+'px '+FONT;
+        const l=wrapText(mctx,text,maxW);
+        if(l.length<=maxLines&&l.every(q=>mctx.measureText(q).width<=maxW))return {s,l};
+      }
+      mctx.font=weight+' '+min+'px '+FONT;
+      return {s:min,l:wrapText(mctx,text,maxW)};
     };
-
-    /* Tarjeta de cristal con etiqueta y varios puntos */
-    const cardTex=(label,items,cw)=>{
-      const fs=cw*.047,lf=cw*.029,pad=cw*.07,bullet=cw*.05,lh=fs*1.34,gap=cw*.02;
-      mctx.font='400 '+fs+'px '+FONT;
-      const blocks=items.filter(Boolean).map(t=>wrap(mctx,t,cw-2*pad-bullet));
-      const head=lf*1.5+cw*.035;
-      const H=Math.ceil(pad+head+blocks.reduce((n,l)=>n+l.length*lh+gap,0)-gap+pad);
-      const c=document.createElement('canvas');c.width=cw;c.height=H;
+    const boardTexture=k=>{
+      const c=document.createElement('canvas');c.width=BW;c.height=BH;
       const x=c.getContext('2d');
-      roundRect(x,3,3,cw-6,H-6,cw*.05);
-      x.fillStyle='rgba(13,15,18,.82)';x.fill();
-      x.lineWidth=3;x.strokeStyle='rgba(120,160,255,.4)';x.stroke();
+      const bg=x.createLinearGradient(0,0,0,BH);bg.addColorStop(0,'#0b1224');bg.addColorStop(1,'#060a14');
+      roundRect(x,8,8,BW-16,BH-16,40);x.fillStyle=bg;x.fill();
+      x.lineWidth=7;x.strokeStyle='rgba(125,165,255,.7)';x.stroke();
+      x.fillStyle='rgba(125,165,255,.35)';x.fillRect(56,44,BW-112,6);
       x.textBaseline='alphabetic';x.textAlign='left';
-      let y=pad;
-      x.fillStyle='#7fa6ff';x.beginPath();x.arc(pad+lf*.3,y+lf*.55,lf*.3,0,6.2832);x.fill();
-      x.font='600 '+lf+'px '+FONT;x.fillStyle='#a9bde8';
-      x.letterSpacing=(cw*.004)+'px';x.fillText(label.toUpperCase(),pad+lf*1.1,y+lf*.88);x.letterSpacing='0px';
-      y+=head;
-      x.font='400 '+fs+'px '+FONT;
-      blocks.forEach(lines=>{
-        x.fillStyle='#7fa6ff';x.beginPath();x.arc(pad+bullet*.2,y+fs*.6,fs*.09,0,6.2832);x.fill();
-        x.fillStyle='#e8efff';
-        lines.forEach((l,i)=>x.fillText(l,pad+bullet,y+fs*.95+i*lh));
-        y+=lines.length*lh+gap;
-      });
-      return {tex:toTex(c),ratio:H/cw};
-    };
-
-    let labels=[];
-    const buildGroup=(s,i)=>{
-      const g=new THREE.Group(),mats=[];
-      g.position.set(0,0,-(i+1)*S);
-      const plane=(t,w,x,y)=>{
-        const mat=new THREE.MeshBasicMaterial({map:t.tex,transparent:true,depthWrite:false,opacity:0});
-        const m=new THREE.Mesh(new THREE.PlaneGeometry(w,w*t.ratio),mat);
-        m.position.set(x,y,0);g.add(m);mats.push(mat);return w*t.ratio;
-      };
-      const tw=portrait?9:(s.big?13:11);
-      const T=titleTex(s,portrait?1024:2048,portrait);
-      const th=tw*T.ratio;
-      let top=0,bottom;
-      if(s.big){
-        plane(T,tw,0,0);top=th/2;bottom=-th/2;
+      const hasData=typeof PATH!=='undefined';
+      const step=hasData&&k<=PATH.steps.length?PATH.steps[k-1]:null;
+      if(!step){
+        const t=hasData?PATH.result:'';
+        const f=fitText(t,'700',BW-300,3,150,70);
+        x.textAlign='center';
+        x.font='600 38px '+FONT;x.fillStyle='#aebfe6';x.letterSpacing='8px';x.fillText('EL RESULTADO',BW/2,200);x.letterSpacing='0px';
+        x.font='700 '+f.s+'px '+FONT;x.fillStyle='#fff';
+        f.l.forEach((l,i)=>x.fillText(l,BW/2,330+i*f.s*1.08));
+        x.font='500 54px '+FONT;x.fillStyle='#cfdcff';x.fillText('Javier García · Desarrollo Full Stack',BW/2,330+f.l.length*f.s*1.08+70);
       }else{
-        const R=cardTex(s.right.label,s.right.items,1024),L=s.left?cardTex(s.left.label,s.left.items,1024):null;
-        const cw=portrait?8.6:6.6,gapT=.9;
-        const rh=cw*R.ratio,lh=L?cw*L.ratio:0;
-        plane(T,tw,0,-th/2);
-        let y=-th-gapT;
-        if(portrait){
-          if(L){plane(L,cw,0,y-lh/2);y-=lh+.5}
-          plane(R,cw,0,y-rh/2);y-=rh;
-          bottom=y;
-        }else if(L){
-          plane(L,cw,-(cw/2+.9),y-lh/2);
-          plane(R,cw,cw/2+.9,y-rh/2);
-          bottom=y-Math.max(lh,rh);
-        }else{
-          plane(R,cw,0,y-rh/2);
-          bottom=y-rh;
+        /* columna izquierda: etapa, nombre y pregunta */
+        const LW=760;
+        x.font='600 36px '+FONT;x.fillStyle='#aebfe6';x.letterSpacing='7px';x.fillText('ETAPA 0'+k+' DE 0'+PATH.steps.length,80,150);x.letterSpacing='0px';
+        const t=fitText(step.name,'700',LW,3,150,84);
+        x.font='700 '+t.s+'px '+FONT;x.fillStyle='#fff';
+        t.l.forEach((l,i)=>x.fillText(l,80,150+t.s*1.02+i*t.s*1.04));
+        const ay=150+t.s*1.02+(t.l.length-1)*t.s*1.04+86;
+        const a=fitText(step.ask,'500',LW,4,56,40);
+        x.font='500 '+a.s+'px '+FONT;x.fillStyle='#cfdcff';
+        a.l.forEach((l,i)=>x.fillText(l,80,ay+i*a.s*1.32));
+        /* columna derecha: formación y cómo lo implemento */
+        const CX=900,CW=BW-CX-70,fs=45,lh=fs*1.3,pad=30;
+        mctx.font='400 '+fs+'px '+FONT;
+        const cards=[];
+        if(step.training.length)cards.push({label:'FORMACIÓN',items:step.training.map(q=>q.title+' · '+q.place+' · '+q.years)});
+        cards.push({label:'CÓMO LO IMPLEMENTO',items:[step.implement]});
+        const laid=cards.map(cd=>{const blocks=cd.items.map(it=>wrapText(mctx,it,CW-2*pad-34));return {cd,blocks,h:pad+30+26+blocks.reduce((n,b)=>n+b.length*lh+14,0)+pad-14}});
+        const total=laid.reduce((n,q)=>n+q.h,0)+(laid.length-1)*28;
+        let y=(BH-total)/2;
+        for(const q of laid){
+          roundRect(x,CX,y,CW,q.h,26);x.fillStyle='rgba(22,34,66,.92)';x.fill();x.lineWidth=3;x.strokeStyle='rgba(125,165,255,.4)';x.stroke();
+          x.font='600 30px '+FONT;x.fillStyle='#9fb4e6';x.letterSpacing='5px';x.fillText(q.cd.label,CX+pad,y+pad+26);x.letterSpacing='0px';
+          let yy=y+pad+30+26;
+          x.font='400 '+fs+'px '+FONT;
+          for(const b of q.blocks){
+            x.fillStyle='#7fa6ff';x.beginPath();x.arc(CX+pad+8,yy+fs*.62,7,0,6.2832);x.fill();
+            x.fillStyle='#f2f6ff';
+            b.forEach((l,i)=>x.fillText(l,CX+pad+34,yy+fs*.95+i*lh));
+            yy+=b.length*lh+14;
+          }
+          y+=q.h+28;
         }
       }
-      const shift=-(top+bottom)/2;
-      g.children.forEach(m=>{m.position.y+=shift});
-      g.userData={mats,w:s.big?tw:(portrait||!s.left?(portrait?9:Math.max(tw,6.6)):2*6.6+1.8),h:top-bottom};
-      scene.add(g);
-      return g;
+      /* rejilla de LED: cuadrícula fina que deja el texto nítido pero con aspecto de panel luminoso */
+      x.globalCompositeOperation='destination-out';x.fillStyle='rgba(0,0,0,.2)';
+      for(let yy=0;yy<BH;yy+=6)x.fillRect(0,yy,BW,1.4);
+      for(let xx=0;xx<BW;xx+=6)x.fillRect(xx,0,1.4,BH);
+      x.globalCompositeOperation='source-over';
+      return canvasTex2(c);
     };
-    const makeLabels=()=>{labels=steps.map(buildGroup)};
-    const clearLabels=()=>{
-      labels.forEach(g=>{
-        scene.remove(g);
-        g.children.forEach(m=>{m.material.map.dispose();m.material.dispose();m.geometry.dispose()});
-      });
-      labels=[];
-    };
-    makeLabels();
+    const canvasTex2=c=>{const t=new THREE.CanvasTexture(c);t.colorSpace=SRGB;t.anisotropy=maxAniso;return track(t)};
+    const boardMats=[];
+    const boardGeo=track(new THREE.PlaneGeometry(BWORLD,BWORLD*BH/BW));
+    const frameGeo=track(new THREE.BoxGeometry(BWORLD+.5,BWORLD*BH/BW+.5,.3));
+    const frameMat=track(new THREE.MeshStandardMaterial({color:0x151b28,roughness:.5,metalness:.8}));
+    const rodGeo=track(new THREE.CylinderGeometry(.07,.07,1,10));
+    const boards=[];
+    for(let k=1;k<=SEG;k++){
+      const z=-k*S-BDIST;
+      const mat=track(new THREE.ShaderMaterial({
+        uniforms:{map:{value:boardTexture(k)},uReveal:{value:0},uOpacity:{value:0}},
+        transparent:true,depthWrite:false,
+        vertexShader:'varying vec2 vUv;void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',
+        fragmentShader:[
+          'uniform sampler2D map;uniform float uReveal,uOpacity;varying vec2 vUv;',
+          'void main(){',
+          '  vec4 t=texture2D(map,vUv);',
+          '  float shown=1.-smoothstep(uReveal-.1,uReveal,vUv.x);',
+          '  float beam=smoothstep(uReveal-.03,uReveal,vUv.x)*(1.-smoothstep(uReveal,uReveal+.025,vUv.x));',
+          '  vec3 c=t.rgb+vec3(.45,.65,1.)*beam*.9;',
+          '  gl_FragColor=vec4(c,(t.a*shown+beam*.35)*uOpacity);',
+          '  #include <colorspace_fragment>',
+          '}'
+        ].join('\n')
+      }));
+      const board=new THREE.Mesh(boardGeo,mat);board.position.set(0,BCY,z+.18);labelScene.add(board);
+      const frame=new THREE.Mesh(frameGeo,frameMat);frame.position.set(0,BCY,z-.05);scene.add(frame);
+      const topY=BCY+BWORLD*BH/BW/2+.25,ceilY=Math.sqrt(R*R-25)-.1;
+      for(const sx of [-1,1]){
+        const rod=new THREE.Mesh(rodGeo,frameMat);rod.scale.y=Math.max(.4,ceilY-topY);rod.position.set(sx*4.9,topY+rod.scale.y/2,z-.05);scene.add(rod);
+      }
+      boards.push({board,frame,mat,z});
+    }
+    /* números pintados en el asfalto */
+    const roadMarks=[];
+    for(let k=1;k<=SEG;k++){
+      const tex=canvasTex(256,256,(x,w,h)=>{
+        x.fillStyle='#e9eef8';x.font='800 150px Geist,Segoe UI,sans-serif';x.textAlign='center';x.textBaseline='middle';
+        x.fillText(k<=4?'0'+k:'★',w/2,h/2+8);
+        for(let i=0;i<500;i++){x.clearRect(rnd()*w,rnd()*h,1+rnd()*3,1+rnd()*2)}
+      },true,false);
+      const m=new THREE.Mesh(track(new THREE.PlaneGeometry(3.2,3.2).rotateX(-Math.PI/2)),track(new THREE.MeshBasicMaterial({map:tex,transparent:true,depthWrite:false,opacity:.8,color:new THREE.Color(.9,.9,.9)})));
+      m.position.set(0,ROAD+.04,-k*S-7);m.rotation.y=0;scene.add(m);roadMarks.push(m);
+    }
 
-    /* Resplandor al final del pasillo */
-    const gc=document.createElement('canvas');gc.width=gc.height=128;
-    const gx=gc.getContext('2d'),gg=gx.createRadialGradient(64,64,0,64,64,64);
-    gg.addColorStop(0,'rgba(120,170,255,.55)');gg.addColorStop(.35,'rgba(60,120,255,.18)');gg.addColorStop(1,'rgba(60,120,255,0)');
-    gx.fillStyle=gg;gx.fillRect(0,0,128,128);
-    const glowTex=track(new THREE.CanvasTexture(gc));
-    const glow=new THREE.Mesh(track(new THREE.PlaneGeometry(46,46)),track(new THREE.MeshBasicMaterial({map:glowTex,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,opacity:.9})));
-    glow.position.set(0,0,-(ZEND+22));
-    scene.add(glow);
+    /* Polvo en suspensión: motas muy suaves, casi quietas */
+    const N=coarse?260:760;
+    const dPos=new Float32Array(N*3),dSize=new Float32Array(N),dPhase=new Float32Array(N);
+    for(let i=0;i<N;i++){
+      let x,y;do{x=(rnd()*2-1)*5.4;y=(rnd()*2-1)*5.4}while(x*x+y*y>26||y<ROAD+.4);
+      dPos[i*3]=x;dPos[i*3+1]=y;dPos[i*3+2]=14-rnd()*(ZEND+160);
+      dSize[i]=.05+rnd()*.12;dPhase[i]=rnd()*6.2832;
+    }
+    const dGeo=track(new THREE.BufferGeometry());
+    dGeo.setAttribute('position',new THREE.BufferAttribute(dPos,3));
+    dGeo.setAttribute('aSize',new THREE.BufferAttribute(dSize,1));
+    dGeo.setAttribute('aPhase',new THREE.BufferAttribute(dPhase,1));
+    dGeo.boundingSphere=new THREE.Sphere(new THREE.Vector3(0,0,-ZEND/2),ZEND);
+    const U={uScale:{value:600},uTime:{value:0}};
+    const dust=new THREE.Points(dGeo,track(new THREE.ShaderMaterial({
+      uniforms:U,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,
+      vertexShader:[
+        'uniform float uScale,uTime;attribute float aSize,aPhase;varying float vAlpha;',
+        'void main(){',
+        '  vec3 p=position+vec3(sin(uTime*.12+aPhase),cos(uTime*.1+aPhase*1.3),0.)*.18;',
+        '  vec4 mv=modelViewMatrix*vec4(p,1.0);float d=-mv.z;',
+        '  vAlpha=smoothstep(90.,10.,d)*smoothstep(.8,4.,d);',
+        '  gl_PointSize=clamp(aSize*uScale/max(d,.1),0.,20.);gl_Position=projectionMatrix*mv;}'
+      ].join('\n'),
+      fragmentShader:[
+        'varying float vAlpha;',
+        'void main(){float r=length(gl_PointCoord-.5);float a=smoothstep(.5,.0,r);gl_FragColor=vec4(vec3(.8,.88,1.),a*a*vAlpha*.4);}'
+      ].join('\n')
+    })));
+    dust.frustumCulled=false;scene.add(dust);
 
-    /* Cámara: avanza entre paradas con ease suave y se detiene delante de cada portal */
-    const stopZ=k=>k===0?0:-k*S+STOP;
+    /* Postprocesado suave (solo escritorio): un poco de bloom en las lámparas */
+    let composer=null,bloom=null;
+    if(post){
+      try{
+        const rt=new THREE.WebGLRenderTarget(2,2,{type:THREE.HalfFloatType,samples:4});
+        composer=new post.EffectComposer(renderer,rt);
+        composer.addPass(new post.RenderPass(scene,camera));
+        bloom=new post.UnrealBloomPass(new THREE.Vector2(256,256),.26,.55,.97);
+        composer.addPass(bloom);
+        composer.addPass(new post.OutputPass());
+      }catch(e){composer=null;bloom=null}
+    }
+
+    /* Cámara: avanza recta entre paradas con ease suave y se detiene en cada etapa */
+    const stopZ=k=>-k*S;
     const ease=t=>{t=clamp((t-.14)/.72,0,1);return t*t*(3-2*t)};
     const camZ=p=>{
       const u=clamp(p,0,1)*SEG,k=Math.min(SEG-1,Math.floor(u));
       return stopZ(k)+(stopZ(k+1)-stopZ(k))*ease(u-k);
+    };
+
+    /* Panel de cada etapa: texto real en HTML */
+    const stageHTML=k=>{
+      if(typeof PATH==='undefined')return '';
+      if(k>PATH.steps.length)return '<div class="ts-main"><p class="ts-kicker">El resultado</p><h2 class="ts-title">'+esc(PATH.result)+'</h2><p class="ts-ask">Javier García · Desarrollo Full Stack</p></div>';
+      const s=PATH.steps[k-1];
+      const train=s.training.length?'<div class="ts-card"><h3>Formación</h3><ul>'+s.training.map(t=>'<li><b>'+esc(t.title)+'</b><span>'+esc(t.place)+' · '+esc(t.years)+'</span></li>').join('')+'</ul></div>':'';
+      return '<div class="ts-main"><p class="ts-kicker">Etapa 0'+k+' de 0'+PATH.steps.length+'</p><h2 class="ts-title">'+esc(s.name)+'</h2><p class="ts-ask">'+esc(s.ask)+'</p></div>'
+        +'<div class="ts-cards">'+train+'<div class="ts-card"><h3>Cómo lo implemento</h3><p>'+esc(s.implement)+'</p></div></div>';
+    };
+    let stage=0,swapTimer=0,domMode=false;
+    const setStage=k=>{
+      if(!stageEl||k===stage)return;
+      stage=k;
+      clearTimeout(swapTimer);
+      stageEl.classList.remove('on');
+      if(k===0){stageEl.setAttribute('aria-hidden','true');return}
+      swapTimer=setTimeout(()=>{stageEl.innerHTML=stageHTML(k);stageEl.setAttribute('aria-hidden','false');stageEl.classList.add('on')},stageEl.innerHTML?200:0);
     };
 
     const resize=()=>{
@@ -336,47 +469,45 @@ function start(){
       const pr=Math.min(devicePixelRatio||1,coarse?1.5:2);
       renderer.setPixelRatio(pr);
       renderer.setSize(w,h,false);
+      if(composer){composer.setPixelRatio(pr);composer.setSize(w,h)}
       camera.aspect=w/h;
-      camera.fov=w/h<.8?FOV+14:FOV;
+      domMode=w/h<.8;
+      tunnel.classList.toggle('dom-text',domMode);
+      baseFov=w/h<.8?FOV+14:FOV;
+      camera.fov=baseFov;
       camera.updateProjectionMatrix();
-      U.uScale.value=h*pr*.5/Math.tan(THREE.MathUtils.degToRad(camera.fov/2));
-      const now=portraitNow();
-      if(now!==portrait){portrait=now;clearLabels();makeLabels()}
-      const visH=2*STOP*Math.tan(THREE.MathUtils.degToRad(camera.fov/2)),visW=visH*camera.aspect;
-      const ext=labels.reduce((e,g)=>({w:Math.max(e.w,g.userData.w),h:Math.max(e.h,g.userData.h)}),{w:1,h:1});
-      const sc=clamp(Math.min(visW*(portrait?.94:.82)/ext.w,visH*(portrait?.84:.8)/ext.h),.35,1.7);
-      labels.forEach(g=>g.scale.setScalar(sc));
-      if(!full)draw();
+      U.uScale.value=h*pr*.5/Math.tan(THREE.MathUtils.degToRad(baseFov/2));
+      if(!full)draw(0);
     };
 
-    /* Ratón: giro suave de cámara (solo con puntero fino) */
-    const M={yaw:0,pitch:0};
-    let qYaw,qPitch;
-    const onMove=e=>{qYaw((e.clientX/innerWidth-.5)*-.09);qPitch((e.clientY/innerHeight-.5)*-.06)};
-    if(full&&!coarse){
-      qYaw=G.quickTo(M,'yaw',{duration:1.2,ease:'power3.out'});
-      qPitch=G.quickTo(M,'pitch',{duration:1.2,ease:'power3.out'});
-      addEventListener('pointermove',onMove,{passive:true});
-    }
-
-    function draw(){
+    function draw(t){
+      t=t||0;
       const z=camZ(P.p);
-      camera.position.set(0,0,z);
-      camera.rotation.set(M.pitch,M.yaw,Math.sin(P.p*SEG*3.1416)*.012);
-      for(const g of labels){
-        const o=smooth(40,20,z-g.position.z)*smooth(3,9,z-g.position.z);
-        g.visible=o>.005;
-        if(g.visible)for(const m of g.userData.mats)m.opacity=o;
+      camera.position.set(0,EYE,z);
+      camera.rotation.set(.012,0,0);
+      U.uTime.value=t;
+      exitGlow.material.opacity=.55+.45*smooth(.2,1,P.p);
+      for(const b of boards){
+        const d=z-b.z,op=smooth(1,8,d)*(d<80?1:0),show=!domMode&&op>.01;
+        b.board.visible=show;b.frame.visible=!domMode;
+        b.mat.uniforms.uReveal.value=smooth(46,15,d)*1.15;
+        b.mat.uniforms.uOpacity.value=show?op:0;
       }
-      glow.material.opacity=.35+.65*smooth(0,1,P.p);
-      renderer.render(scene,camera);
+      if(full){
+        const u=P.p*SEG,k=Math.round(u);
+        setStage(k>=1&&k<=SEG&&Math.abs(u-k)<.3?k:0);
+      }
+      if(composer)composer.render();
+      else{renderer.clear();renderer.render(scene,camera)}
+      renderer.clearDepth();
+      renderer.render(labelScene,camera);
     }
 
     let visible=true,n=0;
-    const tick=()=>{
+    const tick=time=>{
       if(!visible)return;
       if(coarse&&(n++&1))return;
-      draw();
+      draw(time);
     };
     const io=new IntersectionObserver(es=>{visible=es[0].isIntersecting},{threshold:0});
     io.observe(tunnel);
@@ -384,7 +515,7 @@ function start(){
     ro.observe(pin);
     resize();
 
-    if(full)G.ticker.add(tick);else draw();
+    if(full)G.ticker.add(tick);else draw(0);
     tunnel.classList.add('ready');
 
     /* Limpieza completa: ticker, observadores, ScrollTrigger, geometrías, materiales, texturas y contexto */
@@ -393,10 +524,11 @@ function start(){
     function destroy(){
       G?.ticker.remove(tick);
       io.disconnect();ro.disconnect();
-      removeEventListener('pointermove',onMove);
+      clearTimeout(swapTimer);
       canvas.removeEventListener('webglcontextlost',onLost);
       tl?.scrollTrigger?.kill();tl?.kill();
-      disposables.forEach(o=>o.dispose());clearLabels();
+      disposables.forEach(o=>o.dispose());
+      composer?.dispose();bloom?.dispose();envRT.dispose();
       renderer.dispose();renderer.forceContextLoss();
       tunnel.classList.remove('ready');
     }
