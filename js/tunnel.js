@@ -1,4 +1,7 @@
-/* Viaje por la trayectoria: un túnel de carretera realista que termina en la luz del día (Three.js + GSAP ScrollTrigger).
+/* Viaje por la trayectoria: un túnel de carretera que termina en la luz del día (GSAP ScrollTrigger).
+   MODO CINE (principal): si existe assets/cine/manifest.json, el scroll recorre una secuencia de fotogramas renderizada con
+   Blender (Cycles, hormigón y asfalto PBR, cielo HDRI; ver tools/cine). El texto de cada cartel es HTML real proyectado sobre
+   el cartel renderizado. Si no hay fotogramas, se usa la escena Three.js en tiempo real que describe el resto de este bloque.
    Marketing → Diseño → Código → Product Engineering e IA dentro del túnel; el resultado, en un cartel ya fuera, a plena luz.
    - Túnel: tubo de hormigón, carretera con marcas viales, lámparas de techo con charcos de luz, catadióptricos, salidas de
      emergencia, ventiladores y niebla. Cada etapa es un pórtico sobre la carretera con el número pintado en el asfalto.
@@ -175,9 +178,11 @@ function start(){
     }
 
     /* Proyección del cartel con la cámara de Blender (24 mm, sensor 36 mm, inclinada 0,7° hacia arriba) */
-    const th=m.pitch*Math.PI/180,cs=Math.cos(th),sn=Math.sin(th),tanH=18/24,tanV=tanH*m.h/m.w;
-    const proj=(X,Y,Z)=>{
-      const dp=Y*cs+Z*sn,up=-Y*sn+Z*cs;
+    const tanH=18/24,tanV=tanH*m.h/m.w;
+    /* inclinación de plano de cine: sube al acercarse al cartel para encuadrarlo entero (igual que en el render) */
+    const pitchAt=yb=>m.pitch+m.tilt*smooth(22,12,yb)*(1-smooth(6,0,yb));
+    const proj=(X,Y,Z,th)=>{
+      const cs=Math.cos(th),sn=Math.sin(th),dp=Y*cs+Z*sn,up=-Y*sn+Z*cs;
       return dp<.3?null:[.5+.5*(X/dp)/tanH,.5-.5*(up/dp)/tanV];
     };
     const place=(d,sc,ox,oy,iw,ih)=>{
@@ -190,7 +195,8 @@ function start(){
         const k=i+1;
         if(dom||k!==shown){if(el.dataset.on==='1'){el.dataset.on='0';el.style.opacity='0'}return}
         const Yf=k*S+CAMY-d-.11;
-        const a=proj(-BWM/2,Yf,BCZ+BHM/2),b=proj(BWM/2,Yf,BCZ-BHM/2);
+        const th=pitchAt(k*S+CAMY-d)*Math.PI/180;
+        const a=proj(-BWM/2,Yf,BCZ+BHM/2,th),b=proj(BWM/2,Yf,BCZ-BHM/2,th);
         if(!a||!b){el.style.opacity='0';return}
         const x0=ox+a[0]*iw*sc,y0=oy+a[1]*ih*sc,x1=ox+b[0]*iw*sc,y1=oy+b[1]*ih*sc;
         const bd=k*S+CAMY-d,reveal=clamp(smooth(46,15,bd)*1.15,0,1),op=smooth(2,9,bd)*(reveal>0?1:0);
