@@ -497,3 +497,24 @@ iframe.live.on{opacity:1;visibility:visible}
 @media (prefers-reduced-motion:reduce){.tunnel-stage{transition:none}}
 
 .tunnel:not(.dom-text) .tunnel-stage{position:absolute;left:0;bottom:0;width:1px;height:1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;background:none;opacity:1;transform:none;transition:none}
+
+/* Modo cine: fotogramas de Blender y texto HTML proyectado sobre los carteles renderizados */
+.cine{overflow:hidden;will-change:transform;background:var(--tunnel-bg)}
+.cine canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+.cine-boards{position:absolute;inset:0;pointer-events:none}
+.cine-board{position:absolute;container-type:inline-size;opacity:0;display:grid;grid-template-columns:minmax(0,.82fr) minmax(0,1.18fr);gap:2.2cqw;align-items:center;color:#f2f6ff;overflow:hidden;text-shadow:0 0 1.2cqw rgba(110,160,255,.28)}
+.cb-main{margin-left:3.6cqw;min-width:0}
+.cb-main.cb-end{grid-column:1/-1;margin:0 6cqw;text-align:center}
+.cb-kicker{margin:0;color:#aebfe6;font-size:1.5cqw;font-weight:600;letter-spacing:.22em;text-transform:uppercase}
+.cb-title{margin:.9cqw 0 1.4cqw;color:#fff;font-size:4.1cqw;line-height:1.03;letter-spacing:-.03em}
+.cb-end .cb-title{font-size:5.2cqw}
+.cb-ask{margin:0;color:#cfdcff;font-size:2cqw;line-height:1.34}
+.cb-cards{display:grid;gap:1.4cqw;margin-right:3.2cqw;min-width:0}
+.cb-card{padding:1.5cqw 2cqw;border:.16cqw solid rgba(130,165,255,.4);border-radius:1.3cqw;background:rgba(22,34,66,.6)}
+.cb-card h4{margin:0 0 .9cqw;color:#9fb4e6;font-size:1.35cqw;font-weight:600;letter-spacing:.2em;text-transform:uppercase}
+.cb-card p{margin:0;color:#f2f6ff;font-size:1.9cqw;line-height:1.38}
+.cb-card ul{list-style:none;margin:0;padding:0;display:grid;gap:.9cqw}
+.cb-card li{display:flex;flex-direction:column;padding-left:1.3cqw;border-left:.22cqw solid #6f9bff}
+.cb-card li b{color:#fff;font-size:1.95cqw;font-weight:600;line-height:1.28}
+.cb-card li span{color:#b9c8ec;font-size:1.6cqw}
+.tunnel.dom-text .cine-boards{display:none}
