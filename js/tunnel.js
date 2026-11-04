@@ -32,9 +32,8 @@ async function start(){
 
   /* ---------- contenido compartido de una parada (panel 3D y fallback accesible).
      `kicker` se omite dentro de una ventana con chrome: la barra ya muestra el nombre de la fase. */
-  const stopBody=(s,kicker)=>{
+  const stopBody=(s,kicker,lead)=>{
     let h=kicker===false?'':'<p class="tn-kicker tf-kicker">'+esc(s.fase)+'</p>';
-    if(s.nombre)h+='<h1 class="tn-name">'+esc(s.nombre)+'</h1>';
     if(s.badge)h+='<p class="tn-badge"><i aria-hidden="true"></i>'+esc(s.badge)+'</p>';
     h+='<h3>'+esc(s.titulo||s.fase)+'</h3>';
     if(s.ask)h+='<p class="tn-ask tf-ask">'+esc(s.ask)+'</p>';
@@ -50,7 +49,7 @@ async function start(){
         '<a href="'+esc(l.href)+'"'+(i===0?'':' target="_blank" rel="noopener"')+'>'+esc(l.texto)+'</a>'
       ).join('')+'</div>';
     }
-    if(s.nombre){
+    if(lead){
       const visual='<div class="tn-blueprint" aria-hidden="true">'
         +'<span class="tn-blueprint-label">DE LA IDEA AL PRODUCTO</span>'
         +'<div class="tn-orbit"></div><div class="tn-orbit inner"></div>'
@@ -80,7 +79,7 @@ async function start(){
     if(st.lead){
       return '<div class="tn-slot" data-at="'+st.at+'" data-x="0"><div class="tn-panel tn-hero">'
         +'<div class="tn-win tn-win-lead"><div class="tn-chrome"><i></i><i></i><i></i><span>'+esc(st.data.fase)+'</span><span class="tn-window-role">Full Stack &amp; IA</span></div>'
-        +'<div class="tn-body">'+stopBody(st.data,false)+'</div></div>'
+        +'<div class="tn-body">'+stopBody(st.data,false,true)+'</div></div>'
         +'<div class="tn-cta cta"><a class="btn primary" href="#proyectos">Explorar proyectos</a>'
         +'<a class="btn ghost" href="assets/cv-javi-garcia.pdf" download>Ver CV</a></div>'
         +'</div></div>';

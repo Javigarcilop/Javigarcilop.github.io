@@ -5,11 +5,10 @@
       "at": 0,
       "lado": "right",
       "fase": "Quién soy",
-      "nombre": "Francisco Javier García López",
       "titulo": "Pienso en diseño. Construyo en código.",
       "badge": "Abierto a nuevas oportunidades",
       "texto": [
-        "Soy desarrollador web Full Stack, cada vez más enfocado en el servidor. Vengo del marketing y del diseño gráfico, y la curiosidad por saber cómo se construía por dentro lo que diseñaba me llevó al software.",
+        "Soy Javier García, desarrollador web Full Stack, cada vez más enfocado en el servidor. Vengo del marketing y del diseño gráfico, y la curiosidad por saber cómo se construía por dentro lo que diseñaba me llevó al software.",
         "Hoy desarrollo y evoluciono aplicaciones en entornos reales: formación, FUNDAE, SEPE, integración de sistemas y automatización de procesos. Mi camino apunta al servidor, la automatización y la inteligencia artificial."
       ],
       "chips": ["Full Stack", "Servidor", "Automatización", "IA aplicada"]
