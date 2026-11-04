@@ -2,7 +2,7 @@
   "stops": [
     {
       "id": "quien-soy",
-      "at": 0.08,
+      "at": 0,
       "lado": "right",
       "fase": "Quién soy",
       "titulo": "Mi mayor ventaja como developer no la aprendí programando.",
