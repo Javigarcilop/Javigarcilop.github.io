@@ -32,7 +32,9 @@ button{font:inherit;color:inherit;cursor:pointer}
 header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:50;background:color-mix(in srgb,var(--bg) 82%,transparent);backdrop-filter:saturate(1.4) blur(14px);-webkit-backdrop-filter:saturate(1.4) blur(14px);border-bottom:1px solid var(--line)}
 .top .wrap{height:var(--header-h);display:flex;align-items:center;gap:20px}
 .brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--ink);font-weight:700;letter-spacing:-.01em}
-.brand svg{width:34px;height:34px;flex:none}
+.brand img{width:40px;height:40px;flex:none}
+.brand-wordmark{font-size:22px;line-height:1;letter-spacing:-.045em;font-weight:700;white-space:nowrap}
+.brand-dot{color:#00C2E0}
 nav.main{position:relative;margin-left:auto;display:flex;align-items:center;gap:4px}
 nav.main a{position:relative;color:var(--muted);text-decoration:none;font-weight:500;font-size:15px;padding:8px 12px;border-radius:999px;transition:color .2s;z-index:1}
 nav.main a:hover{color:var(--ink)}
@@ -405,3 +407,5 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;
 
 .map-readout-close{position:absolute;right:10px;top:10px;width:32px;height:32px;border:1px solid var(--line);border-radius:50%;background:#17314B;color:#D8EDF8;font-size:20px;cursor:pointer}
 .map-readout h3{padding-right:28px}
+
+@media (max-width:600px){.brand{gap:7px}.brand img{width:32px;height:32px}.brand-wordmark{font-size:20px}}
