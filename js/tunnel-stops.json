@@ -5,7 +5,7 @@
       "at": 0,
       "lado": "right",
       "fase": "Quién soy",
-      "titulo": "Pienso en diseño. Construyo en código.",
+      "titulo": "Te muestro mi camino.",
       "badge": "Abierto a nuevas oportunidades",
       "texto": [
         "Soy Javier García, desarrollador web Full Stack, cada vez más enfocado en el servidor. Vengo del marketing y del diseño gráfico, y la curiosidad por saber cómo se construía por dentro lo que diseñaba me llevó al software.",
@@ -49,26 +49,13 @@
     },
     {
       "id": "product-ia",
-      "at": 0.72,
-      "lado": "right",
+      "at": 0.90,
+      "lado": "center",
       "fase": "Product Engineering e IA",
       "ask": "La pieza que faltaba: IA aplicada al desarrollo.",
       "texto": ["Potencio todo lo anterior con IA: automatiza y ahorra trabajo, siempre al servicio del producto."],
       "formacion": [
         {"titulo": "Máster Online en Product Engineering con IA", "lugar": "Evolve", "fechas": "2026 – 2027"}
-      ]
-    },
-    {
-      "id": "contacto",
-      "at": 0.90,
-      "lado": "left",
-      "fase": "Contacto",
-      "titulo": "Las buenas soluciones empiezan entendiendo el problema.",
-      "texto": ["Si quieres hablar de desarrollo de software, integraciones o un proyecto tecnológico, escríbeme."],
-      "enlaces": [
-        {"texto": "Escribirme por email", "href": "mailto:javigarcilop@gmail.com?subject=Hablemos%20%7C%20Contacto%20desde%20tu%20portfolio"},
-        {"texto": "LinkedIn", "href": "https://www.linkedin.com/in/francisco-javier-garcia-lopez"},
-        {"texto": "GitHub", "href": "https://github.com/Javigarcilop"}
       ]
     }
   ]

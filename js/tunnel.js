@@ -35,7 +35,9 @@ async function start(){
   const stopBody=(s,kicker,lead)=>{
     let h=kicker===false?'':'<p class="tn-kicker tf-kicker">'+esc(s.fase)+'</p>';
     if(s.badge)h+='<p class="tn-badge"><i aria-hidden="true"></i>'+esc(s.badge)+'</p>';
-    h+='<h3>'+esc(s.titulo||s.fase)+'</h3>';
+    const tag=lead?'h1':'h3';
+    const title=esc(s.titulo||s.fase);
+    h+='<'+tag+'>'+(lead?title.replace('mi camino.','<span>mi camino.</span>'):title)+'</'+tag+'>';
     if(s.ask)h+='<p class="tn-ask tf-ask">'+esc(s.ask)+'</p>';
     (s.texto||[]).forEach(p=>h+='<p>'+esc(p)+'</p>');
     if(s.formacion&&s.formacion.length){
@@ -51,21 +53,37 @@ async function start(){
     }
     if(lead){
       const visual='<div class="tn-blueprint" aria-hidden="true">'
-        +'<span class="tn-blueprint-label">DE LA IDEA AL PRODUCTO</span>'
+        +'<span class="tn-blueprint-label">UNA IDEA. MUCHAS FORMAS DE CONSTRUIRLA.</span>'
         +'<div class="tn-orbit"></div><div class="tn-orbit inner"></div>'
-        +'<div class="tn-mini tn-mini-design"><span>01 / DISEÑO</span><div class="tn-swatch"><i></i><i></i><i></i></div><div class="tn-sketch"></div></div>'
+        +'<div class="tn-mini tn-mini-design"><span>01 / MARKETING + DISEÑO</span><div class="tn-swatch"><i></i><i></i><i></i></div><div class="tn-sketch"></div></div>'
         +'<div class="tn-mini tn-mini-code"><span>02 / CÓDIGO</span><code>&lt;idea&gt;<br>&nbsp; hacerlaReal();<br>&lt;/idea&gt;</code></div>'
         +'<div class="tn-mini tn-mini-product"><span>03 / PRODUCTO</span><div class="tn-mini-chart"><i></i><i></i><i></i><i></i><i></i></div><b>Listo para funcionar ↗</b></div>'
-        +'<span class="tn-blueprint-foot"><i></i> Diseño + lógica + propósito</span></div>';
-      return '<div class="tn-profile"><div class="tn-profile-copy">'+h+'</div>'+visual+'</div>';
+        +'<span class="tn-blueprint-foot"><i></i> Mi siguiente paso: Product Engineering + IA</span></div>';
+      return '<div class="tn-profile"><div class="tn-profile-copy">'+h
+        +'<div class="tn-cta cta"><a class="btn primary" href="#proyectos">Explorar proyectos ↗</a>'
+        +'<a class="btn ghost" href="assets/cv-javi-garcia.pdf" download>Ver CV</a></div></div>'+visual+'</div>';
     }
     return h;
   };
 
+  const finale=s=>'<div class="tn-finale">'
+    +'<p class="tn-finale-eyebrow">El recorrido se convierte en producto</p>'
+    +'<h2>Product Engineering <span>+ IA</span></h2>'
+    +'<p class="tn-finale-idea">Diseño, código e inteligencia. Todo conectado.</p>'
+    +'<div class="tn-product" aria-label="Un producto que conecta experiencia, servidor e inteligencia artificial">'
+    +'<div class="tn-product-top"><span><i></i> Producto completo</span><b>De la idea a la realidad ↗</b></div>'
+    +'<div class="tn-product-modules"><div><span class="tn-module-icon">◈</span><b>Experiencia</b><small>Clara. Útil. Humana.</small><div class="tn-product-ui"><i></i><i></i><i></i></div></div>'
+    +'<span class="tn-product-plus" aria-hidden="true">+</span><div><span class="tn-module-icon">&lt;/&gt;</span><b>Ingeniería</b><small>La lógica que lo hace real.</small><div class="tn-product-code" aria-hidden="true"><i></i><i></i><i></i></div></div>'
+    +'<span class="tn-product-plus" aria-hidden="true">+</span><div><span class="tn-module-icon">✳</span><b>IA aplicada</b><small>Automatizar. Mejorar. Crear.</small><div class="tn-product-ai" aria-hidden="true"><i></i><i></i><i></i></div></div></div>'
+    +'<div class="tn-product-bottom"><span>Una visión de principio a fin</span><span>● Sistemas conectados</span></div></div>'
+    +'<p class="tn-finale-description">'+esc(s.texto[0])+'</p>'
+    +'<p class="tn-finale-study">'+esc(s.formacion[0].titulo)+' · '+esc(s.formacion[0].lugar)+' · '+esc(s.formacion[0].fechas)+'</p>'
+    +'</div>';
+
   /* cabecera + lista accesibles: siempre en el DOM; visibles solo cuando no hay túnel animado (es el fallback) */
-  if(heroLite&&!full)heroLite.classList.remove('sr');
+  if(heroLite)heroLite.hidden=true;
   if(fallbackEl){
-    fallbackEl.innerHTML=STOPS.map(s=>'<li class="tf-item">'+stopBody(s)+'</li>').join('');
+    fallbackEl.innerHTML=STOPS.map((s,i)=>'<li class="tf-item'+(i===0?' tf-intro':s.id==='product-ia'?' tf-finale':'')+'">'+(s.id==='product-ia'?finale(s):stopBody(s,true,i===0))+'</li>').join('');
     if(!full)fallbackEl.classList.remove('sr');
   }
 
@@ -79,13 +97,11 @@ async function start(){
     if(st.lead){
       return '<div class="tn-slot" data-at="'+st.at+'" data-x="0"><div class="tn-panel tn-hero">'
         +'<div class="tn-lead-section">'+stopBody(st.data,true,true)+'</div>'
-        +'<div class="tn-cta cta"><a class="btn primary" href="#proyectos">Explorar proyectos</a>'
-        +'<a class="btn ghost" href="assets/cv-javi-garcia.pdf" download>Ver CV</a></div>'
         +'</div></div>';
     }
     if(st.exit){
-      return '<div class="tn-slot" data-at="'+st.at+'" data-x="0"><div class="tn-panel tn-hero">'
-        +'<div class="tn-exit-section">'+stopBody(st.data,true)+'</div>'
+      return '<div class="tn-slot tn-slot-exit" data-at="'+st.at+'" data-x="0"><div class="tn-panel tn-hero tn-exit">'
+        +'<div class="tn-exit-section">'+finale(st.data)+'</div>'
         +'</div></div>';
     }
     return '<div class="tn-slot" data-at="'+st.at+'" data-x="'+st.x+'"><article class="tn-panel tn-win">'
@@ -94,7 +110,7 @@ async function start(){
   }).join('');
   const panels=[...world2.querySelectorAll('.tn-slot')].map(slot=>({
     slot,panel:slot.querySelector('.tn-panel'),
-    at:parseFloat(slot.dataset.at),x:parseFloat(slot.dataset.x)
+    at:parseFloat(slot.dataset.at),x:parseFloat(slot.dataset.x),exit:slot.classList.contains('tn-slot-exit')
   }));
   panels.forEach(q=>{q.slot.style.transform='translate3d('+q.x+'px,0,'+(-q.at*ZMAX)+'px) translate(-50%,-50%)'});
 
@@ -185,7 +201,8 @@ async function start(){
       if(off!==grp.off){grp.off=off;grp.el.classList.toggle('off',off)}
     }
     for(const q of panels){
-      const z=(p-q.at)*ZMAX;
+      const z=((q.exit?Math.min(p,q.at):p)-q.at)*ZMAX;
+      if(q.exit)q.slot.style.transform='translate3d(0,0,'+(-Math.max(p,q.at)*ZMAX)+'px) translate(-50%,-50%)';
       let o=z<=0?1+z/950:1-z/260;o=clamp(o,0,1);
       q.panel.style.opacity=o.toFixed(3);
       if(o<.5)q.slot.setAttribute('inert','');else q.slot.removeAttribute('inert');
