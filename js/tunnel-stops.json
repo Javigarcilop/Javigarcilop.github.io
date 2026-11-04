@@ -1,0 +1,75 @@
+{
+  "stops": [
+    {
+      "id": "quien-soy",
+      "at": 0.08,
+      "lado": "right",
+      "fase": "Quién soy",
+      "titulo": "Mi mayor ventaja como developer no la aprendí programando.",
+      "badge": "Abierto a nuevas oportunidades",
+      "texto": [
+        "Soy desarrollador web Full Stack, cada vez más enfocado en backend. Vengo del marketing y del diseño gráfico, y la curiosidad por saber cómo se construía por dentro lo que diseñaba me llevó al software.",
+        "Hoy desarrollo y evoluciono aplicaciones en entornos reales: formación, FUNDAE, SEPE, integración de sistemas y automatización de procesos. Mi camino apunta al backend, la automatización y la inteligencia artificial."
+      ],
+      "chips": ["Full Stack", "Backend", "Automatización", "IA aplicada"]
+    },
+    {
+      "id": "marketing",
+      "at": 0.24,
+      "lado": "left",
+      "fase": "Marketing",
+      "ask": "¿Para qué sirve y qué valor aporta?",
+      "texto": ["Defino qué problema resuelvo y para quién. Todo lo demás parte de aquí."],
+      "formacion": [
+        {"titulo": "Ciclo Formativo de Grado Superior en Marketing y Publicidad", "lugar": "Centro Universitario EUSA", "fechas": "2018 – 2020"}
+      ]
+    },
+    {
+      "id": "diseno",
+      "at": 0.40,
+      "lado": "right",
+      "fase": "Diseño",
+      "ask": "¿Quién lo va a usar?",
+      "texto": ["Convierto ese valor en una experiencia clara y usable para quien lo va a utilizar."],
+      "formacion": [
+        {"titulo": "Máster en Diseño Gráfico, Web y Creatividad", "lugar": "Escuela de Negocios de la Cámara de Comercio de Sevilla", "fechas": "2020 – 2021"}
+      ]
+    },
+    {
+      "id": "codigo",
+      "at": 0.56,
+      "lado": "left",
+      "fase": "Código",
+      "ask": "¿Cómo lo convierto en algo que funciona?",
+      "texto": ["Doy forma real a esa experiencia: base de datos, backend e interfaz conectados, con integraciones y automatización de procesos."],
+      "formacion": [
+        {"titulo": "Ciclo Formativo de Grado Superior en Desarrollo de Aplicaciones Web (DAW)", "lugar": "Centro Universitario EUSA", "fechas": "2023 – 2025"},
+        {"titulo": "RPA (Robotic Process Automation) con UiPath", "lugar": "Fundación Generation España", "fechas": "ene. – abr. 2022"}
+      ]
+    },
+    {
+      "id": "product-ia",
+      "at": 0.72,
+      "lado": "right",
+      "fase": "Product Engineering e IA",
+      "ask": "La pieza que faltaba: IA aplicada al desarrollo.",
+      "texto": ["Potencio todo lo anterior con IA: automatiza y ahorra trabajo, siempre al servicio del producto."],
+      "formacion": [
+        {"titulo": "Máster Online en Product Engineering con IA", "lugar": "Evolve", "fechas": "2026 – 2027"}
+      ]
+    },
+    {
+      "id": "contacto",
+      "at": 0.90,
+      "lado": "left",
+      "fase": "Contacto",
+      "titulo": "Las buenas soluciones empiezan entendiendo el problema.",
+      "texto": ["Si quieres hablar de desarrollo de software, integraciones o un proyecto tecnológico, escríbeme."],
+      "enlaces": [
+        {"texto": "Escribirme por email", "href": "mailto:javigarcilop@gmail.com?subject=Hablemos%20%7C%20Contacto%20desde%20tu%20portfolio"},
+        {"texto": "LinkedIn", "href": "https://www.linkedin.com/in/francisco-javier-garcia-lopez"},
+        {"texto": "GitHub", "href": "https://github.com/Javigarcilop"}
+      ]
+    }
+  ]
+}
