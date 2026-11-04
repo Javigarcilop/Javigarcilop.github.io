@@ -314,7 +314,7 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;
 
 /* El nodo se despliega dentro de la propia red, sin una capa modal. */
 .map-project[hidden]{display:none}
-.map-project{position:absolute;z-index:5;right:24px;top:24px;bottom:24px;width:67%;overflow:auto;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:#416486 #0C182B;border:1px solid #355C80;border-radius:20px;background:linear-gradient(145deg,#142940f5,#091526fa 65%);box-shadow:0 30px 80px #0007;color:var(--text)}
+.map-project{position:absolute;z-index:5;right:20px;top:86px;bottom:24px;width:56%;overflow:auto;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:#416486 #0C182B;border:1px solid #355C80;border-radius:20px;background:linear-gradient(145deg,#142940f5,#091526fa 65%);box-shadow:0 30px 80px #0007;color:var(--text)}
 .map-project-bar{position:sticky;top:0;z-index:4;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px 22px;border-bottom:1px solid #2C4B68;background:#0A192CF5;backdrop-filter:blur(12px)}
 .map-project-bar>span{display:flex;align-items:center;gap:8px;font:10px var(--f-code);color:#9AC8DE;letter-spacing:.04em}
 .map-project-bar i{width:6px;height:6px;border-radius:50%;background:#6FE5D7;box-shadow:0 0 12px #6FE5D7}
@@ -331,16 +331,16 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;
 .map-connection{position:absolute;inset:0;width:100%;height:100%;z-index:4;pointer-events:none;opacity:0;transition:opacity .35s}
 .map-connection path{fill:none;stroke:#68DADC;stroke-width:2;stroke-dasharray:5 7;filter:drop-shadow(0 0 5px #68DADC88)}
 .project-open .map-connection{opacity:.7}
-.project-open .mapfull-head,.project-open .map-readout{opacity:0;pointer-events:none}
-.project-open #map .node:not(.sel){opacity:.18}
-.project-open #map .node.sel{opacity:1;transition:transform .6s cubic-bezier(.2,.8,.2,1)}
+.project-open .mapfull-head .sub,.project-open .map-readout{opacity:0;pointer-events:none}
+.project-open #map .node:not(.sel){opacity:.5}
+.project-open #map .node.sel{opacity:1}
 .project-open #map .node.sel circle.core{fill:#6FE5D7;stroke:#C1FCF1}
 .project-open #map .node.sel circle.halo{fill:#6FE5D7}
 .project-open #map .edge{opacity:.08}
 .project-open #map .edge.on{opacity:.3}
 .mapfull-head .active-tech{pointer-events:auto;margin-top:12px}
 @media (max-width:1000px) and (min-width:761px){
-  .map-project{right:16px;width:66%}
+  .map-project{right:16px;width:56%}
   .map-project-bar{padding:12px;gap:8px}
   .map-project-bar>span{font-size:9px}
   .map-project-bar button{font-size:11px}
@@ -348,7 +348,7 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;
   .map-project .case-grid.two{grid-template-columns:1fr}
 }
 @media (max-width:760px){
-  .map-project{left:12px;right:12px;width:auto;top:20%;bottom:12px;border-radius:16px}
+  .map-project{left:12px;right:12px;width:auto;top:190px;bottom:78px;border-radius:16px}
   .map-project-bar{padding:12px;gap:8px}
   .map-project-bar>span{font-size:9px;max-width:44%}
   .map-project-bar button{font-size:11px;padding:8px 10px}
@@ -359,3 +359,49 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;
   .project-open #map .node.sel text{font-size:13px}
 }
 @media (prefers-reduced-motion:reduce){.project-open #map .node.sel{transition:none}}
+
+/* Un lienzo estable con controles siempre visibles. */
+#map{cursor:grab;touch-action:pan-y;user-select:none}
+#map .node{cursor:pointer;transition:opacity .2s}
+#map .node:focus{outline:none}
+#map.is-panning{cursor:grabbing}
+#map:focus-visible{outline:2px solid #68DADC;outline-offset:-4px}
+.pan-enabled #map{touch-action:none;cursor:grab}
+.map-controls{position:absolute;right:20px;top:20px;z-index:8;display:flex;align-items:center;gap:4px;padding:5px;border:1px solid #2D4E6B;border-radius:14px;background:#0B1A2DEC;box-shadow:0 8px 24px #0003}
+.map-controls button{min-width:40px;min-height:40px;padding:8px 12px;border:0;border-radius:9px;background:#142A42;color:#DBEAF8;font-size:13px;font-weight:500;cursor:pointer}
+.map-controls button:hover{background:#22445F}.map-controls button:focus-visible{outline:2px solid #70DFE3;outline-offset:2px}
+.map-controls button:disabled{opacity:.35;cursor:default}
+.map-controls button[aria-pressed="true"]{background:#286674;color:#E0FFFF}
+.map-controls output{font:11px var(--f-code);min-width:42px;text-align:center;color:#AFC9DF}
+.map-project-picker{position:absolute;z-index:7;left:24px;bottom:42px;max-width:34%;display:flex;flex-wrap:wrap;gap:8px}
+.map-project-picker button{display:flex;align-items:center;gap:8px;min-height:42px;padding:10px 14px;border:1px solid #355773;border-radius:12px;background:#0D2036EB;color:#C6DBED;font-size:12px;text-align:left;cursor:pointer}
+.map-project-picker button i{width:7px;height:7px;flex:none;border-radius:50%;background:#6398FF}
+.map-project-picker button:hover{border-color:#7BAFE3;background:#17354D}
+.map-project-picker button[aria-pressed="true"]{border-color:#6EE0D8;background:#16434C;color:#E4FFF9}
+.map-project-picker button[aria-pressed="true"] i{background:#71E8D3;box-shadow:0 0 12px #71E8D3}
+.map-help{position:absolute;z-index:2;left:24px;bottom:14px;color:#9CB6CA;font:10px/1.4 var(--f-code);pointer-events:none;margin:0}
+.map-help .mobile-help{display:none}
+.mapfull-head{max-width:36%;top:24px;left:24px}
+.mapfull .map-readout[hidden]{display:none}
+.mapfull .map-readout{bottom:24px;max-height:48%;overflow:auto}
+@media (max-width:1000px) and (min-width:761px){
+  .map-controls{right:16px;gap:3px}.map-controls button{padding:8px;font-size:12px}
+  .mapfull-head .sub{font-size:13px}.map-project-picker{left:16px;max-width:37%}
+}
+@media (max-width:760px){
+  .mapfull-head{left:16px;top:16px;max-width:calc(100% - 32px)}
+  .mapfull-head .eyebrow{margin:0;font-size:12px}
+  .map-project-picker{left:12px;right:12px;top:48px;bottom:auto;max-width:none;gap:6px}
+  .map-project-picker button{flex:1;justify-content:center;font-size:11px;padding:8px 10px;min-height:40px}
+  .map-controls{top:auto;bottom:12px;left:12px;right:12px;justify-content:center;gap:4px}
+  .map-controls button{min-width:38px;min-height:44px;padding:8px;font-size:12px}
+  .map-controls output{min-width:38px;font-size:10px}
+  .map-help{left:16px;top:100px;bottom:auto;font-size:9px}
+  .map-help .desktop-help{display:none}.map-help .mobile-help{display:inline}
+  .project-open .map-help{visibility:hidden}
+  .mapfull .map-readout{left:12px;right:12px;bottom:82px;max-height:42%;font-size:14px}
+  .mapfull-head .active-tech{margin-top:4px}
+}
+
+.map-readout-close{position:absolute;right:10px;top:10px;width:32px;height:32px;border:1px solid var(--line);border-radius:50%;background:#17314B;color:#D8EDF8;font-size:20px;cursor:pointer}
+.map-readout h3{padding-right:28px}

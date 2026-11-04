@@ -95,6 +95,7 @@ async function start(){
     fallbackEl.innerHTML=STOPS.map((s,i)=>'<li class="tf-item'+(i===0?' tf-intro':s.id==='product-ia'?' tf-finale':s.id==='el-camino'?' tf-journey':'')+'">'+(s.id==='product-ia'?finale(s):s.id==='el-camino'?journey(s):stopBody(s,true,i===0))+'</li>').join('');
     if(!full)fallbackEl.classList.remove('sr');
   }
+  document.dispatchEvent(new Event('tunnel:ready'));
 
   if(!full)return;
 
@@ -171,7 +172,6 @@ async function start(){
   });
   phases.forEach(ph=>{
     const b=document.createElement('button');b.type='button';b.textContent=ph.name;
-    b.style.flex='0 0 '+((ph.b-ph.a)*100)+'%';
     b.addEventListener('click',()=>scrollTo({top:ph.at*maxScroll,behavior:calm?'auto':'smooth'}));
     timeline.insertBefore(b,head);ph.el=b;
   });
@@ -197,7 +197,7 @@ async function start(){
 
   /* ---------- bucle único: progreso con inercia, pinta solo si cambia, pausado fuera de pantalla ---------- */
   const clamp=(v,a,b)=>v<a?a:v>b?b:v;
-  let tp=0,p=0,tmx=0,tmy=0,mx=0,my=0,dirty=true,lastPhase=-1,running=false,rafId=null;
+  let tp=0,p=0,tmx=0,tmy=0,mx=0,my=0,dirty=true,lastPhase=-1,lastTimelineWidth=0,running=false,rafId=null;
 
   const onScroll=()=>{tp=clamp(scrollY/maxScroll,0,1)};
   addEventListener('scroll',onScroll,{passive:true});
@@ -220,11 +220,15 @@ async function start(){
       if(o<.5)q.slot.setAttribute('inert','');else q.slot.removeAttribute('inert');
     }
     let ph=0;for(let k=0;k<phases.length;k++)if(p>=phases[k].a)ph=k;
-    if(ph!==lastPhase){
+    if(ph!==lastPhase||timeline.clientWidth!==lastTimelineWidth){
       lastPhase=ph;
+      lastTimelineWidth=timeline.clientWidth;
       phases.forEach((x,n)=>x.el.setAttribute('aria-current',n===ph?'true':'false'));
+      const active=phases[ph].el;
+      timeline.scrollTo({left:Math.max(0,active.offsetLeft-(timeline.clientWidth-active.offsetWidth)/2),behavior:'smooth'});
     }
-    head.style.left=(p*100)+'%';
+    const phase=phases[ph],local=clamp((p-phase.a)/(phase.b-phase.a),0,1);
+    head.style.width=(phase.el.offsetLeft+phase.el.offsetWidth*local)+'px';
     const exit=clamp((p-.62)/.38,0,1);
     glow.style.transform='scale('+(.18+exit*2.6).toFixed(3)+')';
     glow.style.opacity=(.12+exit*exit*.88).toFixed(3);

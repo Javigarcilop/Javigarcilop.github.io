@@ -18,8 +18,8 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
-<link rel="stylesheet" href="css/styles.css">
-<link rel="stylesheet" href="css/tunnel.css">
+<link rel="stylesheet" href="css/styles.css?v=20261104-navigation">
+<link rel="stylesheet" href="css/tunnel.css?v=20261104-navigation">
 <script src="js/theme-init.js"></script>
 </head>
 <body>
@@ -98,8 +98,17 @@
       <span class="active-tech" id="techchip"><span>Tecnología: <b id="techname"></b></span><button type="button" id="techclear" aria-label="Quitar filtro de tecnología">×</button></span>
       <p class="sub">Cada proyecto tiene una historia. Abre un nodo para descubrir qué problema resuelve, cómo lo construí y por qué tomé cada decisión.</p>
     </div>
-    <div class="map-readout" id="readout" aria-live="polite">
-      <p class="map-hint">Abre un proyecto para explorar su historia completa. Los nodos pequeños te muestran las tecnologías. También puedes arrastrarlos.</p>
+    <nav class="map-project-picker" id="mapProjectPicker" aria-label="Elegir un proyecto del mapa"></nav>
+    <div class="map-controls" role="group" aria-label="Controles del mapa">
+      <button type="button" id="mapZoomOut" aria-label="Alejar mapa">−</button>
+      <output id="mapZoomLevel" aria-label="Nivel de zoom">100%</output>
+      <button type="button" id="mapZoomIn" aria-label="Acercar mapa">+</button>
+      <button type="button" id="mapPan" aria-pressed="false">Mover</button>
+      <button type="button" id="mapFit">Ver toda la red</button>
+    </div>
+    <p class="map-help"><span class="desktop-help">Arrastra el fondo · Flechas para mover · + / − para acercar</span><span class="mobile-help">Pulsa «Mover» para arrastrar la red. Vuelve a pulsarlo para desplazar la página.</span></p>
+    <div class="map-readout" id="readout" aria-live="polite" hidden>
+      <p class="map-hint">Elige un proyecto para descubrir su historia.</p>
     </div>
     <svg class="map-connection" aria-hidden="true"><path id="mapConnection"/></svg>
     <article id="projectDetail" class="map-project from-map" aria-labelledby="d-title" hidden></article>
@@ -157,7 +166,7 @@
 <script defer src="assets/vendor/ScrollTrigger.min.js"></script>
 <script defer src="js/motion.js"></script>
 <script defer src="js/data.js"></script>
-<script defer src="js/app.js"></script>
-<script type="module" src="js/tunnel.js"></script>
+<script defer src="js/app.js?v=20261104-navigation"></script>
+<script type="module" src="js/tunnel.js?v=20261104-navigation"></script>
 </body>
 </html>
