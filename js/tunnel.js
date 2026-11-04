@@ -34,6 +34,7 @@ async function start(){
      `kicker` se omite dentro de una ventana con chrome: la barra ya muestra el nombre de la fase. */
   const stopBody=(s,kicker)=>{
     let h=kicker===false?'':'<p class="tn-kicker tf-kicker">'+esc(s.fase)+'</p>';
+    if(s.nombre)h+='<h1 class="tn-name">'+esc(s.nombre)+'</h1>';
     if(s.badge)h+='<p class="tn-badge"><i aria-hidden="true"></i>'+esc(s.badge)+'</p>';
     h+='<h3>'+esc(s.titulo||s.fase)+'</h3>';
     if(s.ask)h+='<p class="tn-ask tf-ask">'+esc(s.ask)+'</p>';
@@ -61,14 +62,13 @@ async function start(){
 
   if(!full)return;
 
-  /* ---------- paradas en la cámara delantera: la primera ("Quién soy") abre con el nombre, sin
-     ventana aparte de cabecera — todo en un único panel, mismo sistema de opacidad ---------- */
+  /* ---------- paradas en la cámara delantera: el nombre vive dentro de "Quién soy",
+     con el mismo contenido compartido que la versión ligera ---------- */
   const S=420,SLOTS=20,ZMAX=6720;
   const stations=STOPS.map((s,i)=>({at:s.at,x:s.lado==='left'?-300:300,data:s,lead:i===0}));
   world2.innerHTML=stations.map(st=>{
     if(st.lead){
       return '<div class="tn-slot" data-at="'+st.at+'" data-x="0"><div class="tn-panel tn-hero">'
-        +'<h1 class="title">Francisco Javier García López</h1>'
         +'<p class="tn-sub">Full Stack &amp; IA<code aria-hidden="true">_</code></p>'
         +'<div class="tn-win tn-win-lead"><div class="tn-chrome"><i></i><i></i><i></i><span>'+esc(st.data.fase)+'</span></div>'
         +'<div class="tn-body">'+stopBody(st.data,false)+'</div></div>'
