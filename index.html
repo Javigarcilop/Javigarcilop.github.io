@@ -19,7 +19,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="icon" href="assets/favicon.svg?v=20261104-javigarcilop" type="image/svg+xml">
 <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
-<link rel="stylesheet" href="css/styles.css?v=20261104-brand">
+<link rel="stylesheet" href="css/styles.css?v=20261104-adaptive">
 <link rel="stylesheet" href="css/tunnel.css?v=20261104-brand">
 <script src="js/theme-init.js"></script>
 </head>
@@ -30,10 +30,11 @@
   <div class="wrap">
     <a class="brand" href="#inicio" aria-label="javigarcilop, inicio"><img src="assets/logo-javigarcilop-symbol.svg" alt="" width="40" height="40"><span class="brand-wordmark" aria-hidden="true">javigarcilop<span class="brand-dot">.</span></span></a>
     <nav class="main" id="mainnav" aria-label="Principal">
-      <a href="#trayectoria">Trayectoria</a>
-      <a href="#mapa">Proyectos</a>
-      <a href="#stack">Stack</a>
-      <a href="#contacto">Contacto</a>
+      <a href="#inicio"><span class="nav-step">01</span><span class="nav-label">Mi camino</span></a>
+      <a href="#mapa"><span class="nav-step">02</span><span class="nav-label">Proyectos</span></a>
+      <a href="#stack"><span class="nav-step">03</span><span class="nav-label">Stack</span></a>
+      <a href="#contacto"><span class="nav-step">04</span><span class="nav-label">Hablemos</span></a>
+      <a class="nav-download" href="assets/cv-javi-garcia.pdf" download>Descargar CV ↗</a>
       <span class="nav-cursor" id="navCursor" aria-hidden="true"></span>
     </nav>
     <a class="btn ghost sm cv-btn" href="assets/cv-javi-garcia.pdf" download aria-label="Descargar CV">
@@ -41,7 +42,7 @@
       <span>Descargar CV</span>
     </a>
     <button class="icon-btn menu-btn" id="menuBtn" type="button" aria-label="Abrir menú" aria-expanded="false" aria-controls="mainnav">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 17h16"/></svg><span class="menu-label">Explorar</span>
     </button>
   </div>
 </header>
@@ -160,7 +161,7 @@
 <script defer src="assets/vendor/ScrollTrigger.min.js"></script>
 <script defer src="js/motion.js"></script>
 <script defer src="js/data.js"></script>
-<script defer src="js/app.js?v=20261104-navigation"></script>
+<script defer src="js/app.js?v=20261104-adaptive"></script>
 <script type="module" src="js/tunnel.js?v=20261104-navigation"></script>
 </body>
 </html>

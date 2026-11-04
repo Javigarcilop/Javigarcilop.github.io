@@ -76,10 +76,10 @@ function buildMap(){
   const links=PROJECTS.flatMap(p=>p.stack.map(t=>[idx[p.slug],idx['t:'+t]]));
   PROJECTS.forEach((p,i)=>{
     const hub=nodes[idx[p.slug]];
-    hub.x=mobile?W*.5:W*(.28+i*.44);hub.y=mobile?H*(.33+i*.31):H*.53;
+    hub.x=mobile?W*.5:W*(.26+i*.48);hub.y=mobile?H*(.33+i*.31):H*.54;
     p.stack.forEach((t,k)=>{
       const n=nodes[idx['t:'+t]],angle=(-140+k*360/p.stack.length)*Math.PI/180;
-      const radius=mobile?Math.min(118,W*.34):Math.min(135,W*.13);
+      const radius=mobile?Math.min(118,W*.34):Math.min(W*.18,H*.31);
       if(n.x===undefined){n.x=hub.x+Math.cos(angle)*radius;n.y=hub.y+Math.sin(angle)*radius}
     });
   });
@@ -96,7 +96,7 @@ function buildMap(){
     g.setAttribute('tabindex','0');g.setAttribute('role','button');
     g.setAttribute('aria-label',isProject?'Proyecto '+n.p.title+', abrir historia completa':'Tecnología '+n.t+', ver dónde la uso');
     if(isProject){g.setAttribute('aria-expanded','false');g.setAttribute('aria-controls','projectDetail')}
-    g.innerHTML=isProject?`<rect class="hit" x="-88" y="-36" width="176" height="92" rx="18"/><circle class="halo" r="31"/><circle class="core" r="19"/><text text-anchor="middle" y="42">${esc(n.label)}</text>`:`<rect class="hit" x="-48" y="-19" width="96" height="60" rx="12"/><circle class="dot" r="8"/><text text-anchor="middle" y="30">${esc(n.label)}</text>`;
+    g.innerHTML=isProject?`<rect class="hit" x="${mobile?-88:-120}" y="-42" width="${mobile?176:240}" height="110" rx="18"/><circle class="halo" r="40"/><circle class="core" r="28"/><text text-anchor="middle" y="${mobile?48:56}">${esc(n.label)}</text>`:`<rect class="hit" x="-48" y="-19" width="96" height="60" rx="12"/><circle class="dot" r="8"/><text text-anchor="middle" y="30">${esc(n.label)}</text>`;
     g.addEventListener('click',()=>{if(!MAP.justPanned)selectNode(n)});
     g.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();selectNode(n)}});
     g.addEventListener('pointerenter',()=>highlight(MAP.selected||n.id));
@@ -148,13 +148,14 @@ function applyMapCamera(c){
   const selected=MAP.nodes.find(n=>n.id===MAP.selected);
   if(selected?.type==='t'&&!$('#readout').hidden)positionTechReadout(selected);
 }
-function animateMapCamera(target){
+function animateMapCamera(target,travel=false){
   stopMapAnimation();
   if(matchMedia('(prefers-reduced-motion: reduce)').matches){applyMapCamera(target);return}
   const start={...MAP.camera},beg=performance.now();
   const frame=now=>{
-    const t=Math.min(1,(now-beg)/400),ease=1-Math.pow(1-t,3),c={};
+    const t=Math.min(1,(now-beg)/(travel?720:480)),ease=1-Math.pow(1-t,3),c={};
     for(const key of ['x','y','w','h'])c[key]=start[key]+(target[key]-start[key])*ease;
+    if(travel){const pull=Math.sin(Math.PI*t)*MAP.W*.1;c.x-=pull*.2;c.y-=pull*.5*MAP.H/MAP.W;c.w+=pull;c.h+=pull*MAP.H/MAP.W}
     applyMapCamera(c);MAP.frame=t<1?requestAnimationFrame(frame):0;
   };MAP.frame=requestAnimationFrame(frame);
 }
@@ -163,12 +164,12 @@ function zoomMap(factor){
   ensureMapVisible();
   const c=MAP.camera,z=Math.max(.65,Math.min(2.6,MAP.W/c.w*factor)),w=MAP.W/z,h=MAP.H/z;
   const mobile=mapStage.clientWidth<=760;
-  const px=projectPanel.hidden ? .5 : mobile ? .5 : .2,py=projectPanel.hidden ? .5 : mobile ? 125/MAP.H : .5;
+  const px=projectPanel.hidden ? .5 : mobile ? .5 : .23,py=projectPanel.hidden ? .5 : mobile ? 140/MAP.H : .5;
   animateMapCamera({x:c.x+(c.w-w)*px,y:c.y+(c.h-h)*py,w,h});
 }
 function ensureMapVisible(){
-  const bounds=$('#mapa').getBoundingClientRect();
-  if(bounds.top<64||bounds.top>96)scrollTo({top:scrollY+bounds.top-76,behavior:'auto'});
+  const bounds=$('#mapa').getBoundingClientRect(),offset=$('header.top').offsetHeight+12;
+  if(Math.abs(bounds.top-offset)>12)scrollTo({top:scrollY+bounds.top-offset,behavior:'auto'});
 }
 function moveMap(dx,dy){if(MAP){ensureMapVisible();const c=MAP.camera;animateMapCamera({...c,x:c.x+dx*c.w*.12,y:c.y+dy*c.h*.12})}}
 function resetMapView(){
@@ -250,12 +251,13 @@ function setHash(h){try{history.replaceState(null,'',h)}catch(e){}}
 function openProject(slug,noHash,from){
   const i=PROJECTS.findIndex(p=>p.slug===slug); if(i<0)return;
   const p=PROJECTS[i],prev=PROJECTS[(i-1+PROJECTS.length)%PROJECTS.length],next=PROJECTS[(i+1)%PROJECTS.length];
+  const switching=!projectPanel.hidden&&projectPanel.dataset.slug!==slug;
   caseObserver?.disconnect();
   const links=(p.links||[]).map(l=>`<a class="btn ${/demo/i.test(l.label)?'primary':'ghost'}" href="${esc(l.url)}" target="_blank" rel="noopener">${esc(l.label)}</a>`).join('');
   const list=a=>`<ul>${(a||[]).map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`;
   const diagram=(p.diagram||[]).map(([t,s],k)=>`${k?'<span class="arch-link"></span>':''}<span class="arch-node" style="--k:${k}"><b>${esc(t)}</b><small>${esc(s)}</small></span>`).join('');
   projectPanel.innerHTML=`
-    <div class="map-project-bar"><span><i></i> Nodo / ${esc(p.short)}</span><button type="button" id="dclose">← Volver a la red</button></div>
+    <div class="map-project-bar"><button type="button" id="dclose" aria-label="Volver a la red">← Red</button><span class="map-project-count">${i+1} / ${PROJECTS.length}</span><button type="button" class="map-project-next" data-go="${esc(next.slug)}" aria-label="Ir al nodo ${esc(next.short)}">${esc(next.short)} →</button></div>
     <div class="d-body">
       <span class="status ${p.ok?'ok':''}"><i></i>${esc(p.status)}</span>
       <h2 id="d-title">${esc(p.title)}</h2>
@@ -285,7 +287,7 @@ function openProject(slug,noHash,from){
   projectPanel.hidden=false;
   projectPanel.dataset.slug=slug;
   mapStage.classList.add('project-open');
-  focusProjectNode(slug);
+  focusProjectNode(slug,switching);
   projectPanel.scrollTop=0;
   ensureMapVisible();
   $('#d-title').tabIndex=-1;
@@ -303,14 +305,14 @@ function openProject(slug,noHash,from){
   $$('[data-t]',projectPanel).forEach(b=>b.onclick=()=>{closeProject(false);state.tech=b.dataset.t;update();$('#mapa').scrollIntoView({behavior:'smooth'})});
   if(!noHash) setHash('#p='+slug);
 }
-function focusProjectNode(slug){
+function focusProjectNode(slug,travel=false){
   if(!MAP)return;
   const n=MAP.nodes.find(n=>n.id===slug);if(!n)return;
   if(!MAP.overview)MAP.overview={...MAP.camera};
   MAP.selected=slug;
   MAP.nodes.forEach(x=>{x.el.classList.toggle('sel',x===n);if(x.type==='p')x.el.setAttribute('aria-expanded',String(x===n))});highlight(slug);
   const c=MAP.camera,mobile=mapStage.clientWidth<=760;
-  animateMapCamera({...c,x:n.x-c.w*(mobile ? .5:.2),y:n.y-c.h*(mobile ? 125/MAP.H : .5)});
+  animateMapCamera({...c,x:n.x-c.w*(mobile ? .5:.23),y:n.y-c.h*(mobile ? 140/MAP.H : .5)},travel);
   syncProjectPicker();syncMapConnection();
 }
 function closeProject(restoreFocus=true,restoreView=true){
@@ -415,7 +417,7 @@ document.addEventListener('click',e=>{
   const el=document.getElementById(id);
   if(!el)return;
   e.preventDefault();
-  const y=id==='inicio'?0:el.getBoundingClientRect().top+scrollY-76;
+  const y=id==='inicio'?0:el.getBoundingClientRect().top+scrollY-$('header.top').offsetHeight-12;
   scrollTo({top:Math.max(0,y),behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});
   try{history.replaceState(null,'','#'+id)}catch(err){}
 });
