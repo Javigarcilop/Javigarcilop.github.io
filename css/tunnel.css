@@ -176,14 +176,14 @@
   .skip-tunnel{transition:none}
 }
 
-/* Primera ventana: un taller luminoso suspendido en el túnel. */
-.tn-slot:has(.tn-hero){width:min(840px,90vw)}
-.tn-win-lead{position:relative;margin-top:0;background:linear-gradient(125deg,rgba(18,35,59,.98),rgba(7,16,32,.97));border-color:#46658B;box-shadow:0 0 90px -28px #2875C866,0 40px 100px #0009}
-.tn-win-lead::before{content:"";position:absolute;left:18%;right:18%;top:0;height:1px;background:linear-gradient(90deg,transparent,#77EEFF,transparent)}
-.tn-win-lead .tn-body{padding:28px}
-.tn-win-lead .tn-chrome{background:#09142699}
-.tn-win .tn-chrome .tn-window-role{margin-left:auto;color:#96ADC9;font-size:10px;letter-spacing:.06em}
-.tn-profile{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);align-items:center;gap:28px;text-align:left}
+/* Primera parada: no es una ventana más — una sección abierta, de lado a lado, como un taller
+   suspendido en el túnel (sin barra de pestaña, todo el ancho disponible). */
+.tn-slot:has(.tn-hero){width:min(1180px,94vw)}
+.tn-lead-section{position:relative;padding:clamp(28px,4vw,48px) clamp(24px,5vw,56px);border-radius:28px;
+  background:radial-gradient(ellipse 120% 100% at 15% 0%,rgba(39,101,216,.18),transparent 60%),linear-gradient(125deg,rgba(18,35,59,.9),rgba(7,16,32,.85));
+  box-shadow:0 0 110px -30px #2875C866,0 50px 120px #0009;overflow:hidden}
+.tn-lead-section::before{content:"";position:absolute;left:10%;right:10%;top:0;height:1px;background:linear-gradient(90deg,transparent,#77EEFF,transparent)}
+.tn-profile{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);align-items:center;gap:clamp(28px,4vw,56px);text-align:left}
 .tn-profile-copy .tn-name{font-size:14px;color:#BED0E7;margin-bottom:10px;letter-spacing:0}
 .tn-profile-copy .tn-badge{background:#123136;border-color:#245151;color:#84E4CA;font:10px var(--f-code);padding:4px 8px;margin-bottom:16px}
 .tn-profile-copy .tn-badge i{width:5px;height:5px;border-radius:50%;background:#66E8BF;box-shadow:0 0 9px #66E8BF}
@@ -226,3 +226,13 @@
   .tn-hero .tn-cta{margin-top:12px}
 }
 @media (prefers-reduced-motion:reduce){.tn-mini{animation:none}}
+
+/* Última parada: no es un formulario de contacto — es la salida del túnel, centrada y bañada en luz. */
+.tn-exit-section{position:relative;text-align:center;max-width:620px;margin:0 auto;padding:clamp(32px,5vw,56px) clamp(24px,5vw,48px);border-radius:28px;
+  background:radial-gradient(ellipse 140% 120% at 50% 20%,rgba(255,255,255,.95),rgba(221,246,251,.85) 55%,rgba(243,247,252,.72) 100%);
+  box-shadow:0 0 160px 40px rgba(255,255,255,.55),0 30px 90px -20px rgba(8,182,214,.35);color:var(--lt-ink)}
+.tn-exit-section .tn-kicker{color:var(--lt-blue2)}
+.tn-exit-section h3{color:var(--lt-ink);font-size:clamp(1.4rem,2.8vw,2.1rem)}
+.tn-exit-section p{color:var(--lt-muted)}
+.tn-exit-section .tn-links{justify-content:center;margin-top:20px}
+@media (max-width:719px){.tn-exit-section{max-width:92vw}}

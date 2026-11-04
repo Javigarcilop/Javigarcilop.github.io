@@ -74,14 +74,18 @@ async function start(){
   /* ---------- paradas en la cámara delantera: el nombre vive dentro de "Quién soy",
      con el mismo contenido compartido que la versión ligera ---------- */
   const S=420,SLOTS=20,ZMAX=6720;
-  const stations=STOPS.map((s,i)=>({at:s.at,x:s.lado==='left'?-300:300,data:s,lead:i===0}));
+  const stations=STOPS.map((s,i)=>({at:s.at,x:s.lado==='left'?-300:300,data:s,lead:i===0,exit:i===STOPS.length-1}));
   world2.innerHTML=stations.map(st=>{
     if(st.lead){
       return '<div class="tn-slot" data-at="'+st.at+'" data-x="0"><div class="tn-panel tn-hero">'
-        +'<div class="tn-win tn-win-lead"><div class="tn-chrome"><i></i><i></i><i></i><span>'+esc(st.data.fase)+'</span><span class="tn-window-role">Full Stack &amp; IA</span></div>'
-        +'<div class="tn-body">'+stopBody(st.data,false,true)+'</div></div>'
+        +'<div class="tn-lead-section">'+stopBody(st.data,true,true)+'</div>'
         +'<div class="tn-cta cta"><a class="btn primary" href="#proyectos">Explorar proyectos</a>'
         +'<a class="btn ghost" href="assets/cv-javi-garcia.pdf" download>Ver CV</a></div>'
+        +'</div></div>';
+    }
+    if(st.exit){
+      return '<div class="tn-slot" data-at="'+st.at+'" data-x="0"><div class="tn-panel tn-hero">'
+        +'<div class="tn-exit-section">'+stopBody(st.data,true)+'</div>'
         +'</div></div>';
     }
     return '<div class="tn-slot" data-at="'+st.at+'" data-x="'+st.x+'"><article class="tn-panel tn-win">'
