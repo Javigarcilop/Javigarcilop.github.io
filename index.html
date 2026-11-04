@@ -62,29 +62,36 @@
   <a class="skip-tunnel" href="#mapa">Saltar la animación del túnel</a>
   <span class="tn-anchor" id="trayectoria" aria-hidden="true"></span>
   <div class="tn-scene" id="tnScene">
+    <div class="tn-cam" id="tnCam"><div class="tn-world" id="tnWorld" aria-hidden="true"></div></div>
+    <div class="tn-fog" aria-hidden="true"></div>
+    <div class="tn-glow" id="tnGlow" aria-hidden="true"></div>
+    <div class="tn-vig" aria-hidden="true"></div>
+    <div class="tn-cam front" id="tnCam2"><div class="tn-world" id="tnWorld2"></div></div>
+
     <div class="tn-hud" aria-hidden="true">
       <svg><use href="#mono"/></svg>
-      <span class="pill"><i></i>Abierto a oportunidades</span>
+      <span class="tn-pill-badge">Abierto a oportunidades</span>
     </div>
-    <div class="tn-world" id="tnWorld" aria-hidden="true"></div>
-    <div class="tn-fog" aria-hidden="true"></div>
-    <div class="tn-hero">
-      <h1 class="title">Francisco Javier García López</h1>
-      <p class="tn-sub">Full Stack &amp; IA<span class="eyebrow-cursor" aria-hidden="true">_</span></p>
-      <div class="cta">
-        <a class="btn primary" href="#proyectos">Explorar proyectos</a>
-        <a class="btn ghost" href="assets/cv-javi-garcia.pdf" download>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0 4-4m-4 4-4-4"/><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>
-          Ver CV
-        </a>
-      </div>
-    </div>
-    <div class="tn-stops" id="tnStops"></div>
+    <div class="tn-coords" id="tnCoords" aria-hidden="true">z 0</div>
+
     <nav class="tn-timeline" id="tnTimeline" aria-label="Fases del recorrido de la trayectoria">
-      <div class="tn-track"><div class="tn-fill"></div><div class="tn-head"></div></div>
-      <div class="tn-ticks"></div>
+      <div class="tn-head" id="tnHead"></div>
     </nav>
-    <div class="tn-cursor" id="tnCursor" aria-hidden="true"><i></i><span>tú</span></div>
+    <div class="tn-hint" id="tnHint" aria-hidden="true"><span>Desliza</span>
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 6l5 5 5-5" stroke="#1E5FBF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+  </div>
+  <div class="tn-cursor" id="tnCursor" aria-hidden="true">
+    <svg width="22" height="22" viewBox="0 0 22 22" fill="none" aria-hidden="true"><path d="M3 2l15 7-6.5 2L9 17.5 3 2z" fill="#08B6D6" stroke="#fff" stroke-width="1.5" stroke-linejoin="round"/></svg>
+    <span>tú</span>
+  </div>
+  <div class="tn-hero-lite sr" id="tnHeroLite">
+    <h1 class="title">Francisco Javier García López</h1>
+    <p class="tn-sub">Full Stack &amp; IA</p>
+    <div class="cta">
+      <a class="btn primary" href="#proyectos">Explorar proyectos</a>
+      <a class="btn ghost" href="assets/cv-javi-garcia.pdf" download>Ver CV</a>
+    </div>
   </div>
   <ol class="tunnel-fallback sr" id="tunnelFallback" aria-label="Trayectoria"></ol>
 </section>
