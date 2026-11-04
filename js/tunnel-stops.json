@@ -5,57 +5,100 @@
       "at": 0,
       "lado": "right",
       "fase": "Quién soy",
-      "titulo": "Te muestro mi camino.",
+      "titulo": "Mi mayor ventaja no la aprendí programando.",
       "badge": "Abierto a nuevas oportunidades",
       "texto": [
-        "Soy Javier García, desarrollador web Full Stack, cada vez más enfocado en el servidor. Vengo del marketing y del diseño gráfico, y la curiosidad por saber cómo se construía por dentro lo que diseñaba me llevó al software.",
-        "Hoy desarrollo y evoluciono aplicaciones en entornos reales: formación, FUNDAE, SEPE, integración de sistemas y automatización de procesos. Mi camino apunta al servidor, la automatización y la inteligencia artificial."
+        "Soy Javier García, desarrollador web Full Stack. Antes de escribir código, aprendí a entender a las personas desde el marketing y a dar forma a las ideas desde el diseño.",
+        "Hoy conecto esa mirada con servidor, integraciones y automatización para construir aplicaciones que resuelven problemas reales."
       ],
-      "chips": ["Full Stack", "Servidor", "Automatización", "IA aplicada"]
+      "chips": [
+        "Full Stack",
+        "Servidor",
+        "Automatización",
+        "IA aplicada"
+      ]
+    },
+    {
+      "id": "el-camino",
+      "at": 0.17,
+      "lado": "center",
+      "fase": "El camino",
+      "titulo": "Te muestro mi camino.",
+      "texto": [
+        "Cada etapa me enseñó a resolver una parte del problema. Al unirlas, aprendí a construir el producto completo."
+      ]
     },
     {
       "id": "marketing",
-      "at": 0.24,
+      "at": 0.34,
       "lado": "left",
       "fase": "Marketing",
       "ask": "¿Para qué sirve y qué valor aporta?",
-      "texto": ["Defino qué problema resuelvo y para quién. Todo lo demás parte de aquí."],
+      "texto": [
+        "Defino qué problema resuelvo y para quién. Todo lo demás parte de aquí."
+      ],
       "formacion": [
-        {"titulo": "Ciclo Formativo de Grado Superior en Marketing y Publicidad", "lugar": "Centro Universitario EUSA", "fechas": "2018 – 2020"}
+        {
+          "titulo": "Ciclo Formativo de Grado Superior en Marketing y Publicidad",
+          "lugar": "Centro Universitario EUSA",
+          "fechas": "2018 – 2020"
+        }
       ]
     },
     {
       "id": "diseno",
-      "at": 0.40,
+      "at": 0.5,
       "lado": "right",
       "fase": "Diseño",
       "ask": "¿Quién lo va a usar?",
-      "texto": ["Convierto ese valor en una experiencia clara y usable para quien lo va a utilizar."],
+      "texto": [
+        "Convierto ese valor en una experiencia clara y usable para quien lo va a utilizar."
+      ],
       "formacion": [
-        {"titulo": "Máster en Diseño Gráfico, Web y Creatividad", "lugar": "Escuela de Negocios de la Cámara de Comercio de Sevilla", "fechas": "2020 – 2021"}
+        {
+          "titulo": "Máster en Diseño Gráfico, Web y Creatividad",
+          "lugar": "Escuela de Negocios de la Cámara de Comercio de Sevilla",
+          "fechas": "2020 – 2021"
+        }
       ]
     },
     {
       "id": "codigo",
-      "at": 0.56,
+      "at": 0.66,
       "lado": "left",
       "fase": "Código",
       "ask": "¿Cómo lo convierto en algo que funciona?",
-      "texto": ["Doy forma real a esa experiencia: base de datos, servidor e interfaz conectados, con integraciones y automatización de procesos."],
+      "texto": [
+        "Doy forma real a esa experiencia: base de datos, servidor e interfaz conectados, con integraciones y automatización de procesos."
+      ],
       "formacion": [
-        {"titulo": "Ciclo Formativo de Grado Superior en Desarrollo de Aplicaciones Web (DAW)", "lugar": "Centro Universitario EUSA", "fechas": "2023 – 2025"},
-        {"titulo": "RPA (Robotic Process Automation) con UiPath", "lugar": "Fundación Generation España", "fechas": "ene. – abr. 2022"}
+        {
+          "titulo": "Ciclo Formativo de Grado Superior en Desarrollo de Aplicaciones Web (DAW)",
+          "lugar": "Centro Universitario EUSA",
+          "fechas": "2023 – 2025"
+        },
+        {
+          "titulo": "RPA (Robotic Process Automation) con UiPath",
+          "lugar": "Fundación Generation España",
+          "fechas": "ene. – abr. 2022"
+        }
       ]
     },
     {
       "id": "product-ia",
-      "at": 0.90,
+      "at": 0.9,
       "lado": "center",
       "fase": "Product Engineering e IA",
       "ask": "La pieza que faltaba: IA aplicada al desarrollo.",
-      "texto": ["Potencio todo lo anterior con IA: automatiza y ahorra trabajo, siempre al servicio del producto."],
+      "texto": [
+        "Potencio todo lo anterior con IA: automatiza y ahorra trabajo, siempre al servicio del producto."
+      ],
       "formacion": [
-        {"titulo": "Máster Online en Product Engineering con IA", "lugar": "Evolve", "fechas": "2026 – 2027"}
+        {
+          "titulo": "Máster Online en Product Engineering con IA",
+          "lugar": "Evolve",
+          "fechas": "2026 – 2027"
+        }
       ]
     }
   ]

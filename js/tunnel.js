@@ -52,19 +52,28 @@ async function start(){
       ).join('')+'</div>';
     }
     if(lead){
-      const visual='<div class="tn-blueprint" aria-hidden="true">'
-        +'<span class="tn-blueprint-label">UNA IDEA. MUCHAS FORMAS DE CONSTRUIRLA.</span>'
-        +'<div class="tn-orbit"></div><div class="tn-orbit inner"></div>'
-        +'<div class="tn-mini tn-mini-design"><span>01 / MARKETING + DISEÑO</span><div class="tn-swatch"><i></i><i></i><i></i></div><div class="tn-sketch"></div></div>'
-        +'<div class="tn-mini tn-mini-code"><span>02 / CÓDIGO</span><code>&lt;idea&gt;<br>&nbsp; hacerlaReal();<br>&lt;/idea&gt;</code></div>'
-        +'<div class="tn-mini tn-mini-product"><span>03 / PRODUCTO</span><div class="tn-mini-chart"><i></i><i></i><i></i><i></i><i></i></div><b>Listo para funcionar ↗</b></div>'
-        +'<span class="tn-blueprint-foot"><i></i> Mi siguiente paso: Product Engineering + IA</span></div>';
-      return '<div class="tn-profile"><div class="tn-profile-copy">'+h
-        +'<div class="tn-cta cta"><a class="btn primary" href="#proyectos">Explorar proyectos ↗</a>'
-        +'<a class="btn ghost" href="assets/cv-javi-garcia.pdf" download>Ver CV</a></div></div>'+visual+'</div>';
+      return '<div class="tn-intro">'
+        +'<div class="tn-intro-title"><p class="tn-kicker">Desarrollo con visión de producto</p>'
+        +'<h1>'+title.replace('no la aprendí programando.','<span>no la aprendí programando.</span>')+'</h1>'
+        +'<p class="tn-intro-promise">Entender a las personas.<br>Dar forma a las ideas.<br>Hacer que funcionen.</p>'
+        +'<div class="tn-cta cta"><a class="btn primary" href="#proyectos">Explorar proyectos ↗</a><a class="btn ghost" href="assets/cv-javi-garcia.pdf" download>Ver CV</a></div></div>'
+        +'<div class="tn-intro-bio"><p class="tn-badge"><i aria-hidden="true"></i>'+esc(s.badge)+'</p>'
+        +'<p class="tn-intro-label">Quién soy / Full Stack &amp; IA</p>'
+        +(s.texto||[]).map(p=>'<p class="tn-intro-paragraph">'+esc(p)+'</p>').join('')
+        +'<div class="tn-intro-signature" aria-hidden="true"><span>mirada</span><i>+</i><span>lógica</span><i>→</i><strong>producto</strong></div>'
+        +'<ul class="tn-chips">'+s.chips.map(c=>'<li>'+esc(c)+'</li>').join('')+'</ul></div></div>';
     }
     return h;
   };
+
+  const journey=s=>'<div class="tn-journey"><div class="tn-journey-gate" aria-hidden="true"></div>'
+    +'<p class="tn-journey-kicker">Todo lo anterior tiene un porqué</p>'
+    +'<h2>'+esc(s.titulo)+'</h2><p class="tn-journey-story">'+esc(s.texto[0])+'</p>'
+    +'<ol class="tn-journey-route"><li><b>01</b><strong>Marketing</strong><span>Entender el valor</span></li>'
+    +'<li><b>02</b><strong>Diseño</strong><span>Pensar la experiencia</span></li>'
+    +'<li><b>03</b><strong>Código</strong><span>Hacerlo funcionar</span></li>'
+    +'<li><b>04</b><strong>Producto + IA</strong><span>Conectar y potenciar</span></li></ol>'
+    +'<p class="tn-journey-scroll">Sigue avanzando. Las piezas van a encajar. ↓</p></div>';
 
   const finale=s=>'<div class="tn-finale">'
     +'<p class="tn-finale-eyebrow">El recorrido se convierte en producto</p>'
@@ -83,7 +92,7 @@ async function start(){
   /* cabecera + lista accesibles: siempre en el DOM; visibles solo cuando no hay túnel animado (es el fallback) */
   if(heroLite)heroLite.hidden=true;
   if(fallbackEl){
-    fallbackEl.innerHTML=STOPS.map((s,i)=>'<li class="tf-item'+(i===0?' tf-intro':s.id==='product-ia'?' tf-finale':'')+'">'+(s.id==='product-ia'?finale(s):stopBody(s,true,i===0))+'</li>').join('');
+    fallbackEl.innerHTML=STOPS.map((s,i)=>'<li class="tf-item'+(i===0?' tf-intro':s.id==='product-ia'?' tf-finale':s.id==='el-camino'?' tf-journey':'')+'">'+(s.id==='product-ia'?finale(s):s.id==='el-camino'?journey(s):stopBody(s,true,i===0))+'</li>').join('');
     if(!full)fallbackEl.classList.remove('sr');
   }
 
@@ -98,6 +107,9 @@ async function start(){
       return '<div class="tn-slot" data-at="'+st.at+'" data-x="0"><div class="tn-panel tn-hero">'
         +'<div class="tn-lead-section">'+stopBody(st.data,true,true)+'</div>'
         +'</div></div>';
+    }
+    if(st.data.id==='el-camino'){
+      return '<div class="tn-slot tn-slot-journey" data-at="'+st.at+'" data-x="0"><div class="tn-panel">'+journey(st.data)+'</div></div>';
     }
     if(st.exit){
       return '<div class="tn-slot tn-slot-exit" data-at="'+st.at+'" data-x="0"><div class="tn-panel tn-hero tn-exit">'

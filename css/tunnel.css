@@ -176,54 +176,54 @@
   .skip-tunnel{transition:none}
 }
 
-/* Primera parada: no es una ventana más — una sección abierta, de lado a lado, como un taller
-   suspendido en el túnel (sin barra de pestaña, todo el ancho disponible). */
-.tn-slot:has(.tn-hero){width:min(1180px,94vw)}
-.tn-lead-section{position:relative;padding:30px 36px;text-align:left}
-.tn-lead-section .tn-kicker{font:11px var(--f-code);letter-spacing:.18em;text-transform:uppercase;color:#6C99C5;margin-bottom:14px}
-.tn-profile{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);align-items:center;gap:clamp(28px,4vw,56px);text-align:left}
-.tn-profile-copy .tn-name{font-size:14px;color:#BED0E7;margin-bottom:10px;letter-spacing:0}
-.tn-profile-copy .tn-badge{background:#123136;border-color:#245151;color:#84E4CA;font:10px var(--f-code);padding:4px 8px;margin-bottom:16px}
-.tn-profile-copy .tn-badge i{width:5px;height:5px;border-radius:50%;background:#66E8BF;box-shadow:0 0 9px #66E8BF}
-.tn-profile-copy h1{font-size:clamp(27px,3.4vw,40px);line-height:1.07;letter-spacing:-.055em;text-wrap:balance;margin-bottom:16px;color:#ECF5FF}
-.tn-profile-copy p{font-size:12px;line-height:1.65;color:#ACBED5}
-.tn-profile-copy .tn-chips{margin:18px 0 0;gap:5px}
-.tn-profile-copy .tn-chips li{background:#162B44;border-color:#28425E;color:#A8D7FF;font-size:10px;padding:4px 7px}
-.tn-blueprint{position:relative;height:310px;isolation:isolate;background:radial-gradient(ellipse,#17618C33,transparent 68%);font-family:var(--f-code)}
-.tn-blueprint-label{position:absolute;top:0;left:0;color:#819CB9;font-size:9px;letter-spacing:.14em}
-.tn-orbit{position:absolute;width:240px;height:240px;border:1px dashed #4CE4ED33;border-radius:50%;left:50%;top:50%;transform:translate(-50%,-50%) rotate(-25deg) scaleX(.85)}
-.tn-orbit.inner{width:175px;height:175px;border-style:solid;border-color:#74AAFF22}
-.tn-mini{position:absolute;width:165px;padding:12px;border:1px solid #41648A;border-radius:10px;background:linear-gradient(135deg,#1A3350ee,#0A182Afa);box-shadow:0 12px 25px #0006;animation:tn-float 6s ease-in-out infinite}
-.tn-mini>span{display:block;color:#91B9DF;font-size:8px;letter-spacing:.1em;margin-bottom:10px}
-.tn-mini-design{top:32px;left:0;transform:rotate(-9deg)}
-.tn-swatch{display:flex;gap:5px}.tn-swatch i{width:21px;height:21px;border-radius:5px;background:#4CE4ED}.tn-swatch i:nth-child(2){background:#688BFF}.tn-swatch i:nth-child(3){background:#D3E9FF}
-.tn-sketch{margin-top:9px;height:26px;border:1px dashed #7FADD0;border-radius:4px;background:linear-gradient(90deg,transparent 45%,#5785AF33 45% 48%,transparent 48%)}
-.tn-mini-code{top:107px;right:-3px;transform:rotate(7deg);animation-delay:-2s;border-color:#4477A1}
-.tn-mini-code code{font-size:10px;line-height:1.8;color:#8FE8F0}
-.tn-mini-product{bottom:26px;left:7px;transform:rotate(-4deg);animation-delay:-4s;border-color:#3C7A83}
-.tn-mini-product b{display:block;font-size:8px;font-weight:400;color:#96DACD;margin-top:8px}
-.tn-mini-chart{display:flex;align-items:end;gap:5px;height:36px}.tn-mini-chart i{flex:1;background:linear-gradient(#72EAE9,#3868BC);height:35%;border-radius:3px 3px 0 0}.tn-mini-chart i:nth-child(2){height:55%}.tn-mini-chart i:nth-child(3){height:45%}.tn-mini-chart i:nth-child(4){height:75%}.tn-mini-chart i:nth-child(5){height:100%}
-.tn-blueprint-foot{position:absolute;bottom:0;left:0;font-size:8px;color:#7897B3;letter-spacing:.02em}
-.tn-blueprint-foot i{display:inline-block;width:5px;height:5px;margin-right:5px;background:#4CE4ED;border-radius:50%;box-shadow:0 0 9px #4CE4ED}
-.tn-hero .tn-cta{margin-top:20px}
-.tn-hero .tn-cta .btn{font-size:12px;padding:10px 18px}
-@keyframes tn-float{50%{translate:0 -8px}}
-@media (max-width:719px){
-  .tn-profile{grid-template-columns:1fr;gap:26px}
-  .tn-profile-copy h1{font-size:34px}
-  .tn-blueprint{width:260px;max-width:100%;margin:0 auto;height:300px}
-  .tn-hero-lite{margin:70px auto 28px}
-  .tf-item:has(.tn-profile){padding:26px 22px;background:linear-gradient(135deg,#12233B,#081222)}
+/* Presentación: titular a la izquierda y una biografía legible a la derecha. */
+.tn-slot:has(.tn-hero),.tn-slot-journey{width:min(1180px,94vw)}
+.tn-lead-section{padding:30px 36px;text-align:left}
+.tn-intro{display:grid;grid-template-columns:1.1fr 1fr;gap:clamp(40px,6vw,90px);align-items:center}
+.tn-intro-title,.tn-intro-bio{position:relative;isolation:isolate}
+.tn-intro-title::before,.tn-intro-bio::before{content:"";position:absolute;inset:-35px -20px;z-index:-1;pointer-events:none;background:radial-gradient(ellipse,#060C19f5 35%,#060C19c8 60%,transparent 78%);filter:blur(12px)}
+.tn-intro .tn-kicker{font:11px var(--f-code);text-transform:uppercase;letter-spacing:.12em;color:#9CBBD5;margin-bottom:20px}
+.tn-intro h1{font-size:clamp(45px,5vw,66px);line-height:1.03;letter-spacing:-.055em;color:#EDF5FF;text-wrap:balance;margin:0 0 24px}
+.tn-intro h1 span{display:block;color:#72DAE8}
+.tn-intro .tn-intro-promise{font-size:18px;line-height:1.55;color:#AFC7DF}
+.tn-intro .tn-cta{justify-content:flex-start;margin-top:26px}
+.tn-intro .tn-cta .btn{font-size:14px;padding:12px 20px}
+.tn-intro-bio .tn-badge{background:#123136;border-color:#245151;color:#84E4CA;font:11px var(--f-code);padding:6px 10px;margin-bottom:28px}
+.tn-intro-bio .tn-badge i{width:6px;height:6px;border-radius:50%;background:#66E8BF;box-shadow:0 0 9px #66E8BF}
+.tn-intro .tn-intro-label{font:11px var(--f-code);text-transform:uppercase;letter-spacing:.12em;color:#72DAE8;margin-bottom:16px}
+.tn-panel .tn-intro-paragraph,.tf-item .tn-intro-paragraph{font-size:18px;line-height:1.65;color:#D2DFEF;margin:0 0 18px}
+.tn-intro-signature{display:flex;align-items:center;gap:12px;margin:26px 0 18px;font:14px var(--f-code);color:#91ABC6}
+.tn-intro-signature i{font-style:normal;color:#477897}.tn-intro-signature strong{font-weight:500;color:#72DAE8}
+.tn-intro .tn-chips{margin:0;gap:7px}.tn-intro .tn-chips li{background:#13263B;border-color:#29435D;color:#B7D6F4;font-size:11px}
+.tf-item.tf-intro{background:transparent;border:0;padding:40px 0}
+
+/* Umbral narrativo: la invitación aparece después de la presentación. */
+.tn-journey{position:relative;isolation:isolate;text-align:center;padding:30px;max-width:1000px;margin:auto}
+.tn-journey-gate{position:absolute;z-index:-1;width:min(470px,70vw);aspect-ratio:1;left:50%;top:50%;transform:translate(-50%,-50%) rotate(45deg);border:1px solid #68DCE84D;border-radius:70px;background:radial-gradient(ellipse,#0D2840B8,transparent 70%);box-shadow:0 0 80px #36A2CD19,inset 0 0 70px #36A2CD0D;pointer-events:none}
+.tn-panel .tn-journey-kicker,.tf-item .tn-journey-kicker{font:11px var(--f-code);text-transform:uppercase;letter-spacing:.16em;color:#86BBD6;margin:0 0 20px}
+.tn-journey h2{font-size:clamp(40px,5vw,68px);line-height:1.06;letter-spacing:-.055em;color:#EDF5FF;margin:0 0 22px}
+.tn-panel .tn-journey-story,.tf-item .tn-journey-story{font-size:20px;line-height:1.6;color:#C3D8EC;max-width:670px;margin:0 auto 38px}
+.tn-journey-route{display:grid;grid-template-columns:repeat(4,1fr);list-style:none;padding:0;margin:0;gap:18px;text-align:left}
+.tn-journey-route li{position:relative;border-top:1px solid #3B6C8E;padding-top:16px}
+.tn-journey-route li::before{content:"";position:absolute;top:-4px;left:0;width:7px;height:7px;background:#72DAE8;border-radius:50%;box-shadow:0 0 16px #72DAE877}
+.tn-journey-route b{display:block;font:11px var(--f-code);color:#79ACC7;margin-bottom:10px}
+.tn-journey-route strong{display:block;font-size:19px;color:#E3F0FC;font-weight:500}
+.tn-journey-route span{display:block;font-size:13px;color:#A3BDD5;margin-top:5px}
+.tn-panel .tn-journey-scroll,.tf-item .tn-journey-scroll{font:12px var(--f-code);color:#72DAE8;margin-top:34px}
+.tf-item.tf-journey{border:0;background:transparent;padding:40px 0}
+@media (max-height:760px) and (min-width:720px){
+  .tn-lead-section{padding:18px 30px}
+  .tn-intro h1{font-size:56px;margin-bottom:18px}
+  .tn-intro .tn-intro-promise{font-size:16px}
+  .tn-panel .tn-intro-paragraph{font-size:18px;line-height:1.55}
+  .tn-intro-bio .tn-badge{margin-bottom:20px}
+  .tn-intro-signature{margin:18px 0}
 }
-@media (max-height:740px) and (min-width:720px){
-  .tn-win-lead .tn-body{padding:18px 24px}
-  .tn-profile{gap:20px}
-  .tn-profile-copy h1{font-size:30px;margin-bottom:10px}
-  .tn-profile-copy p{font-size:11px}
-  .tn-blueprint{height:285px}
-  .tn-hero .tn-cta{margin-top:12px}
+@media (max-width:950px) and (min-width:720px){
+  .tn-intro{gap:32px}
+  .tn-intro h1{font-size:42px}
+  .tn-panel .tn-intro-paragraph{font-size:16px}
 }
-@media (prefers-reduced-motion:reduce){.tn-mini{animation:none}}
 
 /* La última etapa reúne el producto en el centro de la salida. */
 .tn-exit-section{max-width:820px;margin:auto;padding:30px 36px;border:1px solid #E4F6FF;border-radius:24px;background:linear-gradient(135deg,#F5FCFFf5,#E3F4FBf0);box-shadow:0 0 120px 30px #DDF6FF44,0 35px 100px #0005;text-align:center}
@@ -253,58 +253,22 @@
 .tn-panel .tn-finale-description,.tf-item .tn-finale-description{font-size:12px;color:#45657C;max-width:580px;margin:18px auto 0}
 .tn-panel .tn-finale-study,.tf-item .tn-finale-study{font:9px/1.6 var(--f-code);color:#5B7890;margin:10px auto 0}
 
-/* Una entrada abierta de izquierda a derecha, con espacio para el túnel entre ambas. */
-.tn-profile{grid-template-columns:1.15fr 1fr;gap:70px}
-.tn-profile-copy{position:relative;z-index:0}
-.tn-profile-copy::before{content:"";position:absolute;inset:-36px -28px;z-index:-1;pointer-events:none;background:radial-gradient(ellipse,#060C19f5 35%,#060C19b8 60%,transparent 76%);filter:blur(12px)}
-.tn-profile-copy h1{font-size:clamp(48px,5.6vw,76px);line-height:.98;letter-spacing:-.065em;margin:0 0 24px;color:#EDF5FF}
-.tn-profile-copy h1 span{display:block;color:#72DAE8}
-.tn-profile-copy p{font-size:13px;line-height:1.65;max-width:470px}
-.tn-profile-copy .tn-badge{margin-bottom:18px}
-.tn-profile-copy .tn-chips{margin-top:16px}
-.tn-profile-copy .tn-cta{justify-content:flex-start;margin-top:22px}
-.tn-blueprint{height:365px}
-.tn-mini{width:215px;padding:18px;border-radius:12px}
-.tn-mini>span{font-size:9px}
-.tn-mini-design{top:40px;left:0}
-.tn-mini-code{top:145px;right:0}
-.tn-mini-product{bottom:28px;left:6px}
-.tn-mini-code code{font-size:12px}
-.tn-mini-product b{font-size:10px}
-.tn-blueprint-label{font-size:9px;letter-spacing:.08em}
-.tn-blueprint-foot{font-size:9px}
-.tn-orbit{width:320px;height:320px}
-.tf-item.tf-intro{background:transparent;border:0;padding:40px 0}
 .tf-finale{padding:26px 20px;background:linear-gradient(135deg,#F5FCFF,#DDEFF8);border-color:#B3DDEB;box-shadow:0 0 55px #74DDE933}
-@media (max-height:760px) and (min-width:720px){
-  .tn-lead-section{padding:18px 32px}
-  .tn-profile-copy h1{font-size:52px;margin-bottom:16px}
-  .tn-profile-copy p{font-size:11px}
-  .tn-blueprint{height:315px}
-  .tn-mini{width:190px;padding:14px}
-  .tn-mini-code{top:118px}
-  .tn-exit-section{padding:24px 32px}
-}
-@media (max-width:950px) and (min-width:720px){
-  .tn-profile{gap:32px;grid-template-columns:1.2fr 1fr}
-  .tn-profile-copy h1{font-size:48px}
-  .tn-mini{width:155px;padding:12px}
-  .tn-mini-code{top:135px}
-  .tn-blueprint-label{font-size:7px}
-  .tn-blueprint-foot{font-size:7px}
-}
 @media (max-width:719px){
   .tn-section.calm{margin-top:0}
   .tn-section.calm .tn-hud{display:none}
-  .tn-profile{grid-template-columns:1fr;gap:38px}
-  .tn-profile-copy h1{font-size:54px}
-  .tn-profile-copy p{font-size:14px}
-  .tn-blueprint{height:330px;width:290px}
-  .tn-orbit{width:250px;height:250px}
-  .tn-orbit.inner{width:175px;height:175px}
-  .tn-profile-copy::before{inset:-24px 0}
-  .tn-mini{width:180px;padding:14px}
-  .tn-mini-code{top:124px}
+  .tn-intro{grid-template-columns:1fr;gap:38px}
+  .tn-intro h1{font-size:clamp(40px,10vw,58px)}
+  .tn-intro-title::before,.tn-intro-bio::before{inset:-24px 0}
+  .tn-intro .tn-intro-paragraph{font-size:18px;line-height:1.65}
+  .tn-intro-signature{gap:10px;font-size:12px}
+  .tn-journey{padding:28px 0}
+  .tn-journey h2{font-size:44px}
+  .tn-journey .tn-journey-story{font-size:18px}
+  .tn-journey-route{grid-template-columns:1fr 1fr;gap:28px 16px}
+  .tn-journey-route strong{font-size:18px}
+  .tn-journey-route span{font-size:12px}
+  .tn-journey-gate{width:65vw;border-radius:38px}
   .tn-product-modules{grid-template-columns:1fr;gap:14px;padding:20px}
   .tn-product-modules>div{display:grid;grid-template-columns:42px 1fr;align-items:center}
   .tn-product-modules small{grid-column:2;margin:0}
