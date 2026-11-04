@@ -10,8 +10,8 @@ portfolio-javi-garcia/
 ├── css/styles.css      Estilos, colores (variables CSS) y modo claro/oscuro
 ├── js/
 │   ├── data.js         DATOS: proyectos, tecnologías y categorías (aquí editas casi todo)
-│   ├── app.js          Lógica: filtros, tarjetas, mapa de red, detalle, tema
-│   └── theme-init.js   Aplica el tema guardado antes de pintar (evita parpadeos)
+│   ├── app.js          Lógica: filtros, tarjetas, mapa de red, detalle
+│   └── theme-init.js   Activa las mejoras visuales cuando hay JavaScript
 └── assets/favicon.svg  Icono con el monograma JG
 ```
 
@@ -49,7 +49,7 @@ Todo está en `js/data.js`. Cada proyecto es un objeto de la lista `PROJECTS`:
 
 ## Cambiar el aspecto
 
-- **Colores:** variables CSS al inicio de `css/styles.css` (`--blue`, `--ink`, `--cyan`, `--bg`…). Hay un bloque para el modo claro y otro para el oscuro.
+- **Colores:** variables CSS al inicio de `css/styles.css` (`--blue`, `--ink`, `--cyan`, `--bg`…). La web utiliza una paleta oscura fija. El túnel tiene sus variables en `css/tunnel.css`.
 - **Tipografía:** Space Grotesk (titulares/cuerpo) y JetBrains Mono (detalles técnicos), cargadas desde Google Fonts en `index.html`. Si la cambias, actualiza también `--f-head`/`--f-code` en el CSS.
 - **Textos fijos** (titular, sobre mí, contacto, enlace de LinkedIn): directamente en `index.html`.
 

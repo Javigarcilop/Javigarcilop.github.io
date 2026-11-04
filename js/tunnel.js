@@ -50,6 +50,16 @@ async function start(){
         '<a href="'+esc(l.href)+'"'+(i===0?'':' target="_blank" rel="noopener"')+'>'+esc(l.texto)+'</a>'
       ).join('')+'</div>';
     }
+    if(s.nombre){
+      const visual='<div class="tn-blueprint" aria-hidden="true">'
+        +'<span class="tn-blueprint-label">DE LA IDEA AL PRODUCTO</span>'
+        +'<div class="tn-orbit"></div><div class="tn-orbit inner"></div>'
+        +'<div class="tn-mini tn-mini-design"><span>01 / DISEÑO</span><div class="tn-swatch"><i></i><i></i><i></i></div><div class="tn-sketch"></div></div>'
+        +'<div class="tn-mini tn-mini-code"><span>02 / CÓDIGO</span><code>&lt;idea&gt;<br>&nbsp; hacerlaReal();<br>&lt;/idea&gt;</code></div>'
+        +'<div class="tn-mini tn-mini-product"><span>03 / PRODUCTO</span><div class="tn-mini-chart"><i></i><i></i><i></i><i></i><i></i></div><b>Listo para funcionar ↗</b></div>'
+        +'<span class="tn-blueprint-foot"><i></i> Diseño + lógica + propósito</span></div>';
+      return '<div class="tn-profile"><div class="tn-profile-copy">'+h+'</div>'+visual+'</div>';
+    }
     return h;
   };
 
@@ -69,8 +79,7 @@ async function start(){
   world2.innerHTML=stations.map(st=>{
     if(st.lead){
       return '<div class="tn-slot" data-at="'+st.at+'" data-x="0"><div class="tn-panel tn-hero">'
-        +'<p class="tn-sub">Full Stack &amp; IA<code aria-hidden="true">_</code></p>'
-        +'<div class="tn-win tn-win-lead"><div class="tn-chrome"><i></i><i></i><i></i><span>'+esc(st.data.fase)+'</span></div>'
+        +'<div class="tn-win tn-win-lead"><div class="tn-chrome"><i></i><i></i><i></i><span>'+esc(st.data.fase)+'</span><span class="tn-window-role">Full Stack &amp; IA</span></div>'
         +'<div class="tn-body">'+stopBody(st.data,false)+'</div></div>'
         +'<div class="tn-cta cta"><a class="btn primary" href="#proyectos">Explorar proyectos</a>'
         +'<a class="btn ghost" href="assets/cv-javi-garcia.pdf" download>Ver CV</a></div>'
@@ -127,12 +136,12 @@ async function start(){
   const phases=STOPS.map((s,i)=>{
     const prevAt=i===0?0:(STOPS[i-1].at+s.at)/2;
     const nextAt=i===STOPS.length-1?1:(s.at+STOPS[i+1].at)/2;
-    return {name:s.fase,a:prevAt,b:nextAt};
+    return {name:s.fase,at:s.at,a:prevAt,b:nextAt};
   });
   phases.forEach(ph=>{
     const b=document.createElement('button');b.type='button';b.textContent=ph.name;
     b.style.flex='0 0 '+((ph.b-ph.a)*100)+'%';
-    b.addEventListener('click',()=>scrollTo({top:(ph.a+.01)*maxScroll,behavior:calm?'auto':'smooth'}));
+    b.addEventListener('click',()=>scrollTo({top:ph.at*maxScroll,behavior:calm?'auto':'smooth'}));
     timeline.insertBefore(b,head);ph.el=b;
   });
 
@@ -184,8 +193,9 @@ async function start(){
       phases.forEach((x,n)=>x.el.setAttribute('aria-current',n===ph?'true':'false'));
     }
     head.style.left=(p*100)+'%';
-    glow.style.transform='scale('+(.25+p*2.2).toFixed(3)+')';
-    glow.style.opacity=(.4+p*.6).toFixed(3);
+    const exit=clamp((p-.62)/.38,0,1);
+    glow.style.transform='scale('+(.18+exit*2.6).toFixed(3)+')';
+    glow.style.opacity=(.12+exit*exit*.88).toFixed(3);
     if(hint)hint.style.opacity=p>.03?'0':'1';
     if(coords)coords.textContent='z '+Math.round(cz);
   };

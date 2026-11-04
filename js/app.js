@@ -1,4 +1,4 @@
-/* Lógica del portfolio: filtros, tarjetas, mapa de red, detalle, tema y navegación.
+/* Lógica del portfolio: filtros, tarjetas, mapa de red, detalle y navegación.
    Los datos (proyectos y tecnologías) están en data.js. */
 /* ---------- utilidades ---------- */
 const $ = (s,r=document)=>r.querySelector(s);
@@ -490,14 +490,7 @@ dlg.addEventListener('keydown',e=>{
   }
 });
 
-/* ---------- tema, progreso, navegación, copiar ---------- */
-$('#theme').onclick=()=>{
-  const root=document.documentElement;
-  const dark=root.getAttribute('data-theme')==='dark'||(!root.getAttribute('data-theme')&&matchMedia('(prefers-color-scheme: dark)').matches);
-  const nt=dark?'light':'dark';
-  root.setAttribute('data-theme',nt);
-  try{localStorage.setItem('jg-theme',nt)}catch(e){}
-};
+/* ---------- progreso, navegación, copiar ---------- */
 const bar=$('#progress');
 addEventListener('scroll',()=>{
   const h=document.documentElement;
@@ -537,6 +530,7 @@ const calm=matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 /* El texto visible se parte en piezas animables; el accesible queda entero en aria-label. */
 function splitText(el,unit){
+  if(!el)return;
   const text=el.textContent.trim();
   el.setAttribute('aria-label',text);
   let k=0;

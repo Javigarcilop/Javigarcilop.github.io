@@ -2,27 +2,14 @@
   box-sizing:border-box;
   padding-top:env(safe-area-inset-top,0px);
   padding-bottom:env(safe-area-inset-bottom,0px);
-  --bg:#F4F7FB; --surface:#FFFFFF; --ink:#0B2A6B; --text:#2B3A5C; --muted:#4A5871; --line:#DCE4EE;
-  --blue:#2F6BFF; --blue-text:#1E55E6; --cyan:#19D3F3; --sky:#CFE3FF; --ok:#0E8F7E;
-  --glow1:rgba(47,107,255,.20); --glow2:rgba(25,211,243,.24);
-  --shadow:0 1px 2px rgba(11,42,107,.06),0 8px 24px rgba(11,42,107,.08);
+  color-scheme:dark;
+  --bg:#060C19; --surface:#101C31; --ink:#EDF4FF; --text:#CDDBEE; --muted:#98ACC9; --line:#243750;
+  --blue:#4C82FF; --blue-text:#8DB0FF; --cyan:#4CE4ED; --sky:#172F50; --ok:#3CD4BE;
+  --glow1:rgba(76,130,255,.22); --glow2:rgba(53,221,247,.14);
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.28);
   --f-head:"Space Grotesk",system-ui,sans-serif;
   --f-code:"JetBrains Mono",ui-monospace,monospace;
   --header-h:64px;
-}
-@media (prefers-color-scheme: dark){
-  :root:not([data-theme="light"]){
-    --bg:#0A1228; --surface:#111C3A; --ink:#FFFFFF; --text:#D5DEF5; --muted:#9AA9C7; --line:#1F2E57;
-    --blue:#4C82FF; --blue-text:#8DB0FF; --cyan:#35DDF7; --sky:#1A2A55; --ok:#3CD4BE;
-    --glow1:rgba(76,130,255,.22); --glow2:rgba(53,221,247,.14);
-    --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.28);
-  }
-}
-:root[data-theme="dark"]{
-  --bg:#0A1228; --surface:#111C3A; --ink:#FFFFFF; --text:#D5DEF5; --muted:#9AA9C7; --line:#1F2E57;
-  --blue:#4C82FF; --blue-text:#8DB0FF; --cyan:#35DDF7; --sky:#1A2A55; --ok:#3CD4BE;
-  --glow1:rgba(76,130,255,.22); --glow2:rgba(53,221,247,.14);
-  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.28);
 }
 *,*::before,*::after{box-sizing:inherit}
 html{scroll-padding-top:calc(env(safe-area-inset-top,0px) + 76px);-webkit-text-size-adjust:100%}
@@ -70,11 +57,6 @@ nav.main a[aria-current="true"]{color:#fff}
 .icon-btn:hover{border-color:var(--blue)}
 .icon-btn:active{transform:scale(.94)}
 .icon-btn svg{width:18px;height:18px}
-.sun{display:none}
-:root[data-theme="dark"] .sun{display:block}
-:root[data-theme="dark"] .moon{display:none}
-@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .sun{display:block}:root:not([data-theme="light"]) .moon{display:none}}
-
 /* hero */
 .eyebrow{font-size:13px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:18px}
 h1.title{font-weight:700;font-size:clamp(46px,8vw,96px);line-height:.98;letter-spacing:-.045em;color:var(--ink)}
@@ -219,7 +201,7 @@ h1.title .ch{display:inline-block}
 /* contacto */
 .contact{background:linear-gradient(135deg,var(--ink),color-mix(in srgb,var(--ink) 70%,var(--blue)));color:#fff;border-radius:28px;padding:clamp(32px,6vw,64px);position:relative;overflow:hidden}
 :root[data-theme="dark"] .contact{background:linear-gradient(135deg,#16295C,#1B3A8A)}
-@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .contact{background:linear-gradient(135deg,#16295C,#1B3A8A)}}
+
 .contact::after{content:"";position:absolute;right:-80px;top:-80px;width:340px;height:340px;border-radius:50%;background:radial-gradient(closest-side,rgba(25,211,243,.35),transparent 70%)}
 .contact h2{font-size:clamp(30px,5vw,56px);line-height:1.04;letter-spacing:-.03em;max-width:18ch;position:relative}
 .contact-eyebrow{color:#B9CBF5;position:relative}
