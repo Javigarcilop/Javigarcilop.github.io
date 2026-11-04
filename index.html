@@ -16,7 +16,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="css/styles.css">
-<script type="importmap">{"imports":{"three":"./assets/vendor/three.module.min.js"}}</script>
+<link rel="stylesheet" href="css/tunnel.css">
 <script src="js/theme-init.js"></script>
 </head>
 <body>
@@ -55,13 +55,19 @@
 </header>
 
 <main>
-<section class="tunnel" id="inicio" aria-label="Presentación">
-  <div class="tunnel-pin" id="tunnelPin">
-    <canvas class="tunnel-canvas" id="tunnelCanvas" aria-hidden="true"></canvas>
-    <div class="tunnel-copy" id="tunnelCopy">
-      <p class="eyebrow">Full Stack · Backend · Integraciones · IA aplicada<span class="eyebrow-cursor" aria-hidden="true">_</span></p>
-      <h1 class="title">Javier García</h1>
-      <p class="role">Desarrollo software con visión de producto.<span class="cursor" aria-hidden="true"></span></p>
+<section class="tn-section" id="inicio" aria-label="Presentación y trayectoria">
+  <a class="skip-tunnel" href="#mapa">Saltar la animación del túnel</a>
+  <span class="tn-anchor" id="trayectoria" aria-hidden="true"></span>
+  <div class="tn-scene" id="tnScene">
+    <div class="tn-hud" aria-hidden="true">
+      <svg><use href="#mono"/></svg>
+      <span class="pill"><i></i>Abierto a oportunidades</span>
+    </div>
+    <div class="tn-world" id="tnWorld" aria-hidden="true"></div>
+    <div class="tn-fog" aria-hidden="true"></div>
+    <div class="tn-hero">
+      <h1 class="title">Francisco Javier García López</h1>
+      <p class="tn-sub">Full Stack &amp; IA<span class="eyebrow-cursor" aria-hidden="true">_</span></p>
       <div class="cta">
         <a class="btn primary" href="#proyectos">Explorar proyectos</a>
         <a class="btn ghost" href="assets/cv-javi-garcia.pdf" download>
@@ -70,31 +76,14 @@
         </a>
       </div>
     </div>
-    <div class="tunnel-stage" id="tunnelStage" role="region" aria-live="polite" aria-label="Etapa de la trayectoria" aria-hidden="true"></div>
-    <a class="tunnel-hint" id="tunnelHint" href="#trayectoria" aria-label="Seguir bajando"><span>Desliza</span><i aria-hidden="true"></i></a>
+    <div class="tn-stops" id="tnStops"></div>
+    <nav class="tn-timeline" id="tnTimeline" aria-label="Fases del recorrido de la trayectoria">
+      <div class="tn-track"><div class="tn-fill"></div><div class="tn-head"></div></div>
+      <div class="tn-ticks"></div>
+    </nav>
+    <div class="tn-cursor" id="tnCursor" aria-hidden="true"><i></i><span>tú</span></div>
   </div>
-</section>
-
-<section class="about reveal" id="trayectoria" aria-labelledby="aboutTitle">
-  <div class="wrap">
-    <div class="about-head">
-      <div>
-        <p class="eyebrow">Quién soy</p>
-        <h2 class="h about-lead" id="aboutTitle">Mi mayor ventaja como developer no la aprendí programando.</h2>
-        <p class="about-open"><i aria-hidden="true"></i>Abierto a nuevas oportunidades</p>
-      </div>
-      <div class="about-text">
-        <p>Soy desarrollador web Full Stack, cada vez más enfocado en backend. Vengo del marketing y del diseño gráfico, y la curiosidad por saber cómo se construía por dentro lo que diseñaba me llevó al software.</p>
-        <p>Hoy desarrollo y evoluciono aplicaciones en entornos reales: formación, FUNDAE, SEPE, integración de sistemas y automatización de procesos. Mi camino apunta al backend, la automatización y la inteligencia artificial.</p>
-        <ul class="about-tags" aria-label="Perfil">
-          <li>Full Stack</li><li>Backend</li><li>Automatización</li><li>IA aplicada</li>
-        </ul>
-      </div>
-    </div>
-    <p class="about-bridge"><span>El recorrido que acabas de atravesar</span></p>
-    <ol class="path" id="path" aria-label="Etapas de mi trayectoria"></ol>
-    <div class="path-sum" id="pathSum"></div>
-  </div>
+  <ol class="tunnel-fallback sr" id="tunnelFallback" aria-label="Trayectoria"></ol>
 </section>
 
 <section class="mapa reveal" id="mapa" aria-label="Mapa de proyectos y tecnologías">

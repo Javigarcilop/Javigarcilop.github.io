@@ -530,22 +530,7 @@ $('#copy').onclick=async()=>{
   try{await navigator.clipboard.writeText(email);toast('Email copiado')}catch(e){toast('No se pudo copiar. Escríbeme desde el botón azul.')}
 };
 
-/* ---------- trayectoria: cuatro etapas ---------- */
-const pathEl=$('#path'),pathSum=$('#pathSum');
-pathEl.innerHTML=PATH.steps.map((s,i)=>{
-  const train=s.training.length
-    ?`<div class="ps-block"><span class="ro-kind">Formación</span><ul class="ps-train">${s.training.map(t=>`<li><b>${esc(t.title)}</b><span>${esc(t.place)}</span><em>${esc(t.years)}</em></li>`).join('')}</ul></div>`
-    :'';
-  return `<li class="ps" style="--i:${i}">
-    <span class="ps-num" aria-hidden="true">0${i+1}</span>
-    <h3>${esc(s.name)}</h3>
-    <p class="ps-ask">${esc(s.ask)}</p>
-    ${train}
-    <div class="ps-block"><span class="ro-kind">Cómo lo implemento</span><p>${esc(s.implement)}</p></div>
-  </li>`;
-}).join('');
-pathSum.innerHTML=PATH.steps.map((x,j)=>`${j?'<span class="op" aria-hidden="true">+</span>':''}<span class="term">${esc(x.name)}</span>`).join('')
-  +`<span class="op" aria-hidden="true">=</span><span class="total">${esc(PATH.result)}</span>`;
+/* La trayectoria (antes aquí, como tarjetas .ps) ahora vive en el túnel: ver js/tunnel.js y js/tunnel-stops.json */
 
 /* ---------- experiencia: entrada, titulares, hilo del recorrido y profundidad ---------- */
 const calm=matchMedia('(prefers-reduced-motion: reduce)').matches;

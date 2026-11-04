@@ -1,0 +1,116 @@
+/* Túnel "Del diseño al producto": CSS 3D puro (perspective + preserve-3d), sin WebGL ni librerías.
+   Identidad fija (no invierte con el modo oscuro del sitio): fondo claro, tinta y azules propios —
+   ver variables --lt-* más abajo. Las pantallas de pared son decoración (aria-hidden); el contenido
+   real de cada parada vive en HTML normal, legible sin animación (ver .tunnel-fallback). */
+
+.tn-section{
+  --lt-bg:#F3F7FC;--lt-ink:#0A1F33;--lt-blue1:#1E5FBF;--lt-blue2:#123F82;--lt-cyan:#08B6D6;
+  position:relative;height:700vh;margin-top:calc(-1 * var(--header-h));background:var(--lt-bg);
+}
+.tn-anchor{position:absolute;top:60vh;left:0;width:1px;height:1px}
+
+.skip-tunnel{position:absolute;z-index:200;left:16px;top:16px;padding:10px 16px;border-radius:10px;background:#fff;color:var(--lt-ink);font-weight:500;text-decoration:none;box-shadow:0 10px 30px rgba(10,31,51,.18);transform:translateY(-140%);transition:transform .2s}
+.skip-tunnel:focus{transform:none}
+
+/* ---------- escena 3D ---------- */
+.tn-scene{position:sticky;top:0;height:100svh;overflow:hidden;background:var(--lt-bg);perspective:1000px;perspective-origin:50% 42%}
+.tn-world{position:absolute;inset:0;transform-style:preserve-3d;transform:translateZ(0)}
+.tn-world.animating{will-change:transform}
+
+.tn-screen{position:absolute;top:50%;left:50%;width:220px;height:140px;margin:-70px 0 0 -110px;border-radius:10px;border:1px solid color-mix(in srgb,var(--lt-blue1) 30%,transparent);background:color-mix(in srgb,#fff 88%,var(--lt-bg));padding:12px;overflow:hidden}
+.tn-screen i{display:block;border-radius:3px;background:color-mix(in srgb,var(--lt-blue1) 22%,transparent)}
+.tn-screen.wireframe i{height:6px;margin-bottom:8px;border:1px dashed color-mix(in srgb,var(--lt-blue1) 45%,transparent);background:transparent}
+.tn-screen.ui i{height:10px;margin-bottom:7px}
+.tn-screen.ui i:first-child{width:55%;background:var(--lt-blue1)}
+.tn-screen.code{background:color-mix(in srgb,var(--lt-ink) 92%,transparent);font-family:var(--f-code);font-size:9px;line-height:1.7;color:color-mix(in srgb,#fff 70%,transparent)}
+.tn-screen.code i{display:block;height:auto;background:none;color:inherit;white-space:nowrap}
+.tn-screen.dashboard i{height:34px;margin-bottom:6px;background:linear-gradient(180deg,var(--lt-blue1),var(--lt-blue2))}
+.tn-screen.dashboard i:nth-child(2){height:18px}
+
+/* niebla: se funde con el fondo según la profundidad (sensación de realismo) */
+.tn-fog{position:absolute;inset:0;z-index:2;pointer-events:none;background:radial-gradient(ellipse at 50% 55%,transparent 30%,var(--lt-bg) 92%)}
+
+/* ---------- cabecera propia del túnel: monograma JG + disponibilidad ---------- */
+.tn-hud{position:absolute;z-index:5;left:20px;top:calc(var(--header-h) + 14px);display:flex;align-items:center;gap:10px;pointer-events:none}
+.tn-hud svg{width:26px;height:26px;flex:none}
+.tn-hud .pill{display:inline-flex;align-items:center;gap:7px;padding:6px 12px;border-radius:999px;background:color-mix(in srgb,#fff 80%,transparent);border:1px solid color-mix(in srgb,var(--lt-blue1) 25%,transparent);font-size:12.5px;font-weight:500;color:var(--lt-ink)}
+.tn-hud .pill i{width:7px;height:7px;border-radius:50%;background:var(--ok,#0E8F7E)}
+
+/* ---------- paradas: ventanas de interfaz con texto HTML real, sobre la niebla ---------- */
+.tn-stops{position:absolute;inset:0;z-index:4}
+.tn-stop{position:absolute;top:50%;width:min(420px,calc(50% - 48px));padding:24px 26px;border-radius:18px;border:1px solid color-mix(in srgb,var(--lt-blue1) 25%,transparent);background:color-mix(in srgb,#fff 82%,transparent);-webkit-backdrop-filter:blur(16px) saturate(1.3);backdrop-filter:blur(16px) saturate(1.3);box-shadow:0 24px 60px rgba(10,31,51,.14);opacity:0;transform:translateY(-50%) translateX(0) scale(.96);transition:opacity .35s ease,transform .35s ease;visibility:hidden}
+.tn-stop.on{opacity:1;visibility:visible}
+.tn-stop.animating{will-change:opacity,transform}
+.tn-stop[data-lado="left"]{left:6%;transform:translateY(-50%) translateX(-16px) scale(.96)}
+.tn-stop[data-lado="right"]{right:6%;transform:translateY(-50%) translateX(16px) scale(.96)}
+.tn-stop.on[data-lado="left"],.tn-stop.on[data-lado="right"]{transform:translateY(-50%) translateX(0) scale(1)}
+.tn-stop .tn-kicker{margin:0;font-family:var(--f-code);font-size:12px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--lt-blue1)}
+.tn-stop h2,.tn-stop h3{margin:8px 0 6px;color:var(--lt-ink);font-size:clamp(19px,2vw,24px);line-height:1.15;letter-spacing:-.02em}
+.tn-stop .tn-ask{margin:0 0 10px;color:var(--lt-blue1);font-weight:600;font-size:14.5px}
+.tn-stop p{margin:0 0 8px;font-size:14px;line-height:1.55;color:color-mix(in srgb,var(--lt-ink) 80%,transparent)}
+.tn-stop .tn-badge{display:inline-flex;align-items:center;gap:7px;margin:0 0 10px;padding:5px 12px;border-radius:999px;background:color-mix(in srgb,#fff 60%,transparent);border:1px solid color-mix(in srgb,var(--lt-blue1) 25%,transparent);font-size:12.5px;font-weight:500;color:var(--lt-ink)}
+.tn-stop .tn-chips{list-style:none;margin:10px 0 0;padding:0;display:flex;flex-wrap:wrap;gap:6px}
+.tn-stop .tn-chips li{font-family:var(--f-code);font-size:11.5px;padding:3px 9px;border-radius:999px;background:color-mix(in srgb,var(--lt-blue1) 12%,transparent);color:var(--lt-blue1)}
+.tn-stop .tn-formacion{list-style:none;margin:10px 0 0;padding:0;display:grid;gap:8px}
+.tn-stop .tn-formacion li{padding-left:10px;border-left:2px solid var(--lt-blue1)}
+.tn-stop .tn-formacion b{display:block;font-size:13.5px;color:var(--lt-ink)}
+.tn-stop .tn-formacion span{display:block;font-size:12.5px;color:color-mix(in srgb,var(--lt-ink) 65%,transparent)}
+.tn-stop .tn-links{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.tn-stop .tn-links a{display:inline-flex;align-items:center;padding:8px 14px;border-radius:999px;font-size:13.5px;font-weight:500;text-decoration:none;border:1px solid var(--lt-blue1);color:var(--lt-blue1)}
+.tn-stop .tn-links a:first-child{background:var(--lt-blue1);color:#fff}
+@media (max-width:900px){.tn-stop{width:min(380px,calc(100% - 72px));left:50%!important;right:auto!important;transform:translate(-50%,-50%) scale(.96)}.tn-stop.on{transform:translate(-50%,-50%) scale(1)}}
+
+/* ---------- hero ---------- */
+.tn-hero{position:absolute;inset:0;z-index:6;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:calc(var(--header-h) + 8px) 20px 72px;color:var(--lt-ink)}
+.tn-hero h1{color:var(--lt-ink);font-size:clamp(30px,6vw,64px);line-height:1.04;letter-spacing:-.03em;font-weight:700;max-width:16ch}
+.tn-hero .tn-sub{margin-top:14px;font-family:var(--f-code);font-size:clamp(14px,1.6vw,18px);letter-spacing:.04em;text-transform:uppercase;color:var(--lt-blue1)}
+.tn-hero .cta{display:flex;gap:12px;margin-top:28px;justify-content:center;flex-wrap:wrap}
+.tn-hero .btn.primary{background:var(--lt-blue1)}
+.tn-hero .btn.ghost{background:color-mix(in srgb,#fff 70%,transparent);border-color:color-mix(in srgb,var(--lt-blue1) 35%,transparent);color:var(--lt-ink)}
+
+/* ---------- cursor "tú": solo con puntero fino, con inercia ---------- */
+.tn-cursor{position:fixed;z-index:50;left:0;top:0;display:flex;align-items:center;gap:6px;transform:translate(-50%,-140%);pointer-events:none;opacity:0;transition:opacity .25s}
+.tn-cursor.show{opacity:1}
+.tn-cursor i{width:8px;height:8px;border-radius:50%;background:var(--lt-cyan);box-shadow:0 0 0 4px color-mix(in srgb,var(--lt-cyan) 25%,transparent)}
+.tn-cursor span{font-family:var(--f-code);font-size:11px;padding:3px 8px;border-radius:999px;background:var(--lt-ink);color:#fff}
+@media (pointer:coarse){.tn-cursor{display:none}}
+
+/* ---------- timeline tipo Figma ---------- */
+.tn-timeline{position:absolute;z-index:10;left:50%;bottom:22px;transform:translateX(-50%);width:min(820px,calc(100% - 32px));padding:12px 18px 10px;border-radius:16px;background:color-mix(in srgb,#fff 85%,transparent);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);box-shadow:0 14px 40px rgba(10,31,51,.16);border:1px solid color-mix(in srgb,var(--lt-blue1) 20%,transparent)}
+.tn-timeline .tn-track{position:relative;height:3px;border-radius:3px;background:color-mix(in srgb,var(--lt-blue1) 20%,transparent);margin:18px 4px 10px}
+.tn-timeline .tn-fill{position:absolute;left:0;top:0;bottom:0;border-radius:3px;background:var(--lt-blue1);width:0%}
+.tn-timeline .tn-head{position:absolute;top:50%;width:14px;height:14px;margin:-7px 0 0 -7px;border-radius:50%;background:var(--lt-cyan);box-shadow:0 0 0 5px color-mix(in srgb,var(--lt-cyan) 25%,transparent);transition:left .08s linear}
+.tn-timeline .tn-ticks{position:relative;display:flex;justify-content:space-between}
+.tn-timeline button{all:unset;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;font-family:var(--f-code);font-size:10.5px;color:color-mix(in srgb,var(--lt-ink) 55%,transparent);text-align:center;max-width:90px}
+.tn-timeline button b{width:8px;height:8px;border-radius:50%;background:color-mix(in srgb,var(--lt-blue1) 35%,transparent)}
+.tn-timeline button[aria-current="true"]{color:var(--lt-ink)}
+.tn-timeline button[aria-current="true"] b{background:var(--lt-cyan)}
+.tn-timeline button:focus-visible{outline:2px solid var(--lt-blue1);outline-offset:3px;border-radius:6px}
+@media (max-width:760px){.tn-timeline{display:none}}
+
+.tn-section.calm .tn-world,.tn-section.calm .tn-fog,.tn-section.calm .tn-stops,.tn-section.calm .tn-timeline,.tn-section.calm .tn-cursor,.tn-section.calm .tn-hud{display:none}
+.tn-section.calm{height:auto}
+.tn-section.calm .tn-scene{position:static;height:auto;overflow:visible;perspective:none}
+.tn-section.calm .tn-hero{position:relative;inset:auto;padding:clamp(56px,10vw,110px) 20px 32px;background:radial-gradient(circle at 20% 10%,color-mix(in srgb,var(--lt-blue1) 10%,transparent),transparent 55%),radial-gradient(circle at 85% 30%,color-mix(in srgb,var(--lt-cyan) 12%,transparent),transparent 50%)}
+
+/* ---------- fallback accesible: siempre en el DOM, visible solo sin animación 3D ---------- */
+.tunnel-fallback{list-style:none;margin:0;padding:0 20px clamp(48px,8vw,88px);max-width:760px;margin-inline:auto;display:grid;gap:14px;background:var(--lt-bg);background-image:radial-gradient(circle at 15% 0%,color-mix(in srgb,var(--lt-blue1) 8%,transparent) 0,transparent 45%),repeating-radial-gradient(circle at 50% 0%,transparent 0 60px,color-mix(in srgb,var(--lt-blue1) 6%,transparent) 61px 63px)}
+.tunnel-fallback.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;padding:0;margin:0;max-width:none;background:none}
+.tf-item{padding:18px 22px;border:1px solid color-mix(in srgb,var(--lt-blue1) 20%,transparent);border-radius:16px;background:color-mix(in srgb,#fff 90%,transparent)}
+.tf-item .tf-kicker{margin:0;font-family:var(--f-code);font-size:12px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--lt-blue1)}
+.tf-item h3{margin:6px 0 4px;font-size:18px;letter-spacing:-.02em;color:var(--lt-ink)}
+.tf-item .tf-ask{margin:0 0 6px;font-weight:600;color:var(--lt-blue1);font-size:14px}
+.tf-item p{margin:6px 0 0;font-size:14px;line-height:1.55;color:color-mix(in srgb,var(--lt-ink) 80%,transparent)}
+.tf-item .tf-chips{list-style:none;margin:8px 0 0;padding:0;display:flex;flex-wrap:wrap;gap:6px}
+.tf-item .tf-chips li{font-family:var(--f-code);font-size:11px;padding:3px 9px;border-radius:999px;background:color-mix(in srgb,var(--lt-blue1) 12%,transparent);color:var(--lt-blue1)}
+.tf-item .tf-formacion{list-style:none;margin:8px 0 0;padding:0;display:grid;gap:6px}
+.tf-item .tf-formacion li{padding-left:10px;border-left:2px solid var(--lt-blue1)}
+.tf-item .tf-formacion b{display:block;font-size:13px;color:var(--lt-ink)}
+.tf-item .tf-formacion span{display:block;font-size:12px;color:color-mix(in srgb,var(--lt-ink) 65%,transparent)}
+.tf-item .tn-links{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.tf-item .tn-links a{display:inline-flex;align-items:center;padding:8px 14px;border-radius:999px;font-size:13.5px;font-weight:500;text-decoration:none;border:1px solid var(--lt-blue1);color:var(--lt-blue1)}
+.tf-item .tn-links a:first-child{background:var(--lt-blue1);color:#fff}
+
+@media (prefers-reduced-motion:reduce){
+  .tn-stop,.skip-tunnel,.tn-timeline .tn-head{transition:none}
+}
