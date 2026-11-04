@@ -31,7 +31,7 @@ h1,h2,h3,p{margin:0}
 h1{font-weight:700;letter-spacing:-.045em}
 h2,h3{font-weight:600;letter-spacing:-.03em}
 p{font-weight:400;line-height:1.55}
-.eyebrow,.ro-kind,.status,.demo-pill,.tag,.tier-legend,.tech,.stack-groups h3,.sel-n,.about-open,.about-tags li,.about-bridge,.tp-inputs li,.active-tech,.d-tags button,.d-nav small,.case-grid h3,.ps-num,.ts-kicker,.ts-card h3,.cb-kicker,.cb-card h4,.tunnel-hint{font-family:var(--f-code)}
+.eyebrow,.ro-kind,.status,.demo-pill,.tag,.tier-legend,.tech,.stack-groups h3,.sel-n,.tp-inputs li,.active-tech,.d-tags button,.d-nav small,.case-grid h3{font-family:var(--f-code)}
 a{color:var(--blue-text)}
 button{font:inherit;color:inherit;cursor:pointer}
 :focus-visible{outline:3px solid var(--blue);outline-offset:3px;border-radius:6px}
@@ -150,10 +150,9 @@ h1.title .wd{padding-top:.12em;margin-top:-.12em}
 h1.title .ch{display:inline-block}
 .js.intro h1.title .ch{animation:chIn 1s var(--ease-out) both;animation-delay:calc(var(--i) * 45ms + .15s)}
 @keyframes chIn{from{opacity:0;transform:translateY(105%) rotate(8deg)}}
-.js .tunnel-copy > :not(h1){animation:heroIn .9s var(--ease-out) both}
-.js .tunnel-copy > :nth-child(1){animation-delay:.05s}
-.js .tunnel-copy > :nth-child(3){animation-delay:.6s}
-.js .tunnel-copy > :nth-child(4){animation-delay:.75s}
+.js .tn-hero > :not(h1){animation:heroIn .9s var(--ease-out) both}
+.js .tn-hero > :nth-child(2){animation-delay:.4s}
+.js .tn-hero > :nth-child(3){animation-delay:.6s}
 .js header.top{animation:headIn .7s var(--ease-out) both}
 @keyframes heroIn{from{opacity:0;transform:translateY(18px)}}
 @keyframes headIn{from{opacity:0;transform:translateY(-100%)}}
@@ -285,19 +284,6 @@ dialog[open]{animation:pop .28s cubic-bezier(.2,.9,.3,1)}
 :root[data-theme="dark"] #toast{background:#fff;color:#0B2A6B}
 #toast.show{opacity:1;transform:translate(-50%,0)}
 
-/* el camino que suma */
-.path-sum{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:8px 10px;min-height:46px;margin-top:clamp(26px,4vw,38px)}
-.path-sum .term{padding:6px 14px;border:1px solid var(--line);border-radius:999px;background:var(--surface);color:var(--ink);font-weight:600;font-size:15px;animation:pathIn .45s both}
-.path-sum .op{color:var(--muted);font-weight:700}
-.path-sum .total{padding:8px 18px;border-radius:999px;background:var(--blue-text);color:#fff;font-weight:700;font-size:16px;box-shadow:0 6px 22px var(--glow1);animation:pathIn .5s both}
-:root[data-theme="dark"] .path-sum .total{color:var(--bg)}
-@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .path-sum .total{color:var(--bg)}}
-@keyframes pathIn{from{opacity:0;transform:translateY(6px) scale(.96)}}
-@media (max-width:640px){
-  .path-sum .term{font-size:14px;padding:5px 11px}
-  .path-sum .total{font-size:15px;text-align:center}
-}
-
 @media (max-width:900px){
   .lead{max-width:44ch}
 }
@@ -311,63 +297,11 @@ dialog[open]{animation:pop .28s cubic-bezier(.2,.9,.3,1)}
   .d-nav small{display:none}
 }
 @media (prefers-reduced-motion:reduce){
-  .tunnel-hint i{animation:none}
   *,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}
   .js .rv,.js .reveal .wd-in{opacity:1;transform:none}
 }
 
-/* tarjeta de etapa */
-
-/* túnel de código 3D (hero de entrada) */
-.tunnel{--tunnel-bg:#0d0f12;position:relative;height:520svh;margin-top:calc(-1 * var(--header-h))}
-.tunnel-pin{position:sticky;top:0;height:100svh;overflow:clip;background:var(--tunnel-bg);will-change:opacity}
-.tunnel-canvas{position:absolute;inset:0;width:100%;height:100%;display:block;pointer-events:none;opacity:0;transition:opacity 1.2s var(--ease-out)}
-.tunnel.ready .tunnel-canvas{opacity:1}
-.tunnel-pin::after{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse at center,transparent 38%,rgba(13,15,18,.55) 100%)}
-.tunnel-copy{position:absolute;inset:0;z-index:2;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:calc(var(--header-h) + 8px) 20px 72px;transform-origin:50% 46%;will-change:transform,opacity}
-.tunnel-copy::before{content:"";position:absolute;inset:14% 6%;z-index:-1;pointer-events:none;background:radial-gradient(ellipse at center,rgba(13,15,18,.82),rgba(13,15,18,.5) 48%,transparent 72%)}
-.tunnel-copy .eyebrow{color:#E1E9FB;font-weight:600;text-shadow:0 1px 12px #0d0f12}
-.tunnel-copy .role{text-shadow:0 1px 14px #0d0f12}
-.tunnel-copy h1.title{color:#fff;font-size:clamp(52px,11vw,150px);text-shadow:0 0 60px rgba(76,130,255,.35)}
-.tunnel-copy .role{color:#C4D6FF;max-width:30ch;margin-inline:auto}
-.tunnel-copy .cta{justify-content:center}
-.tunnel-copy .btn.ghost{background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.28);color:#fff}
-.tunnel-copy .btn.ghost:hover{border-color:#8DB0FF}
-.tunnel-copy :focus-visible,.tunnel-hint:focus-visible{outline-color:#8DB0FF}
-.tunnel-hint{position:absolute;z-index:2;left:50%;bottom:26px;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:8px;color:#9AA9C7;font-size:12px;letter-spacing:.14em;text-transform:uppercase;text-decoration:none}
-.tunnel-hint i{width:1px;height:34px;background:linear-gradient(#8DB0FF,transparent);transform-origin:top;animation:hint 1.8s ease-in-out infinite}
-@keyframes hint{0%{transform:scaleY(0)}50%{transform:scaleY(1)}100%{transform:scaleY(1);opacity:0}}
-.tunnel + .about{margin-top:-10svh;z-index:1}
-.tunnel.calm,.tunnel.nogl{height:100svh}
-.tunnel.calm + .about,.tunnel.nogl + .about{margin-top:0}
-.tunnel.calm .tunnel-hint,.tunnel.nogl .tunnel-hint{display:none}
-
-/* cabecera sobre el túnel: texto claro mientras el fondo es oscuro */
-.on-tunnel header.top{--ink:#fff;--text:#D5DEF5;--muted:#B7C3DD;--line:rgba(255,255,255,.16);--surface:#111C3A;--blue-text:#8DB0FF;--blue:#4C82FF;background:rgba(13,15,18,.55);border-bottom-color:rgba(255,255,255,.1)}
-
-/* presentación */
-
-/* trayectoria: cuatro etapas equilibradas */
-.path{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:20px;position:relative}
-.ps{--c:#56678f;position:relative;display:flex;flex-direction:column;gap:12px;padding:26px 22px 22px;border:1px solid var(--line);border-radius:18px;background:var(--surface);box-shadow:var(--shadow);overflow:visible}
-.ps:nth-child(2){--c:#4c6fd0}.ps:nth-child(3){--c:var(--blue)}.ps:nth-child(4){--c:var(--cyan)}
-.ps::before{content:"";position:absolute;left:22px;right:22px;top:-1px;height:3px;border-radius:0 0 3px 3px;background:var(--c)}
-.ps:not(:last-child)::after{content:"+";position:absolute;z-index:2;right:-20px;top:42px;width:20px;height:20px;display:grid;place-items:center;border-radius:50%;background:var(--bg);border:1px solid var(--line);color:var(--muted);font-weight:700;font-size:14px;line-height:1}
-.ps-num{font:500 13px/1 var(--f-code);letter-spacing:.08em;color:var(--blue-text)}
-.ps h3{margin:0;color:var(--ink);font-size:clamp(20px,1.9vw,25px);line-height:1.15;letter-spacing:-.02em}
-.ps-ask{margin:0;color:var(--blue-text);font-weight:600;font-size:15px;line-height:1.4}
-.ps-block{display:grid;gap:6px;padding-top:12px;border-top:1px solid var(--line)}
-.ps-block p{margin:0;font-size:15px;line-height:1.55;color:var(--text)}
-.ps-train{list-style:none;margin:0;padding:0;display:grid;gap:8px}
-.ps-train li{display:flex;flex-direction:column;padding-left:12px;border-left:2px solid var(--blue)}
-.ps-train b{color:var(--ink);font-size:14.5px;font-weight:600;line-height:1.35}
-.ps-train span{color:var(--muted);font-size:13.5px}
-.ps-train em{color:var(--muted);font-size:13px;font-style:normal;font-variant-numeric:tabular-nums}
-.js .reveal .ps{opacity:0;transform:translateY(22px);transition:opacity .7s var(--ease-out),transform .7s var(--ease-out);transition-delay:calc(var(--i) * 110ms + 150ms)}
-.js .reveal.in .ps{opacity:1;transform:none}
-.path-sum{margin-top:clamp(28px,4vw,44px)}
-@media (max-width:1080px){.path{grid-template-columns:repeat(2,minmax(0,1fr))}.ps::after{display:none}}
-@media (max-width:620px){.path{grid-template-columns:1fr}}
+/* presentación: ver css/tunnel.css (el túnel vive en su propio archivo) */
 
 /* mapa a pantalla completa */
 .mapa{position:relative;height:calc(100svh - 76px);min-height:540px;border-block:1px solid var(--line);background:radial-gradient(55% 60% at 72% 38%,var(--glow1),transparent 70%),radial-gradient(40% 45% at 18% 82%,var(--glow2),transparent 70%)}
@@ -378,24 +312,6 @@ dialog[open]{animation:pop .28s cubic-bezier(.2,.9,.3,1)}
 .mapfull-head .sub{font-size:15px;margin-top:8px}
 .mapfull .map-readout{position:absolute;z-index:3;right:max(20px,calc((100vw - 1180px) / 2));bottom:clamp(16px,4vh,40px);width:min(390px,calc(100% - 40px));min-height:0;margin:0;background:color-mix(in srgb,var(--surface) 90%,transparent);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
 @media (max-width:760px){.mapfull .map-readout{left:20px;right:20px;width:auto}.mapfull-head .sub{display:none}}
-
-/* quién soy + trayectoria */
-.about{position:relative;padding:clamp(56px,9vw,112px) 0 clamp(48px,7vw,88px);background:radial-gradient(55% 45% at 88% 0%,var(--glow1),transparent 70%)}
-.about-head{display:grid;grid-template-columns:minmax(0,.95fr) minmax(0,1.05fr);gap:clamp(28px,5vw,84px);align-items:start}
-.about .eyebrow{margin-bottom:14px}
-.about-lead{font-size:clamp(32px,4.2vw,58px);line-height:1.06;letter-spacing:-.03em;color:var(--ink);max-width:14ch;margin:0}
-.about-open{display:inline-flex;align-items:center;gap:10px;margin:28px 0 0;padding:8px 16px;border:1px solid var(--line);border-radius:999px;background:var(--surface);font-size:14px;font-weight:500;color:var(--ink)}
-.about-open i{width:9px;height:9px;border-radius:50%;background:var(--ok);box-shadow:0 0 0 4px color-mix(in srgb,var(--ok) 25%,transparent)}
-.about-text{display:grid;gap:18px;padding-top:clamp(4px,1vw,14px)}
-.about-text p{margin:0;font-size:clamp(16px,1.35vw,18.5px);line-height:1.7;color:var(--text);max-width:58ch}
-.about-text p:first-child{color:var(--ink);font-size:clamp(18px,1.6vw,21px);line-height:1.6}
-.about-tags{list-style:none;margin:6px 0 0;padding:0;display:flex;flex-wrap:wrap;gap:8px}
-.about-tags li{padding:6px 14px;border:1px solid var(--line);border-radius:999px;background:var(--surface);font-size:14px;font-weight:500;color:var(--text)}
-.about-bridge{display:flex;align-items:center;gap:18px;margin:clamp(44px,6vw,76px) 0 28px;color:var(--muted);font-size:13px;font-weight:500;letter-spacing:.1em;text-transform:uppercase}
-.about-bridge::before,.about-bridge::after{content:"";flex:1;height:1px}
-.about-bridge::before{background:linear-gradient(90deg,transparent,var(--line))}
-.about-bridge::after{background:linear-gradient(90deg,var(--line),transparent)}
-@media (max-width:900px){.about-head{grid-template-columns:1fr}.about-lead{max-width:18ch}.about-bridge{font-size:12px;gap:12px}}
 
 /* Proyectos: monitor realista con las demos en vivo */
 .proyectos-lista{margin-top:clamp(28px,4vw,48px)}
@@ -485,44 +401,3 @@ iframe.live.on{opacity:1;visibility:visible}
 @media (prefers-reduced-motion:reduce){
   .pantalla-apagada,.destello{display:none}
 }
-
-/* panel de cada etapa sobre el túnel: HTML nítido y de alto contraste */
-.tunnel-stage{position:absolute;left:0;right:0;bottom:0;z-index:3;display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:clamp(18px,3vw,48px);align-items:end;padding:clamp(90px,16vh,170px) max(20px,calc((100vw - 1180px) / 2)) clamp(30px,6vh,60px);background:linear-gradient(to top,rgba(6,8,12,.95),rgba(6,8,12,.8) 55%,transparent);color:#e8efff;pointer-events:none;opacity:0;transform:translateY(18px);transition:opacity .45s var(--ease-out),transform .45s var(--ease-out)}
-.tunnel-stage.on{opacity:1;transform:none}
-.ts-kicker{margin:0;color:#aebfe6;font-size:13px;font-weight:500;letter-spacing:.14em;text-transform:uppercase}
-.ts-title{margin:6px 0 10px;color:#fff;font-size:clamp(34px,5vw,66px);line-height:1.02;letter-spacing:-.03em}
-.ts-ask{margin:0;color:#cfdcff;font-size:clamp(16px,1.6vw,21px);line-height:1.4}
-.ts-cards{display:grid;gap:12px}
-.ts-card{padding:14px 18px;border:1px solid rgba(130,165,255,.32);border-radius:14px;background:rgba(14,20,38,.78);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
-.ts-card h3{margin:0 0 8px;color:#aebfe6;font-size:12px;font-weight:500;letter-spacing:.12em;text-transform:uppercase}
-.ts-card p{margin:0;color:#eef3ff;font-size:clamp(15px,1.25vw,17px);line-height:1.55}
-.ts-card ul{list-style:none;margin:0;padding:0;display:grid;gap:10px}
-.ts-card li{display:flex;flex-direction:column;padding-left:12px;border-left:2px solid #6f9bff}
-.ts-card li b{color:#fff;font-size:clamp(14.5px,1.2vw,16.5px);font-weight:600;line-height:1.35}
-.ts-card li span{color:#b9c8ec;font-size:13.5px}
-.ts-main:only-child{grid-column:1/-1}
-@media (max-width:820px){.tunnel-stage{grid-template-columns:1fr;gap:12px;padding-top:56px;padding-bottom:22px}.ts-card{padding:12px 14px}.ts-title{font-size:clamp(30px,9vw,44px)}}
-@media (prefers-reduced-motion:reduce){.tunnel-stage{transition:none}}
-
-.tunnel:not(.dom-text) .tunnel-stage{position:absolute;left:0;bottom:0;width:1px;height:1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;background:none;opacity:1;transform:none;transition:none}
-
-/* Modo cine: fotogramas de Blender y texto HTML proyectado sobre los carteles renderizados */
-.cine{overflow:hidden;will-change:transform;background:var(--tunnel-bg)}
-.cine canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
-.cine-boards{position:absolute;inset:0;pointer-events:none}
-.cine-board{position:absolute;container-type:inline-size;opacity:0;display:grid;grid-template-columns:minmax(0,.82fr) minmax(0,1.18fr);gap:2.2cqw;align-items:center;color:#f2f6ff;overflow:hidden;text-shadow:0 0 1.2cqw rgba(110,160,255,.28)}
-.cb-main{margin-left:3.6cqw;min-width:0}
-.cb-main.cb-end{grid-column:1/-1;margin:0 6cqw;text-align:center}
-.cb-kicker{margin:0;color:#aebfe6;font-size:1.5cqw;font-weight:500;letter-spacing:.22em;text-transform:uppercase}
-.cb-title{margin:.9cqw 0 1.4cqw;color:#fff;font-size:4.1cqw;line-height:1.03;letter-spacing:-.03em}
-.cb-end .cb-title{font-size:5.2cqw}
-.cb-ask{margin:0;color:#cfdcff;font-size:2cqw;line-height:1.34}
-.cb-cards{display:grid;gap:1.4cqw;margin-right:3.2cqw;min-width:0}
-.cb-card{padding:1.5cqw 2cqw;border:.16cqw solid rgba(130,165,255,.4);border-radius:1.3cqw;background:rgba(22,34,66,.6)}
-.cb-card h4{margin:0 0 .9cqw;color:#9fb4e6;font-size:1.35cqw;font-weight:500;letter-spacing:.2em;text-transform:uppercase}
-.cb-card p{margin:0;color:#f2f6ff;font-size:1.9cqw;line-height:1.38}
-.cb-card ul{list-style:none;margin:0;padding:0;display:grid;gap:.9cqw}
-.cb-card li{display:flex;flex-direction:column;padding-left:1.3cqw;border-left:.22cqw solid #6f9bff}
-.cb-card li b{color:#fff;font-size:1.95cqw;font-weight:600;line-height:1.28}
-.cb-card li span{color:#b9c8ec;font-size:1.6cqw}
-.tunnel.dom-text .cine-boards{display:none}

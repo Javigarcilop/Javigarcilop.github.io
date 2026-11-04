@@ -26,41 +26,7 @@ const TECH_USE = {
   'HTML y CSS':'Maquetación semántica, accesible y responsive. Este portfolio está hecho a mano, sin frameworks.',
   'Git':'Control de versiones en el trabajo diario y en todos mis proyectos públicos.'
 };
-/* Trayectoria: cada etapa alimenta a la siguiente; "implement" cuenta cómo la aplico al construir software */
-const PATH = {
-  steps:[
-    {
-      name:'Marketing', ask:'¿Para qué sirve y qué valor aporta?',
-      training:[
-        {title:'Ciclo Formativo de Grado Superior en Marketing y Publicidad',place:'Centro Universitario EUSA',years:'2018 – 2020'}
-      ],
-      implement:'Defino qué problema resuelvo y para quién. Todo lo demás parte de aquí.'
-    },
-    {
-      name:'Diseño', ask:'¿Quién lo va a usar?',
-      training:[
-        {title:'Máster en Diseño Gráfico, Web y Creatividad',place:'Escuela de Negocios de la Cámara de Comercio de Sevilla',years:'2020 – 2021'}
-      ],
-      implement:'Convierto ese valor en una experiencia clara y usable para quien lo va a utilizar.'
-    },
-    {
-      name:'Código', ask:'¿Cómo lo convierto en algo que funciona?',
-      training:[
-        {title:'Ciclo Formativo de Grado Superior en Desarrollo de Aplicaciones Web (DAW)',place:'Centro Universitario EUSA',years:'2023 – 2025'},
-        {title:'RPA (Robotic Process Automation) con UiPath',place:'Fundación Generation España',years:'ene. – abr. 2022'}
-      ],
-      implement:'Doy forma real a esa experiencia: base de datos, backend e interfaz conectados, con integraciones y automatización de procesos.'
-    },
-    {
-      name:'Product Engineering e IA', ask:'La pieza que faltaba: IA aplicada al desarrollo.',
-      training:[
-        {title:'Máster Online en Product Engineering con IA',place:'Evolve',years:'2026 – 2027'}
-      ],
-      implement:'Potencio todo lo anterior con IA: automatiza y ahorra trabajo, siempre al servicio del producto.'
-    }
-  ],
-  result:'Soluciones digitales que resuelven problemas reales'
-};
+/* La trayectoria (antes PATH aquí) ahora vive en js/tunnel-stops.json, que carga js/tunnel.js */
 const PROJECTS = [
   {
     slug:'templimail', title:'TempliMail', short:'TempliMail', type:'Plataforma de email marketing', context:'Proyecto personal',
