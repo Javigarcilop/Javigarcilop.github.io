@@ -9,171 +9,17 @@ function rng(seed){let h=1779033703^seed.length;for(let i=0;i<seed.length;i++){h
 const arrow='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
 const arrowL='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>';
 
-/* ---------- ilustración generativa por proyecto ---------- */
-function cover(p,w,h){
-  const r=rng(p.slug), pts=[];
-  const n=10;
-  for(let i=0;i<n;i++)pts.push([16+r()*(w-32),14+r()*(h-28)]);
-  let lines='';
-  pts.forEach((a,i)=>{
-    const near=pts.map((b,j)=>[j,Math.hypot(a[0]-b[0],a[1]-b[1])]).filter(x=>x[0]!==i).sort((x,y)=>x[1]-y[1]).slice(0,2);
-    near.forEach(([j])=>{if(j>i||!near.some(()=>false))lines+=`<line x1="${a[0].toFixed(1)}" y1="${a[1].toFixed(1)}" x2="${pts[j][0].toFixed(1)}" y2="${pts[j][1].toFixed(1)}"/>`});
-  });
-  const gx=(r()*w).toFixed(0), gy=(r()*h).toFixed(0);
-  const hero=Math.floor(r()*n);
-  const dots=pts.map((q,i)=> i===hero
-    ? `<circle cx="${q[0].toFixed(1)}" cy="${q[1].toFixed(1)}" r="9" fill="var(--cyan)"/>`
-    : `<circle cx="${q[0].toFixed(1)}" cy="${q[1].toFixed(1)}" r="${(3.5+r()*2.5).toFixed(1)}" fill="var(--surface)" stroke="var(--blue)" stroke-width="2"/>`).join('');
-  return `<svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false">
-    <defs><radialGradient id="g-${p.slug}-${w}" cx="${gx}" cy="${gy}" r="${w*0.7}" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="var(--cyan)" stop-opacity=".45"/><stop offset="1" stop-color="var(--cyan)" stop-opacity="0"/></radialGradient></defs>
-    <rect width="${w}" height="${h}" fill="var(--sky)"/><rect width="${w}" height="${h}" fill="url(#g-${p.slug}-${w})"/>
-    <g stroke="var(--blue)" stroke-opacity=".5" stroke-width="1.6">${lines}</g>${dots}</svg>`;
-}
-
 /* ---------- estado y proyectos ---------- */
 const state={tech:null};
-const matches=p=>!state.tech||p.stack.includes(state.tech);
-const liveUrl=p=>((p.links||[]).find(l=>/demo/i.test(l.label))||{}).url||'';
-const niceUrl=u=>{try{const x=new URL(u);return x.host+(x.pathname==='/'?'':x.pathname.replace(/\/$/,''))}catch(e){return u}};
-let current=null,loadAllowed=false;
-
-function infoHTML(p){
-  const demo=liveUrl(p);
-  const links=(p.links||[]).map(l=>`<a class="btn ghost" href="${esc(l.url)}" target="_blank" rel="noopener">${esc(l.label)}</a>`).join('');
-  return `<span class="status ${p.ok?'ok':''}"><i></i>${esc(p.status)}${demo?'<span class="demo-pill">Demo en vivo</span>':''}</span>
-    <h3>${esc(p.title)}</h3>
-    <p class="meta">${esc(p.type)} – ${esc(p.context)}</p>
-    <div class="pi-block"><span class="ro-kind">El problema</span><p>${esc(p.problem)}</p></div>
-    <div class="pi-block"><span class="ro-kind">La solución</span><p>${esc(p.solution)}</p></div>
-    <span class="tags">${p.stack.map(t=>`<span class="tag">${esc(t)}</span>`).join('')}</span>
-    <div class="pi-actions"><button type="button" class="btn primary" data-open>Ver caso de estudio ${arrow}</button>${links}</div>`;
-}
-function projectsHTML(){
-  return `<div class="visor">
-    <div class="visor-info">
-      <div class="selector" role="tablist" aria-label="Elegir proyecto">
-        ${PROJECTS.map((p,i)=>`<button type="button" role="tab" class="sel-btn" id="tab-${esc(p.slug)}" data-slug="${esc(p.slug)}" aria-selected="false" aria-controls="visor-panel" tabindex="-1"><span class="sel-n">0${i+1}</span><b>${esc(p.short)}</b><small>${esc(p.type)}</small></button>`).join('')}
-      </div>
-      <div class="info-panel" id="visor-panel" role="tabpanel" aria-live="polite"></div>
-    </div>
-    <div class="escena-3d-contenedor" data-dispositivo="monitor">
-      <div class="escena-rotor">
-        <div class="dispositivo-wrap">
-          <div class="monitor dispositivo-mockup">
-            <i class="grosor g1"></i><i class="grosor g2"></i>
-            <div class="marco">
-              <i class="camara"></i>
-              <div class="pantalla pantalla-principal-encendida" id="pantalla">
-                <div class="navegador">
-                  <div class="nav-chrome">
-                    <span class="semaforo" aria-hidden="true"><i></i><i></i><i></i></span>
-                    <div class="nav-tabs" aria-hidden="true">${PROJECTS.map(p=>`<button type="button" tabindex="-1" class="nav-tab" data-slug="${esc(p.slug)}"><span class="fav"></span>${esc(p.short)}</button>`).join('')}</div>
-                    <button type="button" class="nav-salir" id="navSalir">Salir</button>
-                  </div>
-                  <div class="nav-url">
-                    <span class="nav-lock" aria-hidden="true"></span><span class="nav-host" id="navHost"></span>
-                    <a class="nav-open" id="navOpen" href="#" target="_blank" rel="noopener" aria-label="Abrir la demo en una pestaña nueva">↗</a>
-                  </div>
-                </div>
-                <div class="viewport" id="viewport">
-                  ${PROJECTS.map(p=>`<iframe class="live" data-slug="${esc(p.slug)}" data-src="${esc(liveUrl(p))}" title="Vista en vivo de ${esc(p.title)}" sandbox="allow-scripts allow-same-origin allow-forms allow-popups" referrerpolicy="no-referrer"></iframe>`).join('')}
-                  <div class="cargando" id="cargando" aria-live="polite">Cargando vista en vivo…</div>
-                  <button type="button" class="capa-interaccion" id="capa" aria-label="Activar la vista en vivo para interactuar"><span>Haz clic para interactuar</span></button>
-                </div>
-                <i class="destello"></i>
-                <div class="pantalla-apagada"></div>
-                <i class="vidrio"></i>
-              </div>
-            </div>
-            <div class="menton"><i class="logo-mon" aria-hidden="true"></i></div>
-          </div>
-          <div class="cuello"></div><div class="pie"></div>
-        </div>
-        <div class="escritorio" aria-hidden="true"><div class="teclado"></div></div>
-      </div>
-    </div>
-  </div>`;
-}
-function ensureLoad(slug){
-  if(!loadAllowed)return;
-  const f=$('iframe.live[data-slug="'+slug+'"]');
-  if(f&&!f.getAttribute('src')&&f.dataset.src){
-    f.addEventListener('load',()=>{f.dataset.ok='1';if(current===slug)$('#cargando').classList.remove('on')},{once:true});
-    $('#cargando').classList.add('on');
-    f.src=f.dataset.src;
-    setTimeout(()=>{if(current===slug&&!f.dataset.ok)$('#cargando').textContent='Si no carga, ábrela con el botón ↗ de la barra.'},9000);
-  }
-}
-function selectProject(slug,focus){
-  const p=PROJECTS.find(x=>x.slug===slug);
-  if(!p)return;
-  current=slug;
-  $$('.sel-btn').forEach(b=>{const on=b.dataset.slug===slug;b.setAttribute('aria-selected',String(on));b.tabIndex=on?0:-1;if(on&&focus)b.focus()});
-  $$('.nav-tab').forEach(b=>b.classList.toggle('on',b.dataset.slug===slug));
-  const panel=$('#visor-panel');
-  panel.setAttribute('aria-labelledby','tab-'+slug);
-  panel.innerHTML=infoHTML(p);
-  $('[data-open]',panel).onclick=e=>openProject(slug,false,e.currentTarget);
-  $('#navHost').textContent=niceUrl(liveUrl(p));
-  $('#navOpen').href=liveUrl(p)||'#';
-  $$('iframe.live').forEach(f=>f.classList.toggle('on',f.dataset.slug===slug));
-  const f=$('iframe.live[data-slug="'+slug+'"]');
-  $('#cargando').textContent='Cargando vista en vivo…';
-  $('#cargando').classList.toggle('on',!!(f&&!f.dataset.ok&&loadAllowed));
-  ensureLoad(slug);
-  releaseScreen();
-}
-function releaseScreen(){$('#pantalla').classList.remove('activa')}
-function renderProjects(){
-  const box=$('#proyectos-lista');
-  box.innerHTML=projectsHTML();
-  const pick=slug=>{loadAllowed=true;selectProject(slug)};
-  $$('.sel-btn').forEach(b=>b.onclick=()=>pick(b.dataset.slug));
-  $$('.nav-tab').forEach(b=>b.onclick=()=>pick(b.dataset.slug));
-  $('.selector').addEventListener('keydown',e=>{
-    const keys=$$('.sel-btn').filter(b=>!b.hidden),i=keys.findIndex(b=>b.dataset.slug===current);
-    const to={ArrowRight:i+1,ArrowDown:i+1,ArrowLeft:i-1,ArrowUp:i-1,Home:0,End:keys.length-1}[e.key];
-    if(to===undefined||!keys.length)return;
-    e.preventDefault();selectProject(keys[(to+keys.length)%keys.length].dataset.slug,true);
-  });
-
-  /* La demo real cabe en la pantalla: se renderiza como en un escritorio y se escala */
-  const vp=$('#viewport');
-  new ResizeObserver(()=>{
-    const w=vp.clientWidth,h=vp.clientHeight;
-    if(!w||!h)return;
-    const vw=w<520?720:1280,k=w/vw;
-    $$('iframe.live').forEach(f=>{f.style.width=vw+'px';f.style.height=(h/k)+'px';f.style.transform='scale('+k+')'});
-  }).observe(vp);
-
-  /* Para que la página siga haciendo scroll, la demo solo responde tras un clic y se suelta al salir */
-  $('#capa').onclick=()=>{loadAllowed=true;ensureLoad(current);$('#pantalla').classList.add('activa')};
-  $('#navSalir').onclick=releaseScreen;
-  $('#pantalla').addEventListener('pointerleave',e=>{if(e.pointerType==='mouse')releaseScreen()});
-
-  /* Carga diferida: la demo solo se pide al acercarse a la sección */
-  new IntersectionObserver((es,io)=>{
-    if(es[0].isIntersecting){loadAllowed=true;ensureLoad(current);$('#cargando').classList.toggle('on',!!current&&!$('iframe.live[data-slug="'+current+'"]').dataset.ok);io.disconnect()}
-  },{rootMargin:'300px'}).observe($('.escena-3d-contenedor'));
-
-  selectProject(PROJECTS.filter(matches)[0]?.slug||PROJECTS[0].slug);
-  window.motion?.initProyectos?.();
-}
-function applyFilter(){
-  $$('.sel-btn').forEach(b=>{b.hidden=!matches(PROJECTS.find(x=>x.slug===b.dataset.slug))});
-  $$('.nav-tab').forEach(b=>{b.hidden=!matches(PROJECTS.find(x=>x.slug===b.dataset.slug))});
-  const cur=PROJECTS.find(x=>x.slug===current);
-  if(!cur||!matches(cur)){const n=PROJECTS.find(matches);if(n)selectProject(n.slug)}
-}
 function renderTechChip(){
   $('#techchip').classList.toggle('show',!!state.tech);
   $('#techname').textContent=state.tech||'';
 }
-function update(){renderTechChip();applyFilter();renderStack();markMap()}
+function update(){renderTechChip();renderStack();markMap()}
 function setTech(t,scroll){
   state.tech=(state.tech===t)?null:t;
   update();
-  if(scroll&&state.tech) $('#proyectos').scrollIntoView({behavior:'smooth',block:'start'});
+  if(scroll&&state.tech) $('#mapa').scrollIntoView({behavior:'smooth',block:'start'});
 }
 $('#techclear').onclick=()=>{state.tech=null;update()};
 
@@ -280,6 +126,7 @@ function buildMap(){
     g.setAttribute('class','node '+n.type+(isIA?' ia':''));
     g.setAttribute('tabindex','0');g.setAttribute('role','button');
     g.setAttribute('aria-label',n.type==='p'?'Proyecto '+n.p.title+', abrir historia completa':'Tecnología '+n.t+', ver dónde la uso');
+    if(n.type==='p'){g.setAttribute('aria-expanded','false');g.setAttribute('aria-controls','projectDetail')}
     g.style.transitionDelay=reduce?'0s':(k*25)+'ms';
     g.style.transform=reduce?`translate(${n.X}px,${n.Y}px)`:`translate(${W/2}px,${H/2}px)`;
     if(n.type==='p'){
@@ -327,9 +174,10 @@ function buildMap(){
     g.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();act()}});
   });
   MAP={svg,nodes,edges,links};
+  if(!projectPanel.hidden)pinProjectNode(projectPanel.dataset.slug);
   if(reduce){
     requestAnimationFrame(()=>requestAnimationFrame(()=>{
-      nodes.forEach(n=>{n.el.style.transform=`translate(${n.X}px,${n.Y}px)`});
+      nodes.forEach(n=>{n.el.style.transform=`translate(${n.projectPinned?n.x:n.X}px,${n.projectPinned?n.y:n.Y}px)`});
       svg.classList.add('ready');
     }));
     return;
@@ -338,7 +186,7 @@ function buildMap(){
   svg.addEventListener('pointermove',e=>{const p=toSvgPoint(svg,e.clientX,e.clientY);mouse.x=p.x;mouse.y=p.y;mouse.active=true});
   svg.addEventListener('pointerleave',()=>mouse.active=false);
   requestAnimationFrame(()=>requestAnimationFrame(()=>{
-    nodes.forEach(n=>{n.el.style.transform=`translate(${n.X}px,${n.Y}px)`});
+    nodes.forEach(n=>{n.el.style.transform=`translate(${n.projectPinned?n.x:n.X}px,${n.projectPinned?n.y:n.Y}px)`});
     setTimeout(()=>{svg.classList.add('ready');runPhysics()},750);
   }));
   let mapVisible=true;
@@ -346,7 +194,7 @@ function buildMap(){
   function runPhysics(){
     let t=0;
     (function tick(){
-      if(!mapVisible){MAP.raf=requestAnimationFrame(tick);return}
+      if(!mapVisible||mapStage.classList.contains('project-open')){MAP.raf=requestAnimationFrame(tick);return}
       t+=.016;
       nodes.forEach(n=>{
         if(n.dragging)return;
@@ -392,6 +240,8 @@ function toSvgPoint(svg,clientX,clientY){
 }
 function selectNode(n){
   const box=$('#readout');
+  if(n.type==='p'&&!projectPanel.hidden&&projectPanel.dataset.slug===n.id){closeProject();return}
+  if(n.type==='t')closeProject(false);
   if(MAP.selected===n.id&&n.type!=='p'){MAP.selected=null;MAP.nodes.forEach(x=>x.el.classList.remove('sel'));highlight(null);box.innerHTML='<p class="map-hint">'+MAP_HINT+'</p>';return}
   MAP.selected=n.id;
   MAP.nodes.forEach(x=>x.el.classList.toggle('sel',x===n));
@@ -430,7 +280,7 @@ function markMap(){
 }
 
 /* ---------- detalle de proyecto ---------- */
-const dlg=$('#dlg');
+const projectPanel=$('#projectDetail'),mapStage=$('#mapfull');
 let caseObserver=null;
 /* Cambia la URL sin recargar; algunos navegadores lo bloquean al abrir el archivo directamente (file://). */
 function setHash(h){try{history.replaceState(null,'',h)}catch(e){}}
@@ -438,12 +288,14 @@ function openProject(slug,noHash,from){
   const i=PROJECTS.findIndex(p=>p.slug===slug); if(i<0)return;
   const p=PROJECTS[i],prev=PROJECTS[(i-1+PROJECTS.length)%PROJECTS.length],next=PROJECTS[(i+1)%PROJECTS.length];
   caseObserver?.disconnect();
-  if(!dlg.open)dlg.classList.toggle('from-map',!!from?.closest('#map'));
+  const wasOpen=!projectPanel.hidden;
+  const source=from||MAP?.nodes.find(n=>n.id===slug)?.el;
+  const sourceRect=source?.getBoundingClientRect();
   const links=(p.links||[]).map(l=>`<a class="btn ${/demo/i.test(l.label)?'primary':'ghost'}" href="${esc(l.url)}" target="_blank" rel="noopener">${esc(l.label)}</a>`).join('');
   const list=a=>`<ul>${(a||[]).map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`;
   const diagram=(p.diagram||[]).map(([t,s],k)=>`${k?'<span class="arch-link"></span>':''}<span class="arch-node" style="--k:${k}"><b>${esc(t)}</b><small>${esc(s)}</small></span>`).join('');
-  dlg.innerHTML=`
-    <div class="d-art">${cover(p,640,190)}<p class="d-origin"><span></span>Del nodo al producto</p><button class="icon-btn d-close" type="button" aria-label="Cerrar" id="dclose"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+  projectPanel.innerHTML=`
+    <div class="map-project-bar"><span><i></i> Nodo / ${esc(p.short)}</span><button type="button" id="dclose">← Volver a la red</button></div>
     <div class="d-body">
       <span class="status ${p.ok?'ok':''}"><i></i>${esc(p.status)}</span>
       <h2 id="d-title">${esc(p.title)}</h2>
@@ -470,39 +322,61 @@ function openProject(slug,noHash,from){
         <button type="button" data-go="${next.slug}"><span style="text-align:right"><small>Siguiente caso</small>${esc(next.title)}</span>${arrow}</button>
       </div>`:''}
     </div>`;
-  const wasOpen=dlg.open;
-  if(!wasOpen) dlg.showModal();
-  dlg.scrollTop=0;
-  if(from&&!wasOpen&&!matchMedia('(prefers-reduced-motion: reduce)').matches&&dlg.animate){
-    const a=from.getBoundingClientRect(),b=dlg.getBoundingClientRect();
-    const c=(v,max)=>Math.min(Math.max(0,v),max);
-    const t=c(a.top-b.top,b.height-40),bo=c(b.bottom-a.bottom,b.height-t-40),l=c(a.left-b.left,b.width-40),r=c(b.right-a.right,b.width-l-40);
-    dlg.animate([
-      {clipPath:`inset(${t}px ${r}px ${bo}px ${l}px round 18px)`,opacity:.7},
-      {clipPath:'inset(0 0 0 0 round 24px)',opacity:1}
-    ],{duration:440,easing:'cubic-bezier(.2,.8,.2,1)'});
+  projectPanel.hidden=false;
+  projectPanel.dataset.slug=slug;
+  mapStage.classList.add('project-open');
+  pinProjectNode(slug);
+  projectPanel.scrollTop=0;
+  const mapBounds=$('#mapa').getBoundingClientRect();
+  if(mapBounds.top<64||mapBounds.top>96)scrollTo({top:scrollY+mapBounds.top-76,behavior:'instant'});
+  if(sourceRect&&!wasOpen&&!matchMedia('(prefers-reduced-motion: reduce)').matches){
+    const b=projectPanel.getBoundingClientRect();
+    const x=Math.max(0,Math.min(b.width,sourceRect.left+sourceRect.width/2-b.left));
+    const y=Math.max(0,Math.min(b.height,sourceRect.top+sourceRect.height/2-b.top));
+    projectPanel.animate([{clipPath:`circle(8px at ${x}px ${y}px)`,opacity:.4},{clipPath:`circle(${Math.hypot(b.width,b.height)}px at ${x}px ${y}px)`,opacity:1}],{duration:600,easing:'cubic-bezier(.2,.8,.2,1)'});
   }
-  $('#dclose').onclick=()=>dlg.close();
+  $('#d-title').tabIndex=-1;
+  $('#d-title').focus({preventScroll:true});
+  $('#dclose').onclick=()=>closeProject();
   if(!matchMedia('(prefers-reduced-motion: reduce)').matches){
     caseObserver=new IntersectionObserver(entries=>entries.forEach(entry=>{
       if(entry.isIntersecting){entry.target.classList.add('case-visible');caseObserver.unobserve(entry.target)}
-    }),{root:dlg,threshold:.06});
-    $$('.case-grid section, .arch, .decisions > div, .state-note',dlg).forEach((el,k)=>{
+    }),{root:projectPanel,threshold:.06});
+    $$('.case-grid section, .arch, .decisions > div, .state-note',projectPanel).forEach((el,k)=>{
       el.classList.add('case-reveal');el.style.setProperty('--case-delay',(k%3)*65+'ms');caseObserver.observe(el);
     });
   }
-  $$('[data-go]',dlg).forEach(b=>b.onclick=()=>openProject(b.dataset.go));
-  $$('[data-t]',dlg).forEach(b=>b.onclick=()=>{dlg.close();state.tech=b.dataset.t;update();$('#proyectos').scrollIntoView({behavior:'smooth'})});
+  $$('[data-go]',projectPanel).forEach(b=>b.onclick=()=>openProject(b.dataset.go));
+  $$('[data-t]',projectPanel).forEach(b=>b.onclick=()=>{closeProject(false);state.tech=b.dataset.t;update();$('#mapa').scrollIntoView({behavior:'smooth'})});
   if(!noHash) setHash('#p='+slug);
 }
-dlg.addEventListener('click',e=>{if(e.target===dlg)dlg.close()});
-dlg.addEventListener('close',()=>{caseObserver?.disconnect();if(location.hash.startsWith('#p='))setHash(location.pathname+location.search)});
-dlg.addEventListener('keydown',e=>{
-  if(e.key==='ArrowRight'||e.key==='ArrowLeft'){
-    const cur=location.hash.slice(3),i=PROJECTS.findIndex(p=>p.slug===cur);
-    if(i>=0)openProject(PROJECTS[(i+(e.key==='ArrowRight'?1:PROJECTS.length-1))%PROJECTS.length].slug);
-  }
-});
+function paintMapPositions(){
+  if(!MAP)return;
+  MAP.nodes.forEach(n=>n.el.style.transform=`translate(${n.x}px,${n.y}px)`);
+  MAP.edges.forEach(e=>{const a=MAP.nodes[e.i],b=MAP.nodes[e.j];e.el.setAttribute('x1',a.x);e.el.setAttribute('y1',a.y);e.el.setAttribute('x2',b.x);e.el.setAttribute('y2',b.y)});
+}
+function pinProjectNode(slug){
+  if(!MAP)return;
+  MAP.nodes.forEach(n=>{if(n.projectPinned){n.x=n.X;n.y=n.Y;n.projectPinned=false}});
+  const n=MAP.nodes.find(n=>n.id===slug);if(!n)return;
+  const v=MAP.svg.viewBox.baseVal,mobile=mapStage.clientWidth<=760;
+  n.projectPinned=true;n.x=v.width*(mobile ? .5 : .15);n.y=v.height*(mobile ? .1 : .5);n.vx=0;n.vy=0;
+  MAP.selected=slug;
+  MAP.nodes.forEach(x=>{x.el.classList.toggle('sel',x===n);if(x.type==='p')x.el.setAttribute('aria-expanded',String(x===n))});highlight(slug);paintMapPositions();
+  const pt=MAP.svg.createSVGPoint();pt.x=n.x;pt.y=n.y;
+  const screen=pt.matrixTransform(MAP.svg.getScreenCTM()),bounds=mapStage.getBoundingClientRect(),panel=projectPanel.getBoundingClientRect();
+  const x=screen.x-bounds.left,y=screen.y-bounds.top,tx=mobile?panel.left+panel.width/2-bounds.left:panel.left-bounds.left,ty=mobile?panel.top-bounds.top:panel.top+panel.height/2-bounds.top;
+  $('#mapConnection').setAttribute('d',mobile?`M${x} ${y} L${tx} ${ty}`:`M${x} ${y} C${x+90} ${y},${tx-90} ${ty},${tx} ${ty}`);
+}
+function closeProject(restoreFocus=true){
+  if(projectPanel.hidden)return;
+  const slug=projectPanel.dataset.slug;
+  caseObserver?.disconnect();projectPanel.hidden=true;mapStage.classList.remove('project-open');
+  MAP?.nodes.forEach(n=>{if(n.projectPinned){n.x=n.X;n.y=n.Y;n.projectPinned=false}if(n.type==='p')n.el.setAttribute('aria-expanded','false')});paintMapPositions();
+  if(location.hash.startsWith('#p='))setHash('#mapa');
+  if(restoreFocus)MAP?.nodes.find(n=>n.id===slug)?.el.focus({preventScroll:true});
+}
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!projectPanel.hidden){e.preventDefault();closeProject()}});
 
 /* ---------- progreso, navegación, copiar ---------- */
 const bar=$('#progress');
@@ -598,7 +472,7 @@ document.addEventListener('click',e=>{
 });
 
 /* ---------- arranque ---------- */
-renderProjects();renderStack();buildMap();
+renderStack();buildMap();
 {
   let lw=$('#mapfull').clientWidth,lh=$('#mapfull').clientHeight,tm=null;
   new ResizeObserver(()=>{

@@ -37,8 +37,7 @@
     <a class="brand" href="#inicio" aria-label="Javier García, inicio"><svg aria-hidden="true"><use href="#mono"/></svg></a>
     <nav class="main" id="mainnav" aria-label="Principal">
       <a href="#trayectoria">Trayectoria</a>
-      <a href="#mapa">Mapa</a>
-      <a href="#proyectos">Proyectos</a>
+      <a href="#mapa">Proyectos</a>
       <a href="#stack">Stack</a>
       <a href="#contacto">Contacto</a>
       <span class="nav-cursor" id="navCursor" aria-hidden="true"></span>
@@ -84,7 +83,7 @@
   <div class="tn-hero-lite sr" id="tnHeroLite">
     <p class="tn-sub">Full Stack &amp; IA</p>
     <div class="cta">
-      <a class="btn primary" href="#proyectos">Explorar proyectos</a>
+      <a class="btn primary" href="#mapa">Explorar proyectos</a>
       <a class="btn ghost" href="assets/cv-javi-garcia.pdf" download>Ver CV</a>
     </div>
   </div>
@@ -96,26 +95,14 @@
     <svg id="map" role="group" aria-label="Mapa de proyectos y tecnologías. Cada círculo grande es un proyecto y cada círculo pequeño, una tecnología."></svg>
     <div class="mapfull-head">
       <h2 class="eyebrow">Mis proyectos</h2>
+      <span class="active-tech" id="techchip"><span>Tecnología: <b id="techname"></b></span><button type="button" id="techclear" aria-label="Quitar filtro de tecnología">×</button></span>
       <p class="sub">Cada proyecto tiene una historia. Abre un nodo para descubrir qué problema resuelve, cómo lo construí y por qué tomé cada decisión.</p>
     </div>
     <div class="map-readout" id="readout" aria-live="polite">
       <p class="map-hint">Abre un proyecto para explorar su historia completa. Los nodos pequeños te muestran las tecnologías. También puedes arrastrarlos.</p>
     </div>
-  </div>
-</section>
-
-<section id="proyectos" class="reveal">
-  <div class="wrap">
-    <div class="sec-head">
-      <div>
-        <h2 class="eyebrow">Proyectos</h2>
-        <p class="sub">Proyectos propios con código abierto. En cada uno cuento el problema, la solución, por qué la construí así y en qué estado está de verdad.</p>
-      </div>
-    </div>
-    <div class="tools">
-      <span class="active-tech" id="techchip"><span>Tecnología: <b id="techname"></b></span><button type="button" id="techclear" aria-label="Quitar filtro de tecnología">×</button></span>
-    </div>
-    <div class="proyectos-lista" id="proyectos-lista"></div>
+    <svg class="map-connection" aria-hidden="true"><path id="mapConnection"/></svg>
+    <article id="projectDetail" class="map-project from-map" aria-labelledby="d-title" hidden></article>
   </div>
 </section>
 
@@ -164,7 +151,6 @@
 
 <footer><div class="wrap"><span>© 2026 · Desarrollo de software con visión de producto</span><a href="#inicio">Volver arriba</a></div></footer>
 
-<dialog id="dlg" aria-labelledby="d-title"></dialog>
 <div id="toast" role="status" aria-live="polite"></div>
 
 <script defer src="assets/vendor/gsap.min.js"></script>

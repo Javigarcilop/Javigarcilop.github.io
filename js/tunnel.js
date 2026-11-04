@@ -56,7 +56,7 @@ async function start(){
         +'<div class="tn-intro-title"><p class="tn-kicker">Desarrollo con visión de producto</p>'
         +'<h1>'+title.replace('no la aprendí programando.','<span>no la aprendí programando.</span>')+'</h1>'
         +'<p class="tn-intro-promise">Entender a las personas.<br>Dar forma a las ideas.<br>Hacer que funcionen.</p>'
-        +'<div class="tn-cta cta"><a class="btn primary" href="#proyectos">Explorar proyectos ↗</a><a class="btn ghost" href="assets/cv-javi-garcia.pdf" download>Ver CV</a></div></div>'
+        +'<div class="tn-cta cta"><a class="btn primary" href="#mapa">Explorar proyectos ↗</a><a class="btn ghost" href="assets/cv-javi-garcia.pdf" download>Ver CV</a></div></div>'
         +'<div class="tn-intro-bio"><p class="tn-badge"><i aria-hidden="true"></i>'+esc(s.badge)+'</p>'
         +'<p class="tn-intro-label">Quién soy / Full Stack &amp; IA</p>'
         +(s.texto||[]).map(p=>'<p class="tn-intro-paragraph">'+esc(p)+'</p>').join('')
