@@ -534,9 +534,9 @@ function start(){
     const exitTexSign=canvasTex(256,160,(x,w,h)=>{
       x.fillStyle='#0b7d3f';x.fillRect(0,0,w,h);
       x.strokeStyle='#e8fff0';x.lineWidth=6;x.strokeRect(6,6,w-12,h-12);
-      x.fillStyle='#fff';x.font='700 44px Geist,Segoe UI,sans-serif';x.textAlign='center';x.fillText('SALIDA',w/2+20,64);
+      x.fillStyle='#fff';x.font="700 44px 'Space Grotesk',Segoe UI,sans-serif";x.textAlign='center';x.fillText('SALIDA',w/2+20,64);
       x.beginPath();x.moveTo(30,102);x.lineTo(104,102);x.lineTo(104,88);x.lineTo(136,112);x.lineTo(104,136);x.lineTo(104,122);x.lineTo(30,122);x.closePath();x.fill();
-      x.font='600 26px Geist,Segoe UI,sans-serif';x.fillText('EXIT',w/2+66,134);
+      x.font="600 26px 'Space Grotesk',Segoe UI,sans-serif";x.fillText('EXIT',w/2+66,134);
     },true,false);
     const exitMat=track(new THREE.MeshBasicMaterial({map:exitTexSign,color:new THREE.Color(1.7,1.7,1.7)}));
     const exitGeo=track(new THREE.PlaneGeometry(1.7,1.06));
@@ -563,8 +563,8 @@ function start(){
     /* Puntos de control: cada etapa es un pórtico luminoso sobre la carretera, con el número pintado en el asfalto */
     const labelScene=new THREE.Scene();
     const BW=2048,BH=980,BWORLD=12.4,BCY=1.6,BDIST=12;
-    const FONT="Geist,'Segoe UI',system-ui,sans-serif";
-    try{await Promise.race([document.fonts.load('700 96px Geist'),new Promise(r=>setTimeout(r,1500))])}catch(e){}
+    const FONT="'Space Grotesk','Segoe UI',system-ui,sans-serif";
+    try{await Promise.race([document.fonts.load("700 96px 'Space Grotesk'"),new Promise(r=>setTimeout(r,1500))])}catch(e){}
     const mctx=document.createElement('canvas').getContext('2d');
     const wrapText=(ctx,text,max)=>{
       const out=[];let line='';
@@ -686,7 +686,7 @@ function start(){
     const roadMarks=[];
     for(let k=1;k<=SEG;k++){
       const tex=canvasTex(256,256,(x,w,h)=>{
-        x.fillStyle='#e9eef8';x.font='800 150px Geist,Segoe UI,sans-serif';x.textAlign='center';x.textBaseline='middle';
+        x.fillStyle='#e9eef8';x.font="800 150px 'Space Grotesk',Segoe UI,sans-serif";x.textAlign='center';x.textBaseline='middle';
         x.fillText(k<=4?'0'+k:'★',w/2,h/2+8);
         for(let i=0;i<500;i++){x.clearRect(rnd()*w,rnd()*h,1+rnd()*3,1+rnd()*2)}
       },true,false);

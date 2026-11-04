@@ -50,7 +50,7 @@ Todo está en `js/data.js`. Cada proyecto es un objeto de la lista `PROJECTS`:
 ## Cambiar el aspecto
 
 - **Colores:** variables CSS al inicio de `css/styles.css` (`--blue`, `--ink`, `--cyan`, `--bg`…). Hay un bloque para el modo claro y otro para el oscuro.
-- **Tipografía:** Geist, cargada desde Google Fonts en `index.html`. Si la cambias, actualiza también `--font` en el CSS.
+- **Tipografía:** Space Grotesk (titulares/cuerpo) y JetBrains Mono (detalles técnicos), cargadas desde Google Fonts en `index.html`. Si la cambias, actualiza también `--f-head`/`--f-code` en el CSS.
 - **Textos fijos** (titular, sobre mí, contacto, enlace de LinkedIn): directamente en `index.html`.
 
 ## Publicarlo
