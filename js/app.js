@@ -215,6 +215,7 @@ function renderStack(focusT){
 }
 
 /* ---------- mapa interactivo ---------- */
+const MAP_HINT='Abre un nodo de proyecto para descubrir su problema, solución y decisiones. Los nodos pequeños te muestran las tecnologías. También puedes arrastrarlos.';
 let MAP=null;
 function buildMap(){
   if(MAP&&MAP.raf)cancelAnimationFrame(MAP.raf);
@@ -226,7 +227,7 @@ function buildMap(){
   const kz=cw<600?1:cw<1000?1.25:1.5;
   const W=Math.round(cw/kz),H=Math.round(ch/kz);
   svg.setAttribute('viewBox','0 0 '+W+' '+H);
-  $('#readout').innerHTML='<p class="map-hint">Selecciona un nodo para ver qué es y dónde lo uso. Puedes arrastrarlos.</p>';
+  $('#readout').innerHTML='<p class="map-hint">'+MAP_HINT+'</p>';
   const techs=[...new Set(PROJECTS.flatMap(p=>p.stack))];
   const nodes=[...PROJECTS.map(p=>({id:p.slug,type:'p',label:p.short,r:15,p})),...techs.map(t=>({id:'t:'+t,type:'t',label:t,r:6,t}))];
   const idx=Object.fromEntries(nodes.map((n,i)=>[n.id,i]));
@@ -278,7 +279,7 @@ function buildMap(){
     const isIA=n.type==='t'&&TECH[n.t]==='IA y automatización';
     g.setAttribute('class','node '+n.type+(isIA?' ia':''));
     g.setAttribute('tabindex','0');g.setAttribute('role','button');
-    g.setAttribute('aria-label',n.type==='p'?'Proyecto '+n.p.title+', ver detalle':'Tecnología '+n.t+', ver dónde la uso');
+    g.setAttribute('aria-label',n.type==='p'?'Proyecto '+n.p.title+', abrir historia completa':'Tecnología '+n.t+', ver dónde la uso');
     g.style.transitionDelay=reduce?'0s':(k*25)+'ms';
     g.style.transform=reduce?`translate(${n.X}px,${n.Y}px)`:`translate(${W/2}px,${H/2}px)`;
     if(n.type==='p'){
@@ -391,7 +392,7 @@ function toSvgPoint(svg,clientX,clientY){
 }
 function selectNode(n){
   const box=$('#readout');
-  if(MAP.selected===n.id){MAP.selected=null;MAP.nodes.forEach(x=>x.el.classList.remove('sel'));highlight(null);box.innerHTML='<p class="map-hint">Selecciona un nodo para ver qué es y dónde lo uso. Puedes arrastrarlos.</p>';return}
+  if(MAP.selected===n.id&&n.type!=='p'){MAP.selected=null;MAP.nodes.forEach(x=>x.el.classList.remove('sel'));highlight(null);box.innerHTML='<p class="map-hint">'+MAP_HINT+'</p>';return}
   MAP.selected=n.id;
   MAP.nodes.forEach(x=>x.el.classList.toggle('sel',x===n));
   highlight(n.id);
@@ -400,13 +401,14 @@ function selectNode(n){
     box.innerHTML=`<span class="ro-kind">Proyecto · ${esc(p.status)}</span>
       <h3>${esc(p.title)}</h3><p>${esc(p.summary)}</p>
       <div class="ro-actions"><button type="button" class="btn primary sm" data-open="${esc(p.slug)}">Ver caso de estudio</button></div>`;
+    openProject(p.slug,false,n.el);
   }else{
     const used=PROJECTS.filter(p=>p.stack.includes(n.t));
     box.innerHTML=`<span class="ro-kind">${esc(TECH[n.t]||'Tecnología')}</span>
       <h3>${esc(n.t)}</h3><p>${esc(TECH_USE[n.t]||'')}</p>
       <div class="ro-actions">${used.map(p=>`<button type="button" class="btn ghost sm" data-open="${esc(p.slug)}">${esc(p.title)} →</button>`).join('')}</div>`;
   }
-  $$('[data-open]',box).forEach(b=>b.onclick=()=>openProject(b.dataset.open));
+  $$('[data-open]',box).forEach(b=>b.onclick=e=>openProject(b.dataset.open,false,e.currentTarget));
 }
 function highlight(id){
   if(!MAP)return;
@@ -429,24 +431,28 @@ function markMap(){
 
 /* ---------- detalle de proyecto ---------- */
 const dlg=$('#dlg');
+let caseObserver=null;
 /* Cambia la URL sin recargar; algunos navegadores lo bloquean al abrir el archivo directamente (file://). */
 function setHash(h){try{history.replaceState(null,'',h)}catch(e){}}
 function openProject(slug,noHash,from){
   const i=PROJECTS.findIndex(p=>p.slug===slug); if(i<0)return;
   const p=PROJECTS[i],prev=PROJECTS[(i-1+PROJECTS.length)%PROJECTS.length],next=PROJECTS[(i+1)%PROJECTS.length];
+  caseObserver?.disconnect();
+  if(!dlg.open)dlg.classList.toggle('from-map',!!from?.closest('#map'));
   const links=(p.links||[]).map(l=>`<a class="btn ${/demo/i.test(l.label)?'primary':'ghost'}" href="${esc(l.url)}" target="_blank" rel="noopener">${esc(l.label)}</a>`).join('');
   const list=a=>`<ul>${(a||[]).map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`;
   const diagram=(p.diagram||[]).map(([t,s],k)=>`${k?'<span class="arch-link"></span>':''}<span class="arch-node" style="--k:${k}"><b>${esc(t)}</b><small>${esc(s)}</small></span>`).join('');
   dlg.innerHTML=`
-    <div class="d-art">${cover(p,640,190)}<button class="icon-btn d-close" type="button" aria-label="Cerrar" id="dclose"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+    <div class="d-art">${cover(p,640,190)}<p class="d-origin"><span></span>Del nodo al producto</p><button class="icon-btn d-close" type="button" aria-label="Cerrar" id="dclose"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
     <div class="d-body">
       <span class="status ${p.ok?'ok':''}"><i></i>${esc(p.status)}</span>
       <h2 id="d-title">${esc(p.title)}</h2>
       <div class="d-meta"><span>${esc(p.type)}</span><span>${esc(p.context)}</span></div>
+      <p class="d-story-intro">Una idea por fuera. Todo un sistema por dentro.</p>
       <div class="case-grid">
-        <section><h3>Contexto</h3><p>${esc(p.context_long||p.context)}</p></section>
-        <section><h3>Problema</h3><p>${esc(p.problem||'')}</p></section>
-        <section><h3>Solución</h3><p>${esc(p.solution||p.summary)}</p></section>
+        <section><span class="case-step" aria-hidden="true">01 / EL PUNTO DE PARTIDA</span><h3>Contexto</h3><p>${esc(p.context_long||p.context)}</p></section>
+        <section><span class="case-step" aria-hidden="true">02 / LO QUE HABÍA QUE RESOLVER</span><h3>Problema</h3><p>${esc(p.problem||'')}</p></section>
+        <section><span class="case-step" aria-hidden="true">03 / LO QUE CONSTRUÍ</span><h3>Solución</h3><p>${esc(p.solution||p.summary)}</p></section>
       </div>
       ${diagram?`<h3>Arquitectura</h3><div class="arch" role="img" aria-label="Flujo: ${esc(p.diagram.map(d=>d[0]).join(', '))}">${diagram}</div>`:''}
       <h3>Mi aportación</h3>${list(p.highlights)}
@@ -477,12 +483,20 @@ function openProject(slug,noHash,from){
     ],{duration:440,easing:'cubic-bezier(.2,.8,.2,1)'});
   }
   $('#dclose').onclick=()=>dlg.close();
+  if(!matchMedia('(prefers-reduced-motion: reduce)').matches){
+    caseObserver=new IntersectionObserver(entries=>entries.forEach(entry=>{
+      if(entry.isIntersecting){entry.target.classList.add('case-visible');caseObserver.unobserve(entry.target)}
+    }),{root:dlg,threshold:.06});
+    $$('.case-grid section, .arch, .decisions > div, .state-note',dlg).forEach((el,k)=>{
+      el.classList.add('case-reveal');el.style.setProperty('--case-delay',(k%3)*65+'ms');caseObserver.observe(el);
+    });
+  }
   $$('[data-go]',dlg).forEach(b=>b.onclick=()=>openProject(b.dataset.go));
   $$('[data-t]',dlg).forEach(b=>b.onclick=()=>{dlg.close();state.tech=b.dataset.t;update();$('#proyectos').scrollIntoView({behavior:'smooth'})});
   if(!noHash) setHash('#p='+slug);
 }
 dlg.addEventListener('click',e=>{if(e.target===dlg)dlg.close()});
-dlg.addEventListener('close',()=>{if(location.hash.startsWith('#p='))setHash(location.pathname+location.search)});
+dlg.addEventListener('close',()=>{caseObserver?.disconnect();if(location.hash.startsWith('#p='))setHash(location.pathname+location.search)});
 dlg.addEventListener('keydown',e=>{
   if(e.key==='ArrowRight'||e.key==='ArrowLeft'){
     const cur=location.hash.slice(3),i=PROJECTS.findIndex(p=>p.slug===cur);
