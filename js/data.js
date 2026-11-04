@@ -1,6 +1,6 @@
 
 const TECH = {
-  'PHP':'Backend','MySQL':'Backend','CodeIgniter':'Backend',
+  'PHP':'Servidor','MySQL':'Servidor','CodeIgniter':'Servidor',
   'Angular':'Frontend','JavaScript':'Frontend','HTML y CSS':'Frontend',
   'Gemini API':'IA y automatización',
   'Docker':'Herramientas','Vercel':'Herramientas','Git':'Herramientas'
@@ -12,7 +12,7 @@ const TECH_TIERS = {
   'Gemini API':['proj'],
   'Docker':['proj'],'Vercel':['proj'],'Git':['pro','proj']
 };
-const CATS = ['Backend','Frontend','IA y automatización'];
+const CATS = ['Servidor','Frontend','IA y automatización'];
 /* Para qué uso cada tecnología, según los proyectos reales */
 const TECH_USE = {
   'PHP':'API REST y lógica de negocio de TempliMail, sin framework: autenticación JWT, cola de envíos y validaciones.',
@@ -20,7 +20,7 @@ const TECH_USE = {
   'Angular':'Interfaz de TempliMail con componentes standalone, formularios y vista previa de correos.',
   'JavaScript':'Frontend del Generador de especificaciones, sin frameworks.',
   'Gemini API':'Generar historias de usuario, criterios de aceptación y roadmap a partir de una idea.',
-  'Docker':'Entorno reproducible de TempliMail: backend, base de datos y worker de envíos.',
+  'Docker':'Entorno reproducible de TempliMail: servidor, base de datos y worker de envíos.',
   'Vercel':'Función serverless que llama a Gemini sin exponer la clave en el navegador.',
   'CodeIgniter':'Framework PHP de aplicaciones web de empresa en producción.',
   'HTML y CSS':'Maquetación semántica, accesible y responsive. Este portfolio está hecho a mano, sin frameworks.',
@@ -30,8 +30,8 @@ const TECH_USE = {
 const PROJECTS = [
   {
     slug:'templimail', title:'TempliMail', short:'TempliMail', type:'Plataforma de email marketing', context:'Proyecto personal',
-    status:'En desarrollo', ok:false, cats:['Backend','Frontend'],
-    summary:'Plataforma de email marketing con interfaz en Angular 19 y backend en PHP, en un entorno reproducible con Docker.',
+    status:'En desarrollo', ok:false, cats:['Servidor','Frontend'],
+    summary:'Plataforma de email marketing con interfaz en Angular 19 y servidor en PHP, en un entorno reproducible con Docker.',
     context_long:'Proyecto propio que nace como proyecto final del ciclo de Desarrollo de Aplicaciones Web y que sigo evolucionando para practicar producto de principio a fin.',
     problem:'Enviar comunicaciones personalizadas a una lista de contactos obliga a gestionar contactos, plantillas, envíos programados y bajas, y a saber exactamente qué recibió cada persona.',
     solution:'Una aplicación web en la que cada usuario gestiona sus contactos y grupos, diseña plantillas con variables como {{nombre}}, lanza campañas inmediatas o programadas y consulta el estado de cada entrega.',
@@ -39,7 +39,7 @@ const PROJECTS = [
       'Modelo de datos, API, interfaz y entorno: todo el producto de principio a fin.',
       'API REST en PHP con autenticación JWT y datos aislados por usuario.',
       'Frontend en Angular 19 con componentes standalone.',
-      'Entorno reproducible con Docker: backend, MySQL, worker de envíos y servidor de correo de pruebas.'
+      'Entorno reproducible con Docker: PHP, MySQL, worker de envíos y servidor de correo de pruebas.'
     ],
     decisions:[
       ['PHP sin framework','Router por tabla y capas controlador, servicio y modelo: control directo sobre HTTP, autenticación y validación, sin depender de un framework.'],
@@ -57,7 +57,7 @@ const PROJECTS = [
       'Lo difícil de un producto que parece sencillo está en los casos límite: reintentos, bajas, permisos y zonas horarias.',
       'Tener pruebas automáticas de los flujos críticos me da confianza para cambiar código sin miedo a romper algo.'
     ],
-    statusNote:'En desarrollo. La demo online usa un backend simulado en el navegador: los datos son de ejemplo y no se envía ningún correo real.',
+    statusNote:'En desarrollo. La demo online usa un servidor simulado en el navegador: los datos son de ejemplo y no se envía ningún correo real.',
     diagram:[['Angular','Interfaz'],['API PHP','JWT · validación'],['MySQL','Datos por usuario'],['Worker','Cola y reintentos']],
     stack:['Angular','PHP','MySQL','Docker'],
     links:[

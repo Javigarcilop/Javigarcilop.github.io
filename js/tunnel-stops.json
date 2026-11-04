@@ -8,10 +8,10 @@
       "titulo": "Mi mayor ventaja como developer no la aprendí programando.",
       "badge": "Abierto a nuevas oportunidades",
       "texto": [
-        "Soy desarrollador web Full Stack, cada vez más enfocado en backend. Vengo del marketing y del diseño gráfico, y la curiosidad por saber cómo se construía por dentro lo que diseñaba me llevó al software.",
-        "Hoy desarrollo y evoluciono aplicaciones en entornos reales: formación, FUNDAE, SEPE, integración de sistemas y automatización de procesos. Mi camino apunta al backend, la automatización y la inteligencia artificial."
+        "Soy desarrollador web Full Stack, cada vez más enfocado en el servidor. Vengo del marketing y del diseño gráfico, y la curiosidad por saber cómo se construía por dentro lo que diseñaba me llevó al software.",
+        "Hoy desarrollo y evoluciono aplicaciones en entornos reales: formación, FUNDAE, SEPE, integración de sistemas y automatización de procesos. Mi camino apunta al servidor, la automatización y la inteligencia artificial."
       ],
-      "chips": ["Full Stack", "Backend", "Automatización", "IA aplicada"]
+      "chips": ["Full Stack", "Servidor", "Automatización", "IA aplicada"]
     },
     {
       "id": "marketing",
@@ -41,7 +41,7 @@
       "lado": "left",
       "fase": "Código",
       "ask": "¿Cómo lo convierto en algo que funciona?",
-      "texto": ["Doy forma real a esa experiencia: base de datos, backend e interfaz conectados, con integraciones y automatización de procesos."],
+      "texto": ["Doy forma real a esa experiencia: base de datos, servidor e interfaz conectados, con integraciones y automatización de procesos."],
       "formacion": [
         {"titulo": "Ciclo Formativo de Grado Superior en Desarrollo de Aplicaciones Web (DAW)", "lugar": "Centro Universitario EUSA", "fechas": "2023 – 2025"},
         {"titulo": "RPA (Robotic Process Automation) con UiPath", "lugar": "Fundación Generation España", "fechas": "ene. – abr. 2022"}

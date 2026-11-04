@@ -182,7 +182,7 @@ const TIER_LABEL={pro:'Experiencia profesional',proj:'Proyectos propios'};
 let stackSel=null;
 function renderStack(focusT){
   const box=$('#stack-groups'); box.innerHTML='';
-  ['Backend','Frontend','IA y automatización','Herramientas'].forEach(g=>{
+  ['Servidor','Frontend','IA y automatización','Herramientas'].forEach(g=>{
     const techs=Object.keys(TECH).filter(t=>TECH[t]===g&&TECH_TIERS[t]);
     if(!techs.length) return;
     const d=document.createElement('div');

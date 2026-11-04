@@ -35,7 +35,7 @@ Todo está en `js/data.js`. Cada proyecto es un objeto de la lista `PROJECTS`:
   context: 'Proyecto personal',   // dónde o para quién
   status: 'En desarrollo',        // texto del estado
   ok: false,                      // true = punto verde (terminado o en producción)
-  cats: ['Backend','Frontend'],   // categorías para los filtros (deben estar en CATS)
+  cats: ['Servidor','Frontend'],   // categorías para los filtros (deben estar en CATS)
   summary: 'Una o dos frases.',   // resumen de la tarjeta
   highlights: ['Qué hice 1', 'Qué hice 2'],
   stack: ['PHP','MySQL'],         // tecnologías: deben existir en TECH
