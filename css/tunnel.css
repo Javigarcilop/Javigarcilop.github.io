@@ -118,10 +118,10 @@
 /* ---------- cabecera propia, coordenadas, timeline, pista de scroll ---------- */
 .tn-hud{position:absolute;z-index:4;left:0;right:0;top:0;display:flex;align-items:center;justify-content:space-between;padding:calc(16px + env(safe-area-inset-top,0px)) clamp(16px,3vw,32px) 0;pointer-events:none}
 .tn-hud img{width:32px;height:32px;flex:none}
-.tn-hud .tn-pill-badge{font-family:var(--f-code);font-size:.78rem;color:var(--lt-blue2);background:color-mix(in srgb,#101E32 85%,transparent);border:1px solid var(--lt-line);padding:6px 12px;border-radius:999px;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+.tn-hud .tn-pill-badge{font-family:var(--f-code);font-size:.78rem;color:var(--lt-blue2);background:color-mix(in srgb,#101E32 94%,transparent);border:1px solid var(--lt-line);padding:6px 12px;border-radius:999px}
 .tn-coords{position:absolute;z-index:4;right:clamp(16px,3vw,32px);top:calc(64px + env(safe-area-inset-top,0px));font-family:var(--f-code);font-size:.72rem;color:var(--lt-muted)}
 
-.tn-timeline{position:absolute;z-index:5;left:50%;transform:translateX(-50%);bottom:calc(20px + env(safe-area-inset-bottom,0px));width:min(960px,calc(100% - 32px));height:54px;display:flex;overflow-x:auto;overflow-y:hidden;scrollbar-width:thin;scrollbar-color:#42647D transparent;background:color-mix(in srgb,#101E32 90%,transparent);border:1px solid var(--lt-line);border-radius:14px;-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);box-shadow:0 18px 40px -24px rgba(18,63,130,.6)}
+.tn-timeline{position:absolute;z-index:5;left:50%;transform:translateX(-50%);bottom:calc(20px + env(safe-area-inset-bottom,0px));width:min(960px,calc(100% - 32px));height:54px;display:flex;overflow-x:auto;overflow-y:hidden;scrollbar-width:thin;scrollbar-color:#42647D transparent;background:color-mix(in srgb,#101E32 95%,transparent);border:1px solid var(--lt-line);border-radius:14px;box-shadow:0 18px 40px -24px rgba(18,63,130,.6)}
 .tn-timeline button{all:unset;box-sizing:border-box;position:relative;flex:1 0 auto;min-width:max-content;font:500 .875rem var(--f-code);color:var(--lt-muted);cursor:pointer;border-right:1px solid var(--lt-line);padding:0 16px;display:flex;align-items:center;justify-content:center;text-align:center;white-space:nowrap;transition:color .2s,background .2s}
 .tn-timeline button:last-of-type{border-right:0;border-radius:0 13px 13px 0}
 .tn-timeline button:first-of-type{border-radius:13px 0 0 13px}

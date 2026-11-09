@@ -29,7 +29,7 @@ button{font:inherit;color:inherit;cursor:pointer}
 #progress{position:fixed;left:0;top:0;height:3px;width:0;background:linear-gradient(90deg,var(--blue),var(--cyan));z-index:60}
 
 /* cabecera */
-header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:50;background:color-mix(in srgb,var(--bg) 82%,transparent);backdrop-filter:saturate(1.4) blur(14px);-webkit-backdrop-filter:saturate(1.4) blur(14px);border-bottom:1px solid var(--line)}
+header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:50;background:color-mix(in srgb,var(--bg) 94%,transparent);border-bottom:1px solid var(--line)}
 .top .wrap{height:var(--header-h);display:flex;align-items:center;gap:20px}
 .brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--ink);font-weight:700;letter-spacing:-.01em}
 .brand img{width:40px;height:40px;flex:none}
