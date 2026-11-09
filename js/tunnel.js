@@ -206,6 +206,19 @@ async function start(){
     tmx=(e.clientX/innerWidth-.5)*2;tmy=-(e.clientY/innerHeight-.5)*2;
   },{passive:true});
 
+  /* Geometría de la timeline en caché: el bucle no lee offsetLeft/offsetWidth/clientWidth (evita layout forzado por frame) */
+  const geo=[];let tlW=0;
+  const measureTl=()=>{
+    tlW=timeline.clientWidth;
+    phases.forEach((x,i)=>{geo[i]={l:x.el.offsetLeft,w:x.el.offsetWidth}});
+    dirty=true;
+  };
+  measureTl();
+  if('ResizeObserver' in window){
+    const tro=new ResizeObserver(measureTl);
+    tro.observe(timeline);phases.forEach(x=>tro.observe(x.el));
+  }
+
   const updateUI=()=>{
     const cz=p*ZMAX;
     for(const grp of groups){
@@ -220,15 +233,15 @@ async function start(){
       if(o<.5)q.slot.setAttribute('inert','');else q.slot.removeAttribute('inert');
     }
     let ph=0;for(let k=0;k<phases.length;k++)if(p>=phases[k].a)ph=k;
-    if(ph!==lastPhase||timeline.clientWidth!==lastTimelineWidth){
+    if(ph!==lastPhase||tlW!==lastTimelineWidth){
       lastPhase=ph;
-      lastTimelineWidth=timeline.clientWidth;
+      lastTimelineWidth=tlW;
       phases.forEach((x,n)=>x.el.setAttribute('aria-current',n===ph?'true':'false'));
-      const active=phases[ph].el;
-      timeline.scrollTo({left:Math.max(0,active.offsetLeft-(timeline.clientWidth-active.offsetWidth)/2),behavior:'smooth'});
+      const g=geo[ph];
+      timeline.scrollTo({left:Math.max(0,g.l-(tlW-g.w)/2),behavior:'smooth'});
     }
     const phase=phases[ph],local=clamp((p-phase.a)/(phase.b-phase.a),0,1);
-    head.style.width=(phase.el.offsetLeft+phase.el.offsetWidth*local)+'px';
+    head.style.transform='scaleX('+(geo[ph].l+geo[ph].w*local).toFixed(2)+')';
     const exit=clamp((p-.62)/.38,0,1);
     glow.style.transform='scale('+(.18+exit*2.6).toFixed(3)+')';
     glow.style.opacity=(.12+exit*exit*.88).toFixed(3);
