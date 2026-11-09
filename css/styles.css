@@ -411,7 +411,7 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;
 @media (max-width:600px){.brand{gap:7px}.brand img{width:32px;height:32px}.brand-wordmark{font-size:20px}}
 
 /* La identidad y la navegación siguen el hilo del recorrido. */
-header.top{background:#07101EEB;border-bottom-color:#29405B;box-shadow:0 8px 30px #0002}
+header.top{background:#07101EF7;border-bottom-color:#29405B;box-shadow:0 8px 30px #0002}
 .top .wrap{gap:26px}
 .brand{gap:10px}.brand img{width:52px;height:52px}.brand-wordmark{font-size:28px;letter-spacing:-.05em}
 nav.main{align-self:stretch;align-items:stretch;gap:0;isolation:isolate}
