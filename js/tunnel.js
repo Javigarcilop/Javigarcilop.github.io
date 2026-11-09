@@ -43,7 +43,7 @@ async function start(){
 
   const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   let STOPS=[];
-  try{STOPS=(await fetch('js/tunnel-stops.json').then(r=>r.json())).stops||[]}catch(e){STOPS=[]}
+  try{STOPS=(await fetch('js/tunnel-stops.json?v=20261111').then(r=>r.json())).stops||[]}catch(e){STOPS=[]}
   if(!STOPS.length){document.documentElement.classList.remove('in-tunnel');return}
 
   /* ---------- contenido compartido de una parada (panel 3D y fallback accesible).
@@ -73,7 +73,7 @@ async function start(){
         +'<h1>'+title.replace('no la aprendí programando.','<span>no la aprendí programando.</span>')+'</h1>'
         +'<p class="tn-intro-promise">Entender a las personas.<br>Dar forma a las ideas.<br>Hacer que funcionen.</p>'
         +'<div class="tn-cta cta"><a class="btn primary" href="#mapa">Explorar proyectos ↗</a><a class="btn ghost" href="assets/cv-javi-garcia.pdf" download>Ver CV</a></div></div>'
-        +'<div class="tn-intro-bio"><p class="tn-badge"><i aria-hidden="true"></i>'+esc(s.badge)+'</p>'
+        +'<div class="tn-intro-bio">'+(s.badge?'<p class="tn-badge"><i aria-hidden="true"></i>'+esc(s.badge)+'</p>':'')
         +'<p class="tn-intro-label">Quién soy / Full Stack &amp; IA</p>'
         +(s.texto||[]).map(p=>'<p class="tn-intro-paragraph">'+esc(p)+'</p>').join('')
         +'<div class="tn-intro-signature" aria-hidden="true"><span>mirada</span><i>+</i><span>lógica</span><i>→</i><strong>producto</strong></div>'

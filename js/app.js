@@ -168,7 +168,7 @@ function zoomMap(factor){
   animateMapCamera({x:c.x+(c.w-w)*px,y:c.y+(c.h-h)*py,w,h});
 }
 function ensureMapVisible(){
-  const bounds=$('#mapa').getBoundingClientRect(),offset=$('header.top').offsetHeight+12;
+  const bounds=$('#mapa').getBoundingClientRect(),offset=0;
   if(Math.abs(bounds.top-offset)>12)scrollTo({top:scrollY+bounds.top-offset,behavior:'auto'});
 }
 function moveMap(dx,dy){if(MAP){ensureMapVisible();const c=MAP.camera;animateMapCamera({...c,x:c.x+dx*c.w*.12,y:c.y+dy*c.h*.12})}}
@@ -396,7 +396,7 @@ document.addEventListener('click',e=>{
   const el=document.getElementById(id);
   if(!el)return;
   e.preventDefault();
-  const y=id==='inicio'?0:el.getBoundingClientRect().top+scrollY-$('header.top').offsetHeight-12;
+  const y=id==='inicio'?0:el.getBoundingClientRect().top+scrollY;
   const jump=a.hasAttribute('data-jump');
   scrollTo({top:Math.max(0,y),behavior:jump||matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});
   if(jump){el.setAttribute('tabindex','-1');el.focus({preventScroll:true})}
