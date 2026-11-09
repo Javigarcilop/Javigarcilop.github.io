@@ -418,7 +418,9 @@ document.addEventListener('click',e=>{
   if(!el)return;
   e.preventDefault();
   const y=id==='inicio'?0:el.getBoundingClientRect().top+scrollY-$('header.top').offsetHeight-12;
-  scrollTo({top:Math.max(0,y),behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});
+  const jump=a.hasAttribute('data-jump');
+  scrollTo({top:Math.max(0,y),behavior:jump||matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});
+  if(jump){el.setAttribute('tabindex','-1');el.focus({preventScroll:true})}
   try{history.replaceState(null,'','#'+id)}catch(err){}
 });
 

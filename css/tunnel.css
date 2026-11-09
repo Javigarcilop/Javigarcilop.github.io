@@ -10,8 +10,13 @@
 }
 .tn-anchor{position:absolute;top:60vh;left:0;width:1px;height:1px}
 
-.skip-tunnel{position:fixed;z-index:200;left:16px;top:16px;padding:10px 16px;border-radius:10px;background:#111F34;color:var(--lt-ink);font-weight:500;text-decoration:none;box-shadow:0 10px 30px rgba(10,31,51,.18);transform:translateY(-140%);transition:transform .2s}
-.skip-tunnel:focus{transform:none}
+/* Saltar la animación: dentro de la escena fijada (visible con ratón y táctil mientras dura el túnel, y se va con él).
+   Es el primer elemento enfocable de la sección. */
+.skip-tunnel{position:absolute;z-index:6;right:clamp(16px,3vw,32px);bottom:calc(86px + env(safe-area-inset-bottom,0px));display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 18px;border-radius:999px;border:1px solid color-mix(in srgb,var(--lt-cyan) 45%,var(--lt-line));background:color-mix(in srgb,#101E32 95%,transparent);color:var(--lt-ink);font:500 .8125rem var(--f-code);letter-spacing:.02em;text-decoration:none;box-shadow:0 10px 30px rgba(3,10,24,.45);transition:background .2s,border-color .2s,transform .2s}
+.skip-tunnel:hover{background:var(--lt-cyan-soft);border-color:var(--lt-cyan)}
+.skip-tunnel:active{transform:translateY(1px)}
+.skip-tunnel:focus-visible{outline:2px solid var(--lt-blue2);outline-offset:3px}
+.tn-section.calm .skip-tunnel{display:none}
 
 /* ---------- escena y las dos cámaras ---------- */
 .tn-scene{position:sticky;top:0;height:100svh;overflow:hidden;background:var(--lt-bg);perspective:1000px;perspective-origin:50% 50%}
