@@ -143,12 +143,24 @@ async function start(){
   }));
   panels.forEach(q=>{q.slot.style.transform='translate3d('+q.x+'px,0,'+(-q.at*ZMAX)+'px) translate(-50%,-50%)'});
 
-  /* ---------- tubo de fondo: solo anillos, sin información de relleno (el contenido vive en los paneles) ---------- */
+  /* ---------- tubo de fondo: los anillos cuentan el logo, "del diseño al producto" ----------
+     Como en el símbolo de javigarcilop: al principio solo hay un marco punteado (el boceto), en Diseño aparece el
+     marco sólido y el punteado se le va acercando, en Código casi se han fundido y en Product Engineering e IA queda
+     el marco sólido y claro con el punto cian encendido. Sin texto: la forma cuenta la historia. */
+  const atOf=id=>(STOPS.find(s=>s.id===id)||{}).at;
+  const A_DIS=atOf('diseno')??.5,A_COD=atOf('codigo')??.66,A_PRO=atOf('product-ia')??.9;
+  const lerp=(a,b,t)=>a+(b-a)*Math.max(0,Math.min(1,t));
   const groups=[];
   const frag=document.createDocumentFragment();
   for(let i=1;i<=SLOTS;i++){
+    const f=i*S/ZMAX;
+    let ph,off;
+    if(f<A_DIS-.08){ph='a';off=26}
+    else if(f<A_COD-.06){ph='b';off=lerp(26,10,(f-(A_DIS-.08))/((A_COD-.06)-(A_DIS-.08)))}
+    else if(f<A_PRO-.12){ph='c';off=lerp(10,3,(f-(A_COD-.06))/((A_PRO-.12)-(A_COD-.06)))}
+    else{ph='d';off=0}
     const g=document.createElement('div');g.className='tn-ringgroup';g.style.transform='translateZ('+(-i*S)+'px)';
-    g.innerHTML='<div class="tn-ring'+(i%3===0?' c':'')+'"></div>';
+    g.innerHTML='<div class="tn-frame ph-'+ph+'" style="--off:'+off.toFixed(1)+'px"><i class="tn-back"></i><i class="tn-front"></i><i class="tn-dot"></i></div>';
     frag.appendChild(g);groups.push({el:g,z:-i*S,off:false});
   }
   world.appendChild(frag);

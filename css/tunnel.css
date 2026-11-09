@@ -274,3 +274,17 @@ html.jg-splash-skip .jg-splash-layer{pointer-events:none;opacity:0;transition:op
 @keyframes jgZoom{to{transform:scale(7);opacity:0}}
 @media (prefers-reduced-motion:reduce){html.jg-splash .jg-splash-layer{display:none}}
 
+/* ---------- anillos con la historia del logo: punteado (boceto) -> sólido con punto cian (producto) ---------- */
+.tn-frame{position:absolute;left:-520px;top:-330px;width:1040px;height:660px}
+.tn-frame i{position:absolute;inset:0;border-radius:28px}
+.tn-back{border:3px dashed #5B6B85;opacity:.6;transform:translate(calc(var(--off) * -1),var(--off))}
+.tn-front{border:2px solid transparent}
+.ph-a .tn-front{display:none}
+.ph-b .tn-front{border-color:color-mix(in srgb,var(--lt-blue1) 45%,transparent)}
+.ph-b .tn-back{opacity:.5}
+.ph-c .tn-front{border-color:color-mix(in srgb,var(--lt-blue1) 75%,transparent)}
+.ph-c .tn-back{opacity:.28}
+.ph-d .tn-front{border-color:color-mix(in srgb,#EDF4FF 70%,transparent)}
+.ph-d .tn-back{display:none}
+.tn-frame .tn-dot{inset:auto;top:-10px;right:-10px;width:20px;height:20px;border-radius:50%;background:var(--lt-cyan);box-shadow:0 0 22px var(--lt-cyan);display:none}
+.ph-d .tn-dot{display:block}
