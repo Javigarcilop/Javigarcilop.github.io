@@ -143,44 +143,13 @@ async function start(){
   }));
   panels.forEach(q=>{q.slot.style.transform='translate3d('+q.x+'px,0,'+(-q.at*ZMAX)+'px) translate(-50%,-50%)'});
 
-  /* ---------- tubo de fondo: anillos (estructura) + paredes con contenido real de cada etapa ----------
-     Las paredes enseñan cómo se aplicó cada etapa en los proyectos reales (datos de js/data.js): el problema
-     (Marketing), la interfaz real (Diseño), cómo funciona (Código) y el resultado (Product Engineering e IA).
-     Van en el lado contrario al panel de la parada para no taparlo. Sin datos, solo quedan los anillos. */
+  /* ---------- tubo de fondo: solo anillos, sin información de relleno (el contenido vive en los paneles) ---------- */
   const groups=[];
   const frag=document.createDocumentFragment();
   for(let i=1;i<=SLOTS;i++){
     const g=document.createElement('div');g.className='tn-ringgroup';g.style.transform='translateZ('+(-i*S)+'px)';
     g.innerHTML='<div class="tn-ring'+(i%3===0?' c':'')+'"></div>';
     frag.appendChild(g);groups.push({el:g,z:-i*S,off:false});
-  }
-  const PR=typeof PROJECTS!=='undefined'?PROJECTS.slice(0,2):[];
-  const SHOT={'templimail':'assets/tunnel/templimail.webp','generador-especificaciones':'assets/tunnel/generador.webp'};
-  const name=p=>esc(p.short||p.title);
-  const WALL={
-    marketing:p=>'<p class="tw-k">El problema · '+name(p)+'</p><p class="tw-t">'+esc(p.problem)+'</p>',
-    diseno:p=>SHOT[p.slug]?'<p class="tw-k">Interfaz real · '+name(p)+'</p><img src="'+SHOT[p.slug]+'" alt="" loading="lazy" decoding="async">':'',
-    codigo:p=>'<p class="tw-k">Cómo funciona · '+name(p)+'</p><ol class="tw-flow">'+(p.diagram||[]).map(d=>'<li><b>'+esc(d[0])+'</b><span>'+esc(d[1])+'</span></li>').join('')+'</ol>',
-    'product-ia':p=>'<p class="tw-k">Resultado · '+esc(p.status)+'</p><p class="tw-h">'+esc(p.title)+'</p><p class="tw-t">'+esc(p.solution)+'</p>'
-  };
-  const addWall=(html,side,z)=>{
-    if(!html)return;
-    const g=document.createElement('div');g.className='tn-ringgroup';g.style.transform='translateZ('+z+'px)';
-    g.innerHTML='<div class="tn-wall '+side+'">'+html+'</div>';
-    frag.appendChild(g);groups.push({el:g,z,off:false});
-  };
-  for(const st of STOPS){
-    const fill=WALL[st.id];
-    if(!fill||!PR.length)continue;
-    if(st.lado==='left'||st.lado==='right'){
-      /* las dos paredes en el lado libre, una detrás de otra */
-      const side=st.lado==='left'?'r':'l',base=-st.at*ZMAX;
-      PR.forEach((p,i)=>addWall(fill(p),side,base-260-i*420));
-    }else{
-      /* parada central (salida): una pared a cada lado, antes de llegar al panel final */
-      const base=-(st.at-.1)*ZMAX;
-      PR.forEach((p,i)=>addWall(fill(p),i?'r':'l',base-420));
-    }
   }
   world.appendChild(frag);
 
