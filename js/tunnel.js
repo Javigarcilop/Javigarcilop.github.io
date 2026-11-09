@@ -27,6 +27,22 @@ async function start(){
   const full=!!supports3d&&!calm&&!narrow;
   if(!full)section.classList.add('calm');
 
+  /* Si el túnel quedó estático solo por el ancho (página cargada con la ventana estrecha o aún a 0 px, p. ej. un panel
+     que se abre después), al ampliar la ventana se recarga una vez para activar la versión completa. */
+  if(narrow&&!calm&&supports3d){
+    const onGrow=()=>{
+      if(innerWidth<720)return;
+      removeEventListener('resize',onGrow);
+      try{
+        const last=+sessionStorage.getItem('tn-reflow')||0;
+        if(Date.now()-last<8000)return;
+        sessionStorage.setItem('tn-reflow',String(Date.now()));
+      }catch(e){}
+      location.reload();
+    };
+    addEventListener('resize',onGrow,{passive:true});
+  }
+
   const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   let STOPS=[];
   try{STOPS=(await fetch('js/tunnel-stops.json').then(r=>r.json())).stops||[]}catch(e){STOPS=[]}
