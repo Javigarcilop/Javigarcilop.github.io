@@ -19,6 +19,7 @@
 .tn-section.calm .skip-tunnel{display:none}
 
 /* ---------- escena y las dos cámaras ---------- */
+.tn-streams{position:absolute;inset:0;width:100%;height:100%;display:block;pointer-events:none;visibility:hidden}
 .tn-scene{position:sticky;top:0;height:100svh;overflow:hidden;background:var(--lt-bg);perspective:1000px;perspective-origin:50% 50%}
 .tn-cam{position:absolute;left:50%;top:50%;width:0;height:0;transform-style:preserve-3d}
 .tn-cam.front{z-index:3}
@@ -149,7 +150,7 @@
 /* ---------- modo ligero: móvil, reduced-motion o sin soporte 3D ---------- */
 .tn-section.calm{height:auto}
 .tn-section.calm .tn-scene{position:relative;height:auto;min-height:0;overflow:visible;perspective:none;display:block;padding:0}
-.tn-section.calm .tn-cam,.tn-section.calm .tn-fog,.tn-section.calm .tn-vig,.tn-section.calm .tn-glow,.tn-section.calm .tn-timeline,.tn-section.calm .tn-hint,.tn-section.calm .tn-coords{display:none}
+.tn-section.calm .tn-streams,.tn-section.calm .tn-cam,.tn-section.calm .tn-fog,.tn-section.calm .tn-vig,.tn-section.calm .tn-glow,.tn-section.calm .tn-timeline,.tn-section.calm .tn-hint,.tn-section.calm .tn-coords{display:none}
 .tn-section.calm .tn-hud{position:relative;left:auto;right:auto;top:auto;padding:16px clamp(16px,3vw,32px) 0;pointer-events:auto}
 .tn-section.calm .tn-cursor{display:none}
 

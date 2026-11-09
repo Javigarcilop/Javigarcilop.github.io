@@ -8,6 +8,8 @@
    Fallback (móvil <720px, prefers-reduced-motion o sin soporte 3D): lista vertical estática,
    siempre en el DOM, que es también la versión accesible/legible-sin-animación del túnel. */
 
+import {createStreams} from './tunnel-streams.js?v=20261109-streams2';
+
 const section=document.querySelector('.tn-section');
 if(section)start();
 
@@ -219,6 +221,13 @@ async function start(){
     tro.observe(timeline);phases.forEach(x=>tro.observe(x.el));
   }
 
+  /* Haces de luz (WebGL) solo en el modo completo; se crean en reposo para no competir con el primer pintado */
+  let streams=null;
+  if(full){
+    const mk=()=>{try{streams=createStreams(scene);if(streams&&running)streams.play();streams?.set(p)}catch(e){streams=null}};
+    if('requestIdleCallback' in window)requestIdleCallback(mk,{timeout:2500});else setTimeout(mk,1200);
+  }
+
   const updateUI=()=>{
     const cz=p*ZMAX;
     for(const grp of groups){
@@ -245,6 +254,7 @@ async function start(){
     const exit=clamp((p-.62)/.38,0,1);
     glow.style.transform='scale('+(.18+exit*2.6).toFixed(3)+')';
     glow.style.opacity=(.12+exit*exit*.88).toFixed(3);
+    streams?.set(p);
     if(hint)hint.style.opacity=p>.03?'0':'1';
     if(coords)coords.textContent='z '+Math.round(cz);
   };
@@ -263,15 +273,15 @@ async function start(){
     cam.style.transform=ct;cam2.style.transform=ct;
     updateUI();
   };
-  const play=()=>{if(running)return;running=true;dirty=true;cam.classList.add('animating');cam2.classList.add('animating');rafId=requestAnimationFrame(frame)};
-  const pause=()=>{running=false;cam.classList.remove('animating');cam2.classList.remove('animating');if(rafId)cancelAnimationFrame(rafId);rafId=null};
+  const play=()=>{if(running)return;running=true;dirty=true;streams?.play();cam.classList.add('animating');cam2.classList.add('animating');rafId=requestAnimationFrame(frame)};
+  const pause=()=>{running=false;streams?.pause();cam.classList.remove('animating');cam2.classList.remove('animating');if(rafId)cancelAnimationFrame(rafId);rafId=null};
 
   const io=new IntersectionObserver(es=>{es[0].isIntersecting&&!document.hidden?play():pause()},{threshold:0});
   io.observe(section);
   document.addEventListener('visibilitychange',()=>{if(document.hidden)pause();else io.unobserve(section),io.observe(section)});
   updateUI();
 
-  const destroy=()=>{pause();io.disconnect()};
+  const destroy=()=>{pause();io.disconnect();streams?.destroy()};
   addEventListener('pagehide',destroy,{once:true});
-  window.tunnelScene={destroy};
+  window.tunnelScene={destroy,get streams(){return streams}};
 }
