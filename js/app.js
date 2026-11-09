@@ -329,33 +329,12 @@ function closeProject(restoreFocus=true,restoreView=true){
 
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!projectPanel.hidden){e.preventDefault();closeProject()}});
 
-/* ---------- progreso, navegación, copiar ---------- */
+/* ---------- progreso y copiar ---------- */
 const bar=$('#progress');
 addEventListener('scroll',()=>{
   const h=document.documentElement;
   bar.style.width=Math.min(100,(h.scrollTop/(h.scrollHeight-h.clientHeight||1))*100)+'%';
 },{passive:true});
-const secs=$$('main section[id]'),links=$$('nav.main a'),navCursor=$('#navCursor');
-function moveNavCursor(){
-  const active=links.find(a=>a.getAttribute('aria-current')==='true');
-  if(!active){navCursor.classList.remove('show');return}
-  const navBox=active.parentElement.getBoundingClientRect(),box=active.getBoundingClientRect();
-  navCursor.style.width=box.width+'px';
-  navCursor.style.transform=`translateX(${box.left-navBox.left}px)`;
-  navCursor.classList.add('show');
-}
-const io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){links.forEach(a=>a.setAttribute('aria-current',String(a.getAttribute('href')==='#'+e.target.id)))}});moveNavCursor()},{rootMargin:'-45% 0px -50% 0px'});
-secs.forEach(s=>io.observe(s));
-addEventListener('resize',moveNavCursor,{passive:true});
-const menuBtn=$('#menuBtn'),mainNav=$('#mainnav');
-function setMenu(open){
-  mainNav.classList.toggle('open',open);
-  menuBtn.setAttribute('aria-expanded',String(open));
-  menuBtn.setAttribute('aria-label',open?'Cerrar menú':'Abrir menú');
-}
-menuBtn.onclick=()=>setMenu(!mainNav.classList.contains('open'));
-links.forEach(a=>a.addEventListener('click',()=>setMenu(false)));
-document.addEventListener('keydown',e=>{if(e.key==='Escape'&&mainNav.classList.contains('open')){setMenu(false);menuBtn.focus()}});
 function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('show');clearTimeout(toast.t);toast.t=setTimeout(()=>t.classList.remove('show'),2200)}
 $('#copy').onclick=async()=>{
   const email='javigarcilop@gmail.com';
