@@ -235,21 +235,6 @@ async function start(){
     tro.observe(timeline);phases.forEach(x=>tro.observe(x.el));
   }
 
-  /* Objeto protagonista (Three.js, vendorizado): solo en modo completo, sin ahorro de datos ni conexión lenta, y cargado en reposo */
-  let obj=null;
-  const slowNet=!!navigator.connection?.saveData||/(^|-)2g$/.test(navigator.connection?.effectiveType||'');
-  if(full&&!slowNet){
-    const mk=async()=>{
-      try{
-        const m=await import('./tunnel-object.js?v=20261110-objeto4');
-        const o=await m.createObject(scene,STOPS);
-        if(!o)return;
-        obj=o;if(running)obj.play();obj.set(p,mx,my);
-      }catch(e){obj=null}
-    };
-    if('requestIdleCallback' in window)requestIdleCallback(mk,{timeout:3000});else setTimeout(mk,1500);
-  }
-
   const updateUI=()=>{
     const cz=p*ZMAX;
     for(const grp of groups){
@@ -276,7 +261,6 @@ async function start(){
     const exit=clamp((p-.62)/.38,0,1);
     glow.style.transform='scale('+(.18+exit*2.6).toFixed(3)+')';
     glow.style.opacity=(.12+exit*exit*.88).toFixed(3);
-    obj?.set(p,mx,my);
     if(hint)hint.style.opacity=p>.03?'0':'1';
     if(coords)coords.textContent='z '+Math.round(cz);
   };
@@ -295,15 +279,15 @@ async function start(){
     cam.style.transform=ct;cam2.style.transform=ct;
     updateUI();
   };
-  const play=()=>{if(running)return;running=true;dirty=true;obj?.play();cam.classList.add('animating');cam2.classList.add('animating');rafId=requestAnimationFrame(frame)};
-  const pause=()=>{running=false;obj?.pause();cam.classList.remove('animating');cam2.classList.remove('animating');if(rafId)cancelAnimationFrame(rafId);rafId=null};
+  const play=()=>{if(running)return;running=true;dirty=true;cam.classList.add('animating');cam2.classList.add('animating');rafId=requestAnimationFrame(frame)};
+  const pause=()=>{running=false;cam.classList.remove('animating');cam2.classList.remove('animating');if(rafId)cancelAnimationFrame(rafId);rafId=null};
 
   const io=new IntersectionObserver(es=>{es[0].isIntersecting&&!document.hidden?play():pause()},{threshold:0});
   io.observe(section);
   document.addEventListener('visibilitychange',()=>{if(document.hidden)pause();else io.unobserve(section),io.observe(section)});
   updateUI();
 
-  const destroy=()=>{pause();io.disconnect();obj?.destroy()};
+  const destroy=()=>{pause();io.disconnect()};
   addEventListener('pagehide',destroy,{once:true});
-  window.tunnelScene={destroy,get object(){return obj}};
+  window.tunnelScene={destroy};
 }
