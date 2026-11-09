@@ -143,40 +143,44 @@ async function start(){
   }));
   panels.forEach(q=>{q.slot.style.transform='translate3d('+q.x+'px,0,'+(-q.at*ZMAX)+'px) translate(-50%,-50%)'});
 
-  /* ---------- tubo de fondo: anillos + 4 pantallas por anillo, de wireframe a dashboard ---------- */
-  const BAR='<div class="tn-bar"><i></i><i></i><i></i><span class="tn-pill"></span></div>';
-  const T={
-    wire:[
-      BAR+'<div class="tn-img"></div><div class="tn-ln a"></div><div class="tn-ln b"></div><div class="tn-row"><div class="tn-bx"></div><div class="tn-bx"></div><div class="tn-bx"></div></div>',
-      BAR+'<div class="tn-row"><div class="tn-bx" style="height:90px"></div><div class="tn-bx" style="height:90px"></div></div><div class="tn-ln a"></div><div class="tn-ln c2"></div><div class="tn-ln b"></div>',
-      BAR+'<div class="tn-ln b"></div><div class="tn-img"></div><div class="tn-row"><div class="tn-bx"></div><div class="tn-bx"></div></div><div class="tn-ln a"></div>'
-    ],
-    ui:[
-      BAR+'<div class="tn-av"></div><div class="tn-ttl"></div><div class="tn-ln a"></div><div class="tn-ln b"></div><div class="tn-btnx"></div>',
-      BAR+'<div class="tn-grid2"><div class="tn-card2"><div class="tn-ico"></div><div class="tn-ln a"></div><div class="tn-ln b"></div></div><div class="tn-card2"><div class="tn-ico"></div><div class="tn-ln a"></div><div class="tn-ln b"></div></div></div>',
-      BAR+'<div class="tn-ttl"></div><div class="tn-inp"></div><div class="tn-inp"></div><div class="tn-tog"></div><div class="tn-btnx cy"></div>'
-    ],
-    code:[
-      '<pre><span class="cm">// modelo</span>\n<span class="k">class</span> Item <span class="k">extends</span> Model {\n  <span class="k">public function</span> activos() {\n    <span class="k">return</span> $this-&gt;where(<span class="s">\'estado\'</span>, 1);\n  }\n}</pre>',
-      '<pre>@Component({\n  selector: <span class="s">\'app-panel\'</span>\n})\n<span class="k">export class</span> Panel {\n  datos$ = <span class="k">this</span>.api.get(<span class="s">\'/datos\'</span>);\n}</pre>',
-      '<pre><span class="k">SELECT</span> id, nombre\n<span class="k">FROM</span> registros\n<span class="k">WHERE</span> activo = 1\n<span class="k">ORDER BY</span> fecha <span class="k">DESC</span>;</pre>'
-    ],
-    prod:[
-      '<div class="tn-kpis"><div></div><div></div><div></div></div><div class="tn-bars"><i style="height:38%"></i><i style="height:62%"></i><i style="height:48%"></i><i style="height:80%"></i><i style="height:58%"></i><i style="height:92%"></i><i style="height:70%"></i></div>',
-      BAR+'<div class="tn-trow"><b></b><span></span><em></em></div><div class="tn-trow"><b></b><span></span><em></em></div><div class="tn-trow"><b></b><span></span><em></em></div><div class="tn-trow"><b></b><span></span><em></em></div>',
-      '<div class="tn-msg a"></div><div class="tn-msg b"></div><div class="tn-msg a s"></div><div class="tn-kpis"><div></div><div></div><div></div></div>'
-    ]
-  };
-  const kindAt=pf=>pf<.14?'wire':pf<.28?'ui':pf<.5?'code':pf<.88?'prod':'ui';
-
+  /* ---------- tubo de fondo: anillos (estructura) + paredes con contenido real de cada etapa ----------
+     Las paredes enseñan cómo se aplicó cada etapa en los proyectos reales (datos de js/data.js): el problema
+     (Marketing), la interfaz real (Diseño), cómo funciona (Código) y el resultado (Product Engineering e IA).
+     Van en el lado contrario al panel de la parada para no taparlo. Sin datos, solo quedan los anillos. */
   const groups=[];
   const frag=document.createDocumentFragment();
   for(let i=1;i<=SLOTS;i++){
     const g=document.createElement('div');g.className='tn-ringgroup';g.style.transform='translateZ('+(-i*S)+'px)';
-    const k=kindAt(i*S/ZMAX),sides=['l','r','f','c'];
-    let h='<div class="tn-ring'+(i%3===0?' c':'')+'"></div>';
-    for(let s=0;s<4;s++)h+='<div class="tn-tile k-'+k+' '+sides[s]+'">'+T[k][(i+s)%3]+'</div>';
-    g.innerHTML=h;frag.appendChild(g);groups.push({el:g,z:-i*S,off:false});
+    g.innerHTML='<div class="tn-ring'+(i%3===0?' c':'')+'"></div>';
+    frag.appendChild(g);groups.push({el:g,z:-i*S,off:false});
+  }
+  const PR=typeof PROJECTS!=='undefined'?PROJECTS.slice(0,2):[];
+  const SHOT={'templimail':'assets/tunnel/templimail.webp','generador-especificaciones':'assets/tunnel/generador.webp'};
+  const name=p=>esc(p.short||p.title);
+  const WALL={
+    marketing:p=>'<p class="tw-k">El problema · '+name(p)+'</p><p class="tw-t">'+esc(p.problem)+'</p>',
+    diseno:p=>SHOT[p.slug]?'<p class="tw-k">Interfaz real · '+name(p)+'</p><img src="'+SHOT[p.slug]+'" alt="" loading="lazy" decoding="async">':'',
+    codigo:p=>'<p class="tw-k">Cómo funciona · '+name(p)+'</p><ol class="tw-flow">'+(p.diagram||[]).map(d=>'<li><b>'+esc(d[0])+'</b><span>'+esc(d[1])+'</span></li>').join('')+'</ol>',
+    'product-ia':p=>'<p class="tw-k">Resultado · '+esc(p.status)+'</p><p class="tw-h">'+esc(p.title)+'</p><p class="tw-t">'+esc(p.solution)+'</p>'
+  };
+  const addWall=(html,side,z)=>{
+    if(!html)return;
+    const g=document.createElement('div');g.className='tn-ringgroup';g.style.transform='translateZ('+z+'px)';
+    g.innerHTML='<div class="tn-wall '+side+'">'+html+'</div>';
+    frag.appendChild(g);groups.push({el:g,z,off:false});
+  };
+  for(const st of STOPS){
+    const fill=WALL[st.id];
+    if(!fill||!PR.length)continue;
+    if(st.lado==='left'||st.lado==='right'){
+      /* las dos paredes en el lado libre, una detrás de otra */
+      const side=st.lado==='left'?'r':'l',base=-st.at*ZMAX;
+      PR.forEach((p,i)=>addWall(fill(p),side,base-260-i*420));
+    }else{
+      /* parada central (salida): una pared a cada lado, antes de llegar al panel final */
+      const base=-(st.at-.1)*ZMAX;
+      PR.forEach((p,i)=>addWall(fill(p),i?'r':'l',base-420));
+    }
   }
   world.appendChild(frag);
 

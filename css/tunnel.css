@@ -314,3 +314,16 @@ html.jg-splash-skip .jg-splash-layer{pointer-events:none;opacity:0;transition:op
 @keyframes jgFade{60%{opacity:1}to{opacity:0}}
 @keyframes jgZoom{to{transform:scale(7);opacity:0}}
 @media (prefers-reduced-motion:reduce){html.jg-splash .jg-splash-layer{display:none}}
+
+/* ---------- paredes del túnel: contenido real de cada etapa (colores corporativos) ---------- */
+.tn-wall{position:absolute;width:440px;height:320px;left:-220px;top:-160px;padding:20px 22px;border-radius:16px;background:linear-gradient(160deg,#10223A,#0A1528);border:1px solid #2C4F6F;color:var(--lt-blue2);box-shadow:0 24px 48px -30px rgba(18,63,130,.6);backface-visibility:hidden;overflow:hidden;display:flex;flex-direction:column;gap:10px}
+.tn-wall.l{transform:translate3d(-540px,0,0) rotateY(60deg)}
+.tn-wall.r{transform:translate3d(540px,0,0) rotateY(-60deg)}
+.tw-k{margin:0;font:500 12px var(--f-code);letter-spacing:.12em;text-transform:uppercase;color:var(--lt-cyan)}
+.tw-t{margin:0;font-size:18px;line-height:1.5;color:#D6E6FA}
+.tw-h{margin:0;font-size:22px;font-weight:600;line-height:1.15;color:#EDF4FF}
+.tn-wall img{display:block;width:100%;height:auto;border-radius:10px;border:1px solid #2C4F6F}
+.tw-flow{list-style:none;margin:0;padding:0;display:grid;gap:7px}
+.tw-flow li{display:flex;align-items:baseline;gap:10px;padding:7px 12px;border:1px solid #24405E;border-radius:10px;background:#0D1B30}
+.tw-flow b{min-width:120px;font:600 13px var(--f-code);color:var(--lt-blue1)}
+.tw-flow span{font-size:13px;color:#A9BDD6}
