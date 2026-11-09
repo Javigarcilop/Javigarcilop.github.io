@@ -81,7 +81,11 @@
 
 /* ---------- cabecera propia, coordenadas, timeline, pista de scroll ---------- */
 .tn-hud{position:absolute;z-index:4;left:0;right:0;top:0;display:flex;align-items:center;justify-content:space-between;padding:calc(16px + env(safe-area-inset-top,0px)) clamp(16px,3vw,32px) 0;pointer-events:none}
-.tn-hud img{width:84px;height:84px;flex:none;filter:drop-shadow(0 0 18px rgba(76,228,237,.35))}
+/* marca completa en el túnel: símbolo + "javigarcilop." */
+.tn-brand{display:flex;align-items:center;gap:14px}
+.tn-hud img{width:72px;height:72px;flex:none;filter:drop-shadow(0 0 18px rgba(76,228,237,.35))}
+.tn-wordmark{font:700 38px/1 var(--font,"Space Grotesk",system-ui,sans-serif);letter-spacing:-.05em;color:#EDF4FF;white-space:nowrap;text-shadow:0 2px 18px rgba(6,12,25,.8)}
+.tn-dot{color:#00C2E0}
 .tn-hud .tn-pill-badge{font-family:var(--f-code);font-size:.78rem;color:var(--lt-blue2);background:color-mix(in srgb,#101E32 94%,transparent);border:1px solid var(--lt-line);padding:6px 12px;border-radius:999px}
 .tn-coords{position:absolute;z-index:4;right:clamp(16px,3vw,32px);top:calc(64px + env(safe-area-inset-top,0px));font-family:var(--f-code);font-size:.72rem;color:var(--lt-muted)}
 
@@ -219,7 +223,9 @@
 .tf-finale{padding:26px 20px;background:linear-gradient(135deg,#F5FCFF,#DDEFF8);border-color:#B3DDEB;box-shadow:0 0 55px #74DDE933}
 @media (max-width:719px){
   .tn-section.calm{margin-top:0}
-  .tn-section.calm .tn-hud img{width:64px;height:64px}
+  .tn-section.calm .tn-hud img{width:52px;height:52px}
+  .tn-section.calm .tn-wordmark{font-size:28px}
+  .tn-brand{gap:10px}
   .tn-intro{grid-template-columns:1fr;gap:38px}
   .tn-intro h1{font-size:clamp(40px,10vw,58px)}
   .tn-intro-title::before,.tn-intro-bio::before{inset:-24px 0}
