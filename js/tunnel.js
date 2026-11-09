@@ -143,25 +143,23 @@ async function start(){
   }));
   panels.forEach(q=>{q.slot.style.transform='translate3d('+q.x+'px,0,'+(-q.at*ZMAX)+'px) translate(-50%,-50%)'});
 
-  /* ---------- tubo de fondo: los anillos cuentan el logo, "del diseño al producto" ----------
-     Como en el símbolo de javigarcilop: al principio solo hay un marco punteado (el boceto), en Diseño aparece el
-     marco sólido y el punteado se le va acercando, en Código casi se han fundido y en Product Engineering e IA queda
-     el marco sólido y claro con el punto cian encendido. Sin texto: la forma cuenta la historia. */
-  const atOf=id=>(STOPS.find(s=>s.id===id)||{}).at;
-  const A_DIS=atOf('diseno')??.5,A_COD=atOf('codigo')??.66,A_PRO=atOf('product-ia')??.9;
-  const lerp=(a,b,t)=>a+(b-a)*Math.max(0,Math.min(1,t));
+  /* ---------- pasillo arquitectónico: cristal azul noche, suelo brillante, luminarias y LED cian ----------
+     Cada tramo (S px de fondo) tiene suelo, techo y dos paredes. En cada etapa (Marketing, Diseño, Código y
+     Product Engineering e IA) hay un portal de luz con la forma del logo que enmarca el panel al llegar. */
   const groups=[];
   const frag=document.createDocumentFragment();
-  for(let i=1;i<=SLOTS;i++){
-    const f=i*S/ZMAX;
-    let ph,off;
-    if(f<A_DIS-.08){ph='a';off=26}
-    else if(f<A_COD-.06){ph='b';off=lerp(26,10,(f-(A_DIS-.08))/((A_COD-.06)-(A_DIS-.08)))}
-    else if(f<A_PRO-.12){ph='c';off=lerp(10,3,(f-(A_COD-.06))/((A_PRO-.12)-(A_COD-.06)))}
-    else{ph='d';off=0}
+  /* tramos de 2S de fondo: la mitad de planos que con tramos de S */
+  for(let i=0;i<=SLOTS;i+=2){
     const g=document.createElement('div');g.className='tn-ringgroup';g.style.transform='translateZ('+(-i*S)+'px)';
-    g.innerHTML='<div class="tn-frame ph-'+ph+'" style="--off:'+off.toFixed(1)+'px"><i class="tn-back"></i><i class="tn-front"></i><i class="tn-dot"></i></div>';
+    g.innerHTML='<div class="tc-floor"></div><div class="tc-ceil"></div><div class="tc-wall l"></div><div class="tc-wall r"></div>';
     frag.appendChild(g);groups.push({el:g,z:-i*S,off:false});
+  }
+  for(const st of STOPS){
+    if(!['marketing','diseno','codigo','product-ia'].includes(st.id))continue;
+    const z=-st.at*ZMAX-260;
+    const g=document.createElement('div');g.className='tn-ringgroup';g.style.transform='translateZ('+z+'px)';
+    g.innerHTML='<div class="tc-portal'+(st.id==='product-ia'?' last':'')+'"><i></i></div>';
+    frag.appendChild(g);groups.push({el:g,z,off:false});
   }
   world.appendChild(frag);
 
@@ -226,7 +224,7 @@ async function start(){
   const updateUI=()=>{
     const cz=p*ZMAX;
     for(const grp of groups){
-      const d=grp.z+cz,off=(d<-3800||d>700);
+      const d=grp.z+cz,off=(d<-3300||d>900);
       if(off!==grp.off){grp.off=off;grp.el.classList.toggle('off',off)}
     }
     for(const q of panels){
