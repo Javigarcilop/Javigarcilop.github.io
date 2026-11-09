@@ -20,9 +20,9 @@
 <link rel="icon" href="assets/favicon.svg?v=20261104-javigarcilop" type="image/svg+xml">
 <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
 <link rel="stylesheet" href="css/styles.css?v=20261110-cabecera">
-<link rel="stylesheet" href="css/tunnel.css?v=20261110-sinhaces">
+<link rel="stylesheet" href="css/tunnel.css?v=20261110-logo">
 <link rel="preload" href="js/tunnel-stops.json" as="fetch" crossorigin>
-<script src="js/theme-init.js"></script>
+<script src="js/theme-init.js?v=20261110-logo"></script>
 </head>
 <body>
 <div id="progress" aria-hidden="true"></div>
@@ -53,6 +53,10 @@
   <span class="tn-anchor" id="trayectoria" aria-hidden="true"></span>
   <div class="tn-scene" id="tnScene">
     <a class="skip-tunnel" href="#mapa" data-jump>Saltar animación<svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 6l5 5 5-5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="sr"> del túnel e ir a Mis proyectos</span></a>
+    <nav class="tn-corner" aria-label="Accesos rápidos">
+      <a href="assets/cv-javi-garcia.pdf" download>CV<svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 2v9m0 0 3.5-3.5M8 11 4.5 7.5M3 14h10" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+      <a href="#contacto" data-jump>Contacto</a>
+    </nav>
     <div class="tn-cam" id="tnCam"><div class="tn-world" id="tnWorld" aria-hidden="true"></div></div>
     <div class="tn-fog" aria-hidden="true"></div>
     <div class="tn-glow" id="tnGlow" aria-hidden="true"></div>
@@ -60,7 +64,7 @@
     <div class="tn-cam front" id="tnCam2"><div class="tn-world" id="tnWorld2"></div></div>
 
     <div class="tn-hud" aria-hidden="true">
-      <img src="assets/logo-javigarcilop-symbol.svg" alt="" width="32" height="32">
+      <img src="assets/logo-javigarcilop-symbol.svg" alt="" width="52" height="52">
       <span class="tn-pill-badge">Abierto a oportunidades</span>
     </div>
     <div class="tn-coords" id="tnCoords" aria-hidden="true">z 0</div>
@@ -160,6 +164,6 @@
 
 <script defer src="js/data.js"></script>
 <script defer src="js/app.js?v=20261109-perf"></script>
-<script type="module" src="js/tunnel.js?v=20261110-sinhaces"></script>
+<script type="module" src="js/tunnel.js?v=20261110-logo"></script>
 </body>
 </html>

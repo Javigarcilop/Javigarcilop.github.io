@@ -23,7 +23,7 @@ async function start(){
   const narrow=innerWidth<720;
   const supports3d=CSS?.supports?.('(transform-style: preserve-3d)')&&CSS?.supports?.('(perspective: 1px)');
   const full=!!supports3d&&!calm&&!narrow;
-  if(!full)section.classList.add('calm');
+  if(!full){section.classList.add('calm');document.documentElement.classList.remove('in-tunnel')}
 
   /* Si el túnel quedó estático solo por el ancho (página cargada con la ventana estrecha o aún a 0 px, p. ej. un panel
      que se abre después), al ampliar la ventana se recarga una vez para activar la versión completa. */
@@ -44,7 +44,7 @@ async function start(){
   const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   let STOPS=[];
   try{STOPS=(await fetch('js/tunnel-stops.json').then(r=>r.json())).stops||[]}catch(e){STOPS=[]}
-  if(!STOPS.length)return;
+  if(!STOPS.length){document.documentElement.classList.remove('in-tunnel');return}
 
   /* ---------- contenido compartido de una parada (panel 3D y fallback accesible).
      `kicker` se omite dentro de una ventana con chrome: la barra ya muestra el nombre de la fase. */
@@ -205,8 +205,8 @@ async function start(){
   }
 
   /* ---------- medidas del scroll ---------- */
-  let maxScroll=1;
-  const measure=()=>{maxScroll=Math.max(1,section.offsetHeight-innerHeight)};
+  let maxScroll=1,secTop=0;
+  const measure=()=>{maxScroll=Math.max(1,section.offsetHeight-innerHeight);secTop=section.getBoundingClientRect().top+scrollY};
   let resizeTimer=0;
   addEventListener('resize',()=>{clearTimeout(resizeTimer);resizeTimer=setTimeout(()=>{measure();dirty=true},150)},{passive:true});
   measure();
@@ -215,7 +215,10 @@ async function start(){
   const clamp=(v,a,b)=>v<a?a:v>b?b:v;
   let tp=0,p=0,tmx=0,tmy=0,mx=0,my=0,dirty=true,lastPhase=-1,lastTimelineWidth=0,running=false,rafId=null;
 
-  const onScroll=()=>{tp=clamp(scrollY/maxScroll,0,1)};
+  /* La cabecera se oculta mientras la escena está fijada (solo en modo completo) y vuelve al salir del túnel */
+  let inT=null;
+  const setInT=v=>{if(v!==inT){inT=v;document.documentElement.classList.toggle('in-tunnel',v)}};
+  const onScroll=()=>{tp=clamp(scrollY/maxScroll,0,1);if(full)setInT(scrollY<secTop+maxScroll-4)};
   addEventListener('scroll',onScroll,{passive:true});
   onScroll();
   addEventListener('pointermove',e=>{

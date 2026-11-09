@@ -122,7 +122,7 @@
 
 /* ---------- cabecera propia, coordenadas, timeline, pista de scroll ---------- */
 .tn-hud{position:absolute;z-index:4;left:0;right:0;top:0;display:flex;align-items:center;justify-content:space-between;padding:calc(16px + env(safe-area-inset-top,0px)) clamp(16px,3vw,32px) 0;pointer-events:none}
-.tn-hud img{width:32px;height:32px;flex:none}
+.tn-hud img{width:52px;height:52px;flex:none}
 .tn-hud .tn-pill-badge{font-family:var(--f-code);font-size:.78rem;color:var(--lt-blue2);background:color-mix(in srgb,#101E32 94%,transparent);border:1px solid var(--lt-line);padding:6px 12px;border-radius:999px}
 .tn-coords{position:absolute;z-index:4;right:clamp(16px,3vw,32px);top:calc(64px + env(safe-area-inset-top,0px));font-family:var(--f-code);font-size:.72rem;color:var(--lt-muted)}
 
@@ -283,3 +283,17 @@
   .tn-product-top b{display:none}
   .tn-finale h2{font-size:34px}
 }
+
+/* ---------- Entrada y esquinas (modo completo) ---------- */
+/* Sin cabecera mientras dura el túnel: vuelve al salir hacia Proyectos */
+header.top{transition:transform .45s cubic-bezier(.2,.8,.2,1),opacity .35s,visibility 0s}
+html.in-tunnel header.top{transform:translateY(-100%);opacity:0;visibility:hidden;pointer-events:none;animation:none;transition:transform .45s cubic-bezier(.2,.8,.2,1),opacity .3s,visibility 0s linear .45s}
+/* En el túnel: el logo (arriba izq.), CV / Contacto (arriba dcha.) y "Saltar animación" (abajo dcha.) */
+/* el logo se mantiene arriba a la izquierda; fuera la insignia y la lectura de profundidad */
+.tn-section:not(.calm) .tn-hud .tn-pill-badge,.tn-section:not(.calm) .tn-coords{display:none}
+.tn-corner{position:absolute;z-index:6;top:calc(18px + env(safe-area-inset-top,0px));right:clamp(16px,3vw,32px);display:flex;gap:6px}
+.tn-corner a{display:inline-flex;align-items:center;gap:6px;min-height:40px;padding:0 14px;border-radius:999px;border:1px solid var(--lt-line);background:color-mix(in srgb,#101E32 92%,transparent);color:var(--lt-blue2);font:500 .8125rem var(--f-code);letter-spacing:.02em;text-decoration:none;transition:color .2s,border-color .2s,background .2s}
+.tn-corner a:hover{color:var(--lt-ink);border-color:color-mix(in srgb,var(--lt-cyan) 55%,var(--lt-line));background:var(--lt-cyan-soft)}
+.tn-corner a:focus-visible{outline:2px solid var(--lt-blue2);outline-offset:3px}
+.tn-section.calm .tn-corner{display:none}
+
