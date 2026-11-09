@@ -17,7 +17,7 @@ async function start(){
   const cam2=document.getElementById('tnCam2'),world2=document.getElementById('tnWorld2');
   const glow=document.getElementById('tnGlow'),hint=document.getElementById('tnHint'),coords=document.getElementById('tnCoords');
   const timeline=document.getElementById('tnTimeline'),head=document.getElementById('tnHead');
-  const cursor=document.getElementById('tnCursor'),fallbackEl=document.getElementById('tunnelFallback');
+  const fallbackEl=document.getElementById('tunnelFallback');
   const heroLite=document.getElementById('tnHeroLite');
   const calm=matchMedia('(prefers-reduced-motion: reduce)').matches;
   const narrow=innerWidth<720;
@@ -174,18 +174,6 @@ async function start(){
     b.addEventListener('click',()=>scrollTo({top:ph.at*maxScroll,behavior:calm?'auto':'smooth'}));
     timeline.insertBefore(b,head);ph.el=b;
   });
-
-  /* ---------- cursor "tú": inercia propia, solo puntero fino ---------- */
-  const fine=matchMedia('(pointer: fine)').matches;
-  let cx=-100,cy=-100,ox=-100,oy=-100,cRaf=0;
-  const cursorLoop=()=>{
-    ox+=(cx-ox)*.22;oy+=(cy-oy)*.22;
-    cursor.style.transform='translate3d('+ox.toFixed(1)+'px,'+oy.toFixed(1)+'px,0)';
-    cRaf=(Math.abs(cx-ox)>.3||Math.abs(cy-oy)>.3)?requestAnimationFrame(cursorLoop):0;
-  };
-  if(fine){
-    addEventListener('pointermove',e=>{cx=e.clientX;cy=e.clientY;if(!cRaf)cRaf=requestAnimationFrame(cursorLoop)},{passive:true});
-  }
 
   /* ---------- medidas del scroll ---------- */
   let maxScroll=1,secTop=0;

@@ -103,9 +103,6 @@
 @keyframes tn-bob{50%{transform:translateY(5px)}}
 
 /* ---------- cursor "tú": inercia, solo puntero fino ---------- */
-.tn-cursor{position:fixed;left:0;top:0;z-index:30;pointer-events:none;display:none}
-.tn-cursor span{position:absolute;left:14px;top:16px;font:500 .72rem var(--f-code);color:#06121C;background:var(--lt-cyan);padding:2px 8px;border-radius:6px;white-space:nowrap}
-@media (pointer:fine){.tn-cursor{display:block}}
 
 @media (max-width:900px){.tn-coords,.tn-timeline button span{display:none}}
 
@@ -114,7 +111,6 @@
 .tn-section.calm .tn-scene{position:relative;height:auto;min-height:0;overflow:visible;perspective:none;display:block;padding:0}
 .tn-section.calm .tn-cam,.tn-section.calm .tn-fog,.tn-section.calm .tn-vig,.tn-section.calm .tn-glow,.tn-section.calm .tn-timeline,.tn-section.calm .tn-hint,.tn-section.calm .tn-coords{display:none}
 .tn-section.calm .tn-hud{position:relative;left:auto;right:auto;top:auto;padding:16px clamp(16px,3vw,32px) 0;pointer-events:auto}
-.tn-section.calm .tn-cursor{display:none}
 
 /* ---------- cabecera del modo ligero: oculta (.sr) en modo animado (la cabecera ya vive dentro del túnel) ---------- */
 .tn-hero-lite.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
@@ -311,3 +307,30 @@ html.jg-splash-skip .jg-splash-layer{pointer-events:none;opacity:0;transition:op
   box-shadow:0 0 34px rgba(116,170,255,.35),inset 0 0 34px rgba(116,170,255,.18)}
 .tc-portal i{position:absolute;top:-13px;right:-13px;width:24px;height:24px;border-radius:50%;background:var(--lt-cyan);box-shadow:0 0 26px 4px rgba(76,228,237,.75)}
 .tc-portal.last{border-color:rgba(237,244,255,.8);box-shadow:0 0 44px rgba(76,228,237,.45),inset 0 0 44px rgba(76,228,237,.25)}
+
+/* ---------- cursor creativo (js/cursor.js): solo transform/opacity ---------- */
+html.has-jc,html.has-jc *{cursor:none!important}
+html.has-jc input,html.has-jc textarea,html.has-jc select{cursor:auto!important}
+.jc{position:fixed;left:0;top:0;width:0;height:0;overflow:visible;z-index:400;pointer-events:none;opacity:0;transition:opacity .25s}
+.jc.on{opacity:1}
+.jc-dot,.jc-ring,.jc-trail i{position:absolute;left:0;top:0;will-change:transform}
+.jc-label{position:absolute;left:0;top:0}
+.jc-dot{width:6px;height:6px;margin:-3px 0 0 -3px;border-radius:50%;background:#4CE4ED}
+.jc-trail i{width:4px;height:4px;margin:-2px 0 0 -2px;border-radius:50%;background:#4CE4ED}
+.jc-ring::before{content:"";position:absolute;left:-17px;top:-17px;width:34px;height:34px;border-radius:50%;border:1.5px solid rgba(183,212,255,.6);transition:transform .3s cubic-bezier(.2,.8,.2,1),border-color .25s,background-color .25s}
+.jc-tick{position:absolute;background:#4CE4ED;opacity:0;transition:opacity .25s}
+.jc-tick.t{left:-1px;top:-27px;width:2px;height:7px}.jc-tick.b{left:-1px;top:20px;width:2px;height:7px}
+.jc-tick.l{left:-27px;top:-1px;width:7px;height:2px}.jc-tick.r{left:20px;top:-1px;width:7px;height:2px}
+.jc-label{translate:-50% 0;margin-top:30px;white-space:nowrap;font:500 11px var(--f-code);letter-spacing:.08em;text-transform:uppercase;color:#4CE4ED;opacity:0;transition:opacity .2s}
+.jc.has-label .jc-label{opacity:1}
+/* túnel: retícula cian con la etapa actual */
+.jc.is-tunnel .jc-ring::before{border-color:rgba(76,228,237,.85);transform:scale(.82)}
+.jc.is-tunnel .jc-tick{opacity:1}
+/* enlaces y botones: el anillo crece y aparece la etiqueta */
+.jc.is-link .jc-ring::before{transform:scale(1.8);border-color:#4CE4ED;background-color:rgba(76,228,237,.1)}
+.jc.is-link .jc-label{margin-top:38px;padding:3px 8px;border-radius:6px;background:#4CE4ED;color:#06121C}
+.jc.is-link .jc-dot{opacity:0}
+/* mapa: anillo punteado (como el boceto del logo) y "arrastrar" */
+.jc.is-map .jc-ring::before{transform:scale(1.45);border-style:dashed;border-color:rgba(183,212,255,.75)}
+.jc.down .jc-ring::before{transform:scale(.7)}
+.jc-mag{transition:translate .25s cubic-bezier(.2,.8,.2,1)}
