@@ -297,3 +297,20 @@ html.in-tunnel header.top{transform:translateY(-100%);opacity:0;visibility:hidde
 .tn-corner a:focus-visible{outline:2px solid var(--lt-blue2);outline-offset:3px}
 .tn-section.calm .tn-corner{display:none}
 
+/* Intro del logo: solo la primera visita de la sesión (theme-init.js añade html.jg-splash antes del primer pintado) */
+.jg-splash-layer{display:none}
+html.jg-splash .jg-splash-layer{position:fixed;inset:0;z-index:300;display:grid;place-items:center;background:#060C19;cursor:pointer}
+.jg-splash-layer svg{width:clamp(150px,15vw,210px);height:auto;overflow:visible}
+.jg-splash-layer .jg-back{opacity:0;transform:translate(-9px,9px);animation:jgBack .75s .1s cubic-bezier(.2,.8,.2,1) forwards}
+.jg-splash-layer .jg-front{stroke-dasharray:100;stroke-dashoffset:100;animation:jgDraw .9s .2s cubic-bezier(.65,0,.25,1) forwards}
+.jg-splash-layer .jg-dot{transform-origin:56px 10px;transform:scale(0);animation:jgDot .5s .9s cubic-bezier(.3,1.7,.5,1) forwards;filter:drop-shadow(0 0 4px #4CE4ED)}
+@keyframes jgBack{to{opacity:1;transform:none}}
+@keyframes jgDraw{to{stroke-dashoffset:0}}
+@keyframes jgDot{to{transform:scale(1)}}
+/* se funde hacia el túnel: el logo avanza hacia el espectador y el fondo se abre al túnel, que ya se mueve */
+html.jg-splash-out .jg-splash-layer{pointer-events:none;animation:jgFade .7s cubic-bezier(.55,0,.7,.2) forwards}
+html.jg-splash-out .jg-splash-layer svg{animation:jgZoom .7s cubic-bezier(.55,0,.75,0) forwards}
+html.jg-splash-skip .jg-splash-layer{pointer-events:none;opacity:0;transition:opacity .28s ease-out}
+@keyframes jgFade{60%{opacity:1}to{opacity:0}}
+@keyframes jgZoom{to{transform:scale(7);opacity:0}}
+@media (prefers-reduced-motion:reduce){html.jg-splash .jg-splash-layer{display:none}}

@@ -268,15 +268,28 @@ async function start(){
     if(coords)coords.textContent='z '+Math.round(cz);
   };
 
+  /* Entrada: con la intro del logo, el túnel arranca algo más atrás y avanza hasta su sitio mientras el logo se funde */
+  let glideOff=0,glideT0=0,glideDur=1700;
+  const intro=window.jgIntro;
+  if(full&&intro&&intro.state==='draw'){
+    glideOff=1400;
+    intro.onOut(fast=>{glideT0=performance.now();glideDur=fast?420:1700;dirty=true});
+  }
+
   const frame=()=>{
     if(!running)return;
     rafId=requestAnimationFrame(frame);
     const np=p+(tp-p)*.08,nmx=mx+(tmx-mx)*.06,nmy=my+(tmy-my)*.06;
-    const moving=Math.abs(np-p)>.00004||Math.abs(nmx-mx)>.0005||Math.abs(nmy-my)>.0005;
+    let gz=0;
+    if(glideOff){
+      if(glideT0){const t=Math.min(1,(performance.now()-glideT0)/glideDur);gz=glideOff*(1-t)*(1-t)*(1-t);if(t>=1){glideOff=0;gz=0}}
+      else gz=glideOff;
+    }
+    const moving=Math.abs(np-p)>.00004||Math.abs(nmx-mx)>.0005||Math.abs(nmy-my)>.0005||(glideOff>0&&glideT0>0);
     p=np;mx=nmx;my=nmy;
     if(!moving&&!dirty)return;
     dirty=false;
-    const wt='translate3d(0,0,'+(p*ZMAX).toFixed(1)+'px)';
+    const wt='translate3d(0,0,'+(p*ZMAX-gz).toFixed(1)+'px)';
     const ct='rotateX('+(-my*2.2).toFixed(2)+'deg) rotateY('+(mx*3).toFixed(2)+'deg)';
     world.style.transform=wt;world2.style.transform=wt;
     cam.style.transform=ct;cam2.style.transform=ct;
@@ -289,6 +302,7 @@ async function start(){
   io.observe(section);
   document.addEventListener('visibilitychange',()=>{if(document.hidden)pause();else io.unobserve(section),io.observe(section)});
   updateUI();
+  if(full)window.jgIntro?.ready?.();
 
   const destroy=()=>{pause();io.disconnect()};
   addEventListener('pagehide',destroy,{once:true});
