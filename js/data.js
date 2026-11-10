@@ -74,17 +74,17 @@ const PROJECTS = [
     summary:'A partir de una idea de producto en una frase, genera historias de usuario, criterios de aceptación y un mini roadmap usando Gemini.',
     context_long:'Herramienta propia pensada para el primer paso de definición de producto, antes de que un equipo empiece a programar.',
     problem:'Pasar de una idea a requisitos con los que un equipo pueda trabajar lleva tiempo, y es fácil dejar huecos: para quién es, qué tiene que cumplir y por dónde empezar.',
-    solution:'Escribes la idea en una frase y la herramienta devuelve historias de usuario, criterios de aceptación verificables y un roadmap de tres pasos.',
+    solution:'Escribes la idea en una frase y Pauta devuelve un documento con historias de usuario, criterios de aceptación que puedes marcar como revisados y un plan en tres fases, exportable a Markdown.',
     highlights:[
       'Diseño y desarrollo completos de la herramienta, de la interfaz al despliegue.',
       'Frontend en HTML, CSS y JavaScript sin frameworks.',
       'Función serverless en Vercel como intermediaria con Gemini.',
-      'Prompt diseñado para devolver siempre el mismo formato.'
+      'Salida JSON con esquema, validada en el servidor y exportable a Markdown.'
     ],
     decisions:[
       ['Sin framework en el frontend','Es una herramienta de una sola pantalla: HTML, CSS y JavaScript bastan, y la página carga al instante.'],
       ['Clave fuera del navegador','La llamada a Gemini pasa por una función serverless. La clave vive como variable de entorno en Vercel; en el frontend la vería cualquiera.'],
-      ['Formato fijo en el prompt','El prompt define rol, secciones y formato exacto de cada historia, para que la salida sea consistente en cada petición.'],
+      ['JSON con esquema','Gemini responde en JSON con un esquema fijo (responseSchema) y el servidor lo valida antes de enviarlo; así cada parte se presenta y se exporta bien.'],
       ['Errores controlados','La función valida el método y que llegue una idea, y si la IA falla responde con un error genérico sin exponer detalles internos.']
     ],
     challenges:[
