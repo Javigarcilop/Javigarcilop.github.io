@@ -105,7 +105,7 @@ const PROJECTS = [
   },
   {
     slug:'cribo', title:'Cribo', short:'Cribo', type:'Triaje de correo con IA', context:'Proyecto personal',
-    status:'Código público', ok:false, cats:['Servidor','Frontend','IA y automatización'],
+    status:'Demo online', ok:true, cats:['Servidor','Frontend','IA y automatización'],
     summary:'Pegas el correo de una empresa y Cribo los ordena por prioridad, extrae importes y fechas, y te deja una respuesta lista para revisar. Nada se envía sin tu aprobación.',
     context_long:'Proyecto propio para practicar IA aplicada a un problema real de negocio, con foco en salida fiable, seguridad y control humano.',
     problem:'Los equipos pequeños pierden horas decidiendo qué email atender primero y escribiendo respuestas repetitivas.',
@@ -130,10 +130,11 @@ const PROJECTS = [
       'Con IA en producción, lo importante está alrededor del modelo: validación, límites, evaluación y quién decide al final.',
       'Una evaluación con casos etiquetados, aunque sea pequeña, obliga a medir en lugar de suponer.'
     ],
-    statusNote:'Código público en GitHub con tests y evaluación con casos etiquetados. Demo online pendiente; se publicará en modo demo, sin IA.',
+    statusNote:'Demo online en modo demo (reglas locales, sin IA ni coste) con emails ficticios; la primera carga puede tardar un minuto si el servidor estaba dormido. Código público con tests y evaluación con casos etiquetados.',
     diagram:[['Interfaz','Entrada, lectura y respuesta'],['FastAPI','Límites y validación'],['Claude API','Tool use forzado'],['Persona','Revisa y aprueba']],
     stack:['Python','FastAPI','Claude API','JavaScript','Docker'],
     links:[
+      { label:'Ver demo', url:'https://cribo.onrender.com' },
       { label:'Ver código en GitHub', url:'https://github.com/Javigarcilop/cribo' }
     ]
   }
