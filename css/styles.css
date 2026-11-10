@@ -363,7 +363,7 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;
 .map-controls button:disabled{opacity:.35;cursor:default}
 .map-controls button[aria-pressed="true"]{background:#286674;color:#E0FFFF}
 .map-controls output{font:11px var(--f-code);min-width:42px;text-align:center;color:#AFC9DF}
-.map-project-picker{position:absolute;z-index:7;left:24px;bottom:42px;max-width:34%;display:flex;flex-wrap:wrap;gap:8px}
+.map-project-picker{position:absolute;z-index:7;left:24px;bottom:42px;max-width:60%;display:flex;flex-wrap:wrap;gap:8px}
 .map-project-picker button{display:flex;align-items:center;gap:8px;min-height:42px;padding:10px 14px;border:1px solid #355773;border-radius:12px;background:#0D2036EB;color:#C6DBED;font-size:12px;text-align:left;cursor:pointer}
 .map-project-picker button i{width:7px;height:7px;flex:none;border-radius:50%;background:#6398FF}
 .map-project-picker button:hover{border-color:#7BAFE3;background:#17354D}
@@ -381,8 +381,8 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;
 @media (max-width:760px){
   .mapfull-head{left:16px;top:16px;max-width:calc(100% - 32px)}
   .mapfull-head .eyebrow{margin:0;font-size:12px}
-  .map-project-picker{left:12px;right:12px;top:48px;bottom:auto;max-width:none;gap:6px}
-  .map-project-picker button{flex:1;justify-content:center;font-size:11px;padding:8px 10px;min-height:40px}
+  .map-project-picker{left:12px;right:12px;top:48px;bottom:auto;max-width:none;gap:6px;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}
+  .map-project-picker button{flex:1 0 auto;white-space:nowrap;justify-content:center;font-size:11px;padding:8px 10px;min-height:40px}
   .map-controls{top:auto;bottom:12px;left:12px;right:12px;justify-content:center;gap:4px}
   .map-controls button{min-width:38px;min-height:44px;padding:8px;font-size:12px}
   .map-controls output{min-width:38px;font-size:10px}

@@ -74,12 +74,15 @@ function buildMap(){
   const nodes=[...PROJECTS.map(p=>({id:p.slug,type:'p',label:p.short,p})),...techs.map(t=>({id:'t:'+t,type:'t',label:t,t}))];
   const idx=Object.fromEntries(nodes.map((n,i)=>[n.id,i]));
   const links=PROJECTS.flatMap(p=>p.stack.map(t=>[idx[p.slug],idx['t:'+t]]));
+  /* Reparte los proyectos por el ancho (escritorio) o el alto (móvil); con 2 queda igual que antes */
+  const NP=PROJECTS.length,gap=NP>1?1/(NP-1):0,spread=NP>2?1:0;
   PROJECTS.forEach((p,i)=>{
     const hub=nodes[idx[p.slug]];
-    hub.x=mobile?W*.5:W*(.26+i*.48);hub.y=mobile?H*(.33+i*.31):H*.54;
+    hub.x=mobile?W*.5:W*(.26-.09*spread+i*(.48+.12*spread)*gap);
+    hub.y=mobile?H*(.33-.07*spread+i*(.31+.23*spread)*gap):H*(.54+(spread?(i%2?.1:-.04):0));
     p.stack.forEach((t,k)=>{
       const n=nodes[idx['t:'+t]],angle=(-140+k*360/p.stack.length)*Math.PI/180;
-      const radius=mobile?Math.min(118,W*.34):Math.min(W*.18,H*.31);
+      const radius=mobile?Math.min(118,W*.34)*(spread?.8:1):Math.min(W*.18*(spread?.7:1),H*.31);
       if(n.x===undefined){n.x=hub.x+Math.cos(angle)*radius;n.y=hub.y+Math.sin(angle)*radius}
     });
   });

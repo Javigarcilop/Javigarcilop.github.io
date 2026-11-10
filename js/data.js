@@ -1,15 +1,15 @@
 
 const TECH = {
-  'PHP':'Servidor','MySQL':'Servidor','CodeIgniter':'Servidor',
+  'PHP':'Servidor','MySQL':'Servidor','CodeIgniter':'Servidor','Python':'Servidor','FastAPI':'Servidor',
   'Angular':'Frontend','JavaScript':'Frontend','HTML y CSS':'Frontend',
-  'Gemini API':'IA y automatización',
+  'Gemini API':'IA y automatización','Claude API':'IA y automatización',
   'Docker':'Herramientas','Vercel':'Herramientas','Git':'Herramientas'
 };
 /* Dónde tengo experiencia con cada tecnología: solo lo verificable */
 const TECH_TIERS = {
   'PHP':['pro','proj'],'MySQL':['pro','proj'],'CodeIgniter':['pro'],
   'Angular':['proj'],'JavaScript':['proj'],'HTML y CSS':['pro','proj'],
-  'Gemini API':['proj'],
+  'Gemini API':['proj'],'Claude API':['proj'],'Python':['proj'],'FastAPI':['proj'],
   'Docker':['proj'],'Vercel':['proj'],'Git':['pro','proj']
 };
 const CATS = ['Servidor','Frontend','IA y automatización'];
@@ -18,9 +18,12 @@ const TECH_USE = {
   'PHP':'API REST y lógica de negocio de TempliMail, sin framework: autenticación JWT, cola de envíos y validaciones.',
   'MySQL':'Modelo de datos de TempliMail: usuarios, contactos, grupos, plantillas, campañas y entregas.',
   'Angular':'Interfaz de TempliMail con componentes standalone, formularios y vista previa de correos.',
-  'JavaScript':'Frontend del Generador de especificaciones, sin frameworks.',
+  'JavaScript':'Frontends sin frameworks del Generador de especificaciones y de Cribo.',
   'Gemini API':'Generar historias de usuario, criterios de aceptación y roadmap a partir de una idea.',
-  'Docker':'Entorno reproducible de TempliMail: servidor, base de datos y worker de envíos.',
+  'Docker':'Entorno reproducible de TempliMail (servidor, base de datos y worker de envíos) e imagen de despliegue de Cribo.',
+  'Python':'Servidor de Cribo: lógica de triaje, límites de uso, tests con pytest y evaluación.',
+  'FastAPI':'API de Cribo con validación Pydantic de entrada y salida.',
+  'Claude API':'Triaje de emails con salida estructurada por herramienta forzada (tool use) y defensa ante prompt injection.',
   'Vercel':'Función serverless que llama a Gemini sin exponer la clave en el navegador.',
   'CodeIgniter':'Framework PHP de aplicaciones web de empresa en producción.',
   'HTML y CSS':'Maquetación semántica, accesible y responsive. Este portfolio está hecho a mano, sin frameworks.',
@@ -98,6 +101,40 @@ const PROJECTS = [
     links:[
       { label:'Ver demo', url:'https://generador-especificaciones.vercel.app' },
       { label:'Ver código en GitHub', url:'https://github.com/Javigarcilop/generador-especificaciones' }
+    ]
+  },
+  {
+    slug:'cribo', title:'Cribo', short:'Cribo', type:'Triaje de correo con IA', context:'Proyecto personal',
+    status:'Código público', ok:false, cats:['Servidor','Frontend','IA y automatización'],
+    summary:'Pegas el correo de una empresa y Cribo los ordena por prioridad, extrae importes y fechas, y te deja una respuesta lista para revisar. Nada se envía sin tu aprobación.',
+    context_long:'Proyecto propio para practicar IA aplicada a un problema real de negocio, con foco en salida fiable, seguridad y control humano.',
+    problem:'Los equipos pequeños pierden horas decidiendo qué email atender primero y escribiendo respuestas repetitivas.',
+    solution:'Claude lee cada email y devuelve un resultado estructurado: categoría, prioridad con motivo, datos clave y un borrador de respuesta. Lo dudoso se marca para revisión humana y solo lo que una persona aprueba pasa a la bandeja de salida.',
+    highlights:[
+      'Salida estructurada y validada con Pydantic, no texto libre.',
+      'Detección de intentos de prompt injection dentro de los emails.',
+      'Human-in-the-loop real: la IA solo redacta, no tiene forma de enviar.',
+      'Modo demo sin IA para probar la interfaz sin gastar crédito.'
+    ],
+    decisions:[
+      ['Herramienta forzada','El modelo está obligado a llamar a una herramienta con un esquema fijo (tool_choice), así que no puede devolver texto suelto. La respuesta se valida antes de llegar a la interfaz.'],
+      ['El email es dato no fiable','El contenido va delimitado y el prompt prohíbe obedecer órdenes que vengan dentro. Si un email intenta manipular a la IA, se marca con una alerta de seguridad.'],
+      ['Sin inventar datos','Solo se extrae lo que aparece literalmente en el email, y los borradores usan marcadores como [indicar fecha] en vez de prometer precios o plazos.'],
+      ['Coste y abuso acotados','Límites de emails por petición, de tamaño, de peticiones por minuto y de llamadas al modelo por hora, con un modelo pequeño por defecto.']
+    ],
+    challenges:[
+      'Que un modelo de lenguaje devuelva siempre un resultado válido y que un fallo en un email no tumbe el lote.',
+      'Defenderse de instrucciones maliciosas escondidas en el propio contenido que se analiza.'
+    ],
+    learnings:[
+      'Con IA en producción, lo importante está alrededor del modelo: validación, límites, evaluación y quién decide al final.',
+      'Una evaluación con casos etiquetados, aunque sea pequeña, obliga a medir en lugar de suponer.'
+    ],
+    statusNote:'Código público en GitHub con tests y evaluación con casos etiquetados. Demo online pendiente; se publicará en modo demo, sin IA.',
+    diagram:[['Interfaz','Entrada, lectura y respuesta'],['FastAPI','Límites y validación'],['Claude API','Tool use forzado'],['Persona','Revisa y aprueba']],
+    stack:['Python','FastAPI','Claude API','JavaScript','Docker'],
+    links:[
+      { label:'Ver código en GitHub', url:'https://github.com/Javigarcilop/cribo' }
     ]
   }
 ];
