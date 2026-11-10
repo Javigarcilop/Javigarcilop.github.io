@@ -134,7 +134,7 @@ const PROJECTS = [
     diagram:[['Interfaz','Entrada, lectura y respuesta'],['FastAPI','Límites y validación'],['Claude API','Tool use forzado'],['Persona','Revisa y aprueba']],
     stack:['Python','FastAPI','Claude API','JavaScript','Docker'],
     links:[
-      { label:'Ver demo', url:'https://cribo.onrender.com' },
+      { label:'Ver demo', url:'https://cribo.onrender.com/?demo' },
       { label:'Ver código en GitHub', url:'https://github.com/Javigarcilop/cribo' }
     ]
   }
