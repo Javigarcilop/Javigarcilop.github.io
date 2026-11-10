@@ -18,7 +18,7 @@ const TECH_USE = {
   'PHP':'API REST y lógica de negocio de TempliMail, sin framework: autenticación JWT, cola de envíos y validaciones.',
   'MySQL':'Modelo de datos de TempliMail: usuarios, contactos, grupos, plantillas, campañas y entregas.',
   'Angular':'Interfaz de TempliMail con componentes standalone, formularios y vista previa de correos.',
-  'JavaScript':'Frontends sin frameworks del Generador de especificaciones y de Cribo.',
+  'JavaScript':'Frontends sin frameworks de Pauta y de Cribo.',
   'Gemini API':'Generar historias de usuario, criterios de aceptación y roadmap a partir de una idea.',
   'Docker':'Entorno reproducible de TempliMail (servidor, base de datos y worker de envíos) e imagen de despliegue de Cribo.',
   'Python':'Servidor de Cribo: lógica de triaje, límites de uso, tests con pytest y evaluación.',
@@ -69,7 +69,7 @@ const PROJECTS = [
     ]
   },
   {
-    slug:'generador-especificaciones', title:'Generador de especificaciones de producto', short:'Generador de specs', type:'Herramienta con IA', context:'Proyecto personal',
+    slug:'generador-especificaciones', title:'Pauta', short:'Pauta', type:'Generador de especificaciones con IA', context:'Proyecto personal',
     status:'En producción', ok:true, cats:['IA y automatización'],
     summary:'A partir de una idea de producto en una frase, genera historias de usuario, criterios de aceptación y un mini roadmap usando Gemini.',
     context_long:'Herramienta propia pensada para el primer paso de definición de producto, antes de que un equipo empiece a programar.',
